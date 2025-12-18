@@ -8,7 +8,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #bdbdbd;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     font-family: Arial, sans-serif;
 }
 
@@ -20,26 +20,32 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 20px;
+    padding: 20px;
 }
 
 #count {
-    font-size: 38px;
+    font-size: 48px;
     font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 #photo {
-    width: 240px;
-    height: 240px;
+    width: 280px;
+    height: 280px;
     border-radius: 50%;
-    border: 8px solid #eee;
+    border: 8px solid rgba(255,255,255,0.8);
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
 }
 
-#photo:active {
-    transform: scale(0.98);
+#photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
 #photo img {
@@ -48,29 +54,41 @@ html, body {
     object-fit: cover;
 }
 
+#profile-name {
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 20px;
+}
+
 /* ===== BUTTON PANEL ===== */
 #btn {
     position: fixed;
     top: 14px;
     right: 14px;
-    width: 46px;
-    height: 46px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    background: #222;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     z-index: 10;
     border: none;
     outline: none;
-    transition: background 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 #btn:hover {
-    background: #444;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 /* ===== PANEL ===== */
@@ -78,163 +96,373 @@ html, body {
     position: fixed;
     top: 0;
     right: 0;
-    width: 85%;
-    max-width: 360px;
+    width: 90%;
+    max-width: 400px;
     height: 100%;
-    background: #eaeaea;
+    background: white;
     transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
-    padding: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
     overflow-y: auto;
     z-index: 9;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: -5px 0 30px rgba(0,0,0,0.3);
 }
 
 #panel.show {
     transform: translateX(0);
 }
 
-h3 {
-    margin-top: 10px;
-    color: #333;
+/* ===== TABS ===== */
+.tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    background: #f5f5f5;
+    padding: 5px;
+    border-radius: 10px;
 }
 
-input, button {
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-weight: bold;
+    color: #667eea;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== FORM STYLES ===== */
+h3 {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+}
+
+input, select, button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-top: 8px;
     font-size: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: all 0.3s;
 }
 
-input:focus {
+input:focus, select:focus {
     outline: none;
-    border-color: #2196F3;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 button {
     cursor: pointer;
-    background: #2196F3;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    transition: background 0.2s;
+    font-weight: bold;
 }
 
 button:hover {
-    background: #1976D2;
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 button.logout {
-    background: #c62828;
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
 }
 
-button.logout:hover {
-    background: #b71c1c;
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-hr {
-    margin: 20px 0;
-    border: none;
-    border-top: 1px solid #ccc;
+.button-group button {
+    flex: 1;
 }
 
 /* ===== VERIFIKASI KODE ===== */
 #verif-code-container {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 10px 0;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
     text-align: center;
 }
 
 #verif-code {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     letter-spacing: 3px;
-    color: #2196F3;
-    padding: 10px;
-    background: #fff;
-    border-radius: 5px;
-    border: 2px dashed #bbb;
-    margin: 8px 0;
+    color: #667eea;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #ddd;
+    margin: 10px 0;
     user-select: all;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s;
 }
 
 #verif-code:hover {
-    background: #f0f8ff;
+    border-color: #667eea;
+    transform: scale(1.02);
 }
 
 #copy-hint {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
     margin: 5px 0;
 }
 
+/* ===== PROFILE CUSTOMIZATION ===== */
+#profile-preview {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    text-align: center;
+    border: 2px dashed #ddd;
+}
+
+#profile-canvas {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.color-picker {
+    margin: 10px 0;
+}
+
+.color-picker label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 14px;
+}
+
+.color-picker input[type="color"] {
+    width: 50px;
+    height: 40px;
+    padding: 2px;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+}
+
+.color-picker select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    background: white;
+}
+
 /* ===== LEADERBOARD ===== */
+#board-container {
+    margin-top: 20px;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
-    background: white;
-    border-radius: 4px;
-    overflow: hidden;
 }
 
 thead {
-    background: #2196F3;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
 
 th {
-    padding: 10px;
+    padding: 15px;
     text-align: left;
     font-weight: bold;
-}
-
-td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
     font-size: 14px;
 }
 
-tr:last-child td {
-    border-bottom: none;
+td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.profile-cell {
+    width: 60px;
+    padding: 10px;
+}
+
+.profile-mini-canvas {
+    width: 50px;
+    height: 25px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* Ranking Colors */
+.rank-1 td:first-child {
+    position: relative;
+    overflow: hidden;
+}
+
+.rank-1 td:first-child::before {
+    content: "🥇";
+    position: absolute;
+    left: 5px;
+    font-size: 20px;
+}
+
+.rank-2 td:first-child::before {
+    content: "🥈";
+    position: absolute;
+    left: 5px;
+    font-size: 20px;
+}
+
+.rank-3 td:first-child::before {
+    content: "🥉";
+    position: absolute;
+    left: 5px;
+    font-size: 20px;
 }
 
 .gold {
-    background: #fff8e1;
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
 }
 
 .silver {
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
 }
 
 .bronze {
-    background: #fbe9e7;
+    background: linear-gradient(135deg, #fbe9e7 0%, #ffccbc 100%);
 }
 
 .me {
-    outline: 2px solid #2196F3;
-    outline-offset: -2px;
+    position: relative;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-left: 4px solid #2196F3;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close-modal:hover {
+    color: #000;
+}
+
+#modal-canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* ===== CLOSE BUTTON ===== */
+#close-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #ddd;
+    font-weight: bold;
+}
+
+#close-panel:hover {
+    background: #e9ecef;
+    transform: none;
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     #photo {
-        width: 200px;
-        height: 200px;
+        width: 220px;
+        height: 220px;
     }
     
     #count {
-        font-size: 32px;
+        font-size: 36px;
     }
     
     #btn {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    #panel {
+        width: 100%;
+        max-width: none;
+    }
+    
+    th, td {
+        padding: 10px;
+        font-size: 14px;
     }
 }
