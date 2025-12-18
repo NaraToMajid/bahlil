@@ -8,6 +8,15 @@ const sb = supabase.createClient(
 let currentUser = null;
 let currentClick = 0;
 let verificationCode = '';
+let profileSettings = {
+    bgColor: '#2196F3',
+    textColor: '#FFFFFF',
+    borderColor: '#1976D2',
+    gradientMode: 'none',
+    bgPattern: 'none',
+    profilePhoto: null,
+    profileVideo: null
+};
 
 // ==== DOM ELEMENTS ====
 const btn = document.getElementById('btn');
@@ -19,6 +28,9 @@ const reg_pass = document.getElementById('reg_pass');
 const reg_verif = document.getElementById('reg_verif');
 const log_user = document.getElementById('log_user');
 const log_pass = document.getElementById('log_pass');
+const profileCanvas = document.getElementById('profile-canvas');
+const modalCanvas = document.getElementById('modal-canvas');
+const profileNameElement = document.getElementById('profile-name');
 
 // ==== ANTI INSPECT & KLIK KANAN ====
 document.addEventListener('contextmenu', function(e) {
@@ -51,7 +63,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Deteksi DevTools opening (basic detection)
+// Deteksi DevTools opening
 setInterval(function() {
     const before = new Date();
     debugger;
@@ -90,6 +102,318 @@ function generateVerificationCode() {
     }
 }
 
+// ==== TAB SWITCHING ====
+function switchTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update tab content
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    
+    if (tabName === 'leaderboard') {
+        loadBoard();
+    }
+}
+
+// ==== PROFILE CUSTOMIZATION FUNCTIONS ====
+
+// Draw pattern on canvas
+function drawPattern(ctx, pattern, width, height) {
+    switch(pattern) {
+        case 'dots':
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            for(let i = 0; i < width; i += 10) {
+                for(let j = 0; j < height; j += 10) {
+                    if((i + j) % 20 === 0) {
+                        ctx.beginPath();
+                        ctx.arc(i, j, 1, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+            break;
+            
+        case 'lines':
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < width; i += 15) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+            break;
+            
+        case 'grid':
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < width; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+            for(let i = 0; i < height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(width, i);
+                ctx.stroke();
+            }
+            break;
+            
+        case 'stars':
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            for(let i = 0; i < 20; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const size = Math.random() * 2 + 1;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y - size);
+                for(let j = 0; j < 5; j++) {
+                    const angle = (j * 72 - 90) * Math.PI / 180;
+                    const px = x + size * Math.cos(angle);
+                    const py = y + size * Math.sin(angle);
+                    ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+            break;
+    }
+}
+
+// Create gradient
+function createGradient(ctx, mode, color1, color2, width, height) {
+    let gradient;
+    
+    switch(mode) {
+        case 'linear':
+            gradient = ctx.createLinearGradient(0, 0, width, height);
+            break;
+        case 'radial':
+            gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+            break;
+        default:
+            return color1;
+    }
+    
+    gradient.addColorStop(0, color1);
+    gradient.addColorStop(1, color2 || color1);
+    return gradient;
+}
+
+// Draw profile badge
+function drawProfileBadge(canvas, username, settings, isPreview = false) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw background
+    ctx.fillStyle = settings.gradientMode !== 'none' 
+        ? createGradient(ctx, settings.gradientMode, settings.bgColor, settings.borderColor, width, height)
+        : settings.bgColor;
+    
+    // Rounded rectangle
+    const radius = 10;
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(width - radius, 0);
+    ctx.quadraticCurveTo(width, 0, width, radius);
+    ctx.lineTo(width, height - radius);
+    ctx.quadraticCurveTo(width, height, width - radius, height);
+    ctx.lineTo(radius, height);
+    ctx.quadraticCurveTo(0, height, 0, height - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Draw pattern
+    drawPattern(ctx, settings.bgPattern, width, height);
+    
+    // Draw border
+    ctx.strokeStyle = settings.borderColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Draw username
+    ctx.fillStyle = settings.textColor;
+    ctx.font = `bold ${isPreview ? '24px' : '16px'} Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Shadow for text
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+    
+    ctx.fillText(username, width/2, height/2);
+    
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    // Draw crown for top players
+    if (!isPreview && currentUser === username && currentClick > 100) {
+        drawCrown(ctx, width/2, 15);
+    }
+}
+
+// Draw crown for top players
+function drawCrown(ctx, x, y) {
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - 15, y + 10);
+    ctx.lineTo(x - 8, y + 10);
+    ctx.lineTo(x - 8, y + 20);
+    ctx.lineTo(x + 8, y + 20);
+    ctx.lineTo(x + 8, y + 10);
+    ctx.lineTo(x + 15, y + 10);
+    ctx.closePath();
+    ctx.fill();
+    
+    // Jewels
+    ctx.fillStyle = '#FF6B6B';
+    ctx.beginPath();
+    ctx.arc(x, y + 5, 3, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// Update profile preview
+function updateProfilePreview() {
+    if (!currentUser) return;
+    
+    // Update settings from inputs
+    profileSettings.bgColor = document.getElementById('bg-color').value;
+    profileSettings.textColor = document.getElementById('text-color').value;
+    profileSettings.borderColor = document.getElementById('border-color').value;
+    profileSettings.gradientMode = document.getElementById('gradient-mode').value;
+    profileSettings.bgPattern = document.getElementById('bg-pattern').value;
+    
+    // Draw on preview canvas
+    drawProfileBadge(profileCanvas, currentUser, profileSettings);
+    
+    // Update main profile display
+    profileNameElement.textContent = currentUser;
+}
+
+// Save profile to Supabase
+async function saveProfile() {
+    if (!currentUser) {
+        alert('Silakan login terlebih dahulu');
+        return;
+    }
+    
+    try {
+        // Handle profile photo upload
+        const profilePhotoInput = document.getElementById('profile-photo');
+        let profilePhotoUrl = null;
+        
+        if (profilePhotoInput.files && profilePhotoInput.files[0]) {
+            const file = profilePhotoInput.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Foto maksimal 5MB');
+                return;
+            }
+            
+            const fileName = `${currentUser}_${Date.now()}_${file.name}`;
+            const { data: photoData, error: photoError } = await sb.storage
+                .from('profile-photos')
+                .upload(fileName, file);
+            
+            if (photoError) throw photoError;
+            
+            const { data: publicUrlData } = sb.storage
+                .from('profile-photos')
+                .getPublicUrl(fileName);
+            
+            profilePhotoUrl = publicUrlData.publicUrl;
+            profileSettings.profilePhoto = profilePhotoUrl;
+            
+            // Update profile image
+            document.getElementById('user-profile-img').src = profilePhotoUrl;
+        }
+        
+        // Handle video upload
+        const profileVideoInput = document.getElementById('profile-video');
+        let profileVideoUrl = null;
+        
+        if (profileVideoInput.files && profileVideoInput.files[0]) {
+            const file = profileVideoInput.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Video maksimal 5MB');
+                return;
+            }
+            
+            const fileName = `${currentUser}_${Date.now()}_${file.name}`;
+            const { data: videoData, error: videoError } = await sb.storage
+                .from('profile-videos')
+                .upload(fileName, file);
+            
+            if (videoError) throw videoError;
+            
+            const { data: publicUrlData } = sb.storage
+                .from('profile-videos')
+                .getPublicUrl(fileName);
+            
+            profileVideoUrl = publicUrlData.publicUrl;
+            profileSettings.profileVideo = profileVideoUrl;
+        }
+        
+        // Save profile settings to database
+        const { error } = await sb.from('KLIKUSER')
+            .update({
+                profile_settings: profileSettings,
+                profile_photo: profilePhotoUrl,
+                profile_video: profileVideoUrl,
+                updated_at: new Date().toISOString()
+            })
+            .eq('username', currentUser);
+        
+        if (error) throw error;
+        
+        alert('Profil berhasil disimpan!');
+        loadBoard(); // Refresh leaderboard
+        
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        alert('Gagal menyimpan profil');
+    }
+}
+
+// Open profile modal
+function openProfileModal() {
+    if (!currentUser) return;
+    
+    // Update modal canvas
+    drawProfileBadge(modalCanvas, currentUser, profileSettings, true);
+    
+    // Update modal username
+    document.getElementById('modal-username').textContent = currentUser;
+    
+    // Show modal
+    document.getElementById('profile-modal').style.display = 'flex';
+}
+
+// Close profile modal
+function closeProfileModal() {
+    document.getElementById('profile-modal').style.display = 'none';
+}
+
 // ==== EVENT LISTENERS ====
 btn.addEventListener('click', () => {
     panel.classList.add('show');
@@ -97,6 +421,32 @@ btn.addEventListener('click', () => {
 });
 
 photo.addEventListener('click', handlePhotoClick);
+
+// Profile customization listeners
+document.getElementById('bg-color').addEventListener('input', updateProfilePreview);
+document.getElementById('text-color').addEventListener('input', updateProfilePreview);
+document.getElementById('border-color').addEventListener('input', updateProfilePreview);
+document.getElementById('gradient-mode').addEventListener('change', updateProfilePreview);
+document.getElementById('bg-pattern').addEventListener('change', updateProfilePreview);
+
+// Profile photo upload
+document.getElementById('profile-photo').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('user-profile-img').src = e.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
+// Profile video upload
+document.getElementById('profile-video').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        // You can implement video preview here if needed
+        console.log('Video selected:', e.target.files[0].name);
+    }
+});
 
 // ==== FUNCTIONS ====
 
@@ -107,10 +457,12 @@ async function handlePhotoClick() {
         return;
     }
 
+    // Play sound
     const audio = new Audio('suara.mp3');
     audio.playbackRate = 2;
     audio.play().catch(e => console.log('Audio gagal diputar:', e));
 
+    // Update click count
     currentClick++;
     count.textContent = currentClick;
 
@@ -154,7 +506,13 @@ async function register() {
 
     try {
         const { error } = await sb.from('KLIKUSER')
-            .insert({ username: u, password: p, jumlah_klik: 0 });
+            .insert({ 
+                username: u, 
+                password: p, 
+                jumlah_klik: 0,
+                profile_settings: profileSettings,
+                created_at: new Date().toISOString()
+            });
 
         if (error) {
             if (error.code === '23505') {
@@ -194,6 +552,24 @@ async function login() {
 
         currentUser = u;
         currentClick = data.jumlah_klik || 0;
+        
+        // Load profile settings if exists
+        if (data.profile_settings) {
+            profileSettings = { ...profileSettings, ...data.profile_settings };
+            
+            // Update form inputs
+            document.getElementById('bg-color').value = profileSettings.bgColor || '#2196F3';
+            document.getElementById('text-color').value = profileSettings.textColor || '#FFFFFF';
+            document.getElementById('border-color').value = profileSettings.borderColor || '#1976D2';
+            document.getElementById('gradient-mode').value = profileSettings.gradientMode || 'none';
+            document.getElementById('bg-pattern').value = profileSettings.bgPattern || 'none';
+            
+            // Update profile image
+            if (data.profile_photo) {
+                document.getElementById('user-profile-img').src = data.profile_photo;
+            }
+        }
+        
         afterLogin();
     } catch (error) {
         console.error('Login error:', error);
@@ -204,34 +580,13 @@ async function login() {
 // After login handler
 function afterLogin() {
     count.textContent = currentClick;
-
-    panel.innerHTML = `
-        <button onclick="panel.classList.remove('show')">Tutup</button>
-        <button class="logout" onclick="logout()">🚪 Log Out</button>
-        <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-        <table id="board">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Username</th>
-                    <th>Klik</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    `;
+    profileNameElement.textContent = currentUser;
     
-    // Add close button event listener
-    setTimeout(() => {
-        const closeBtn = panel.querySelector('button[onclick="panel.classList.remove(\'show\')"]');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                panel.classList.remove('show');
-            });
-        }
-    }, 100);
+    // Update profile preview
+    updateProfilePreview();
     
-    loadBoard();
+    // Switch to game tab
+    switchTab('game');
 }
 
 // Logout function
@@ -239,50 +594,26 @@ function logout() {
     currentUser = null;
     currentClick = 0;
     count.textContent = 0;
-
-    panel.innerHTML = `
-        <h3>DAFTAR</h3>
-        <input id="reg_user" placeholder="Username">
-        <input id="reg_pass" type="password" placeholder="Password">
-        
-        <div id="verif-code-container">
-            <small>Salin kode verifikasi berikut:</small>
-            <div id="verif-code"></div>
-            <div id="copy-hint">Klik untuk menyalin, lalu tempel di bawah</div>
-        </div>
-        
-        <input id="reg_verif" placeholder="Tempel kode verifikasi di sini">
-        <button onclick="register()">Daftar</button>
-
-        <hr>
-
-        <h3>LOGIN</h3>
-        <input id="log_user" placeholder="Username">
-        <input id="log_pass" type="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-
-        <hr>
-
-        <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-        <table id="board">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Username</th>
-                    <th>Klik</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    `;
+    profileNameElement.textContent = '';
     
-    // Re-generate verification code setelah logout
-    setTimeout(() => {
-        generateVerificationCode();
-    }, 100);
+    // Reset profile image
+    document.getElementById('user-profile-img').src = 'default-profile.webp';
+    
+    // Reset form
+    reg_user.value = '';
+    reg_pass.value = '';
+    reg_verif.value = '';
+    log_user.value = '';
+    log_pass.value = '';
+    
+    // Switch to game tab
+    switchTab('game');
+    
+    // Close panel
+    panel.classList.remove('show');
 }
 
-// Load leaderboard
+// Load leaderboard with profile badges
 async function loadBoard() {
     try {
         const { data, error } = await sb.from('KLIKUSER')
@@ -294,9 +625,7 @@ async function loadBoard() {
             return;
         }
 
-        const board = document.getElementById('board');
-        const boardTbody = board ? board.querySelector('tbody') : null;
-        
+        const boardTbody = document.querySelector('#board tbody');
         if (!boardTbody) return;
 
         boardTbody.innerHTML = '';
@@ -304,7 +633,7 @@ async function loadBoard() {
         if (!data || data.length === 0) {
             boardTbody.innerHTML = `
                 <tr>
-                    <td colspan="3" style="text-align:center; padding:20px;">
+                    <td colspan="4" style="text-align:center; padding:20px;">
                         Belum ada data
                     </td>
                 </tr>
@@ -312,20 +641,60 @@ async function loadBoard() {
             return;
         }
 
-        data.forEach((r, i) => {
-            let cls = '';
-            if (i === 0) cls = 'gold';
-            else if (i === 1) cls = 'silver';
-            else if (i === 2) cls = 'bronze';
-            if (r.username === currentUser) cls += ' me';
+        // Create offscreen canvas for generating mini badges
+        const miniCanvas = document.createElement('canvas');
+        miniCanvas.width = 100;
+        miniCanvas.height = 40;
+        const miniCtx = miniCanvas.getContext('2d');
 
+        data.forEach((user, index) => {
             const row = document.createElement('tr');
-            row.className = cls;
+            let rowClass = '';
+            
+            if (index === 0) rowClass = 'gold rank-1';
+            else if (index === 1) rowClass = 'silver rank-2';
+            else if (index === 2) rowClass = 'bronze rank-3';
+            if (user.username === currentUser) rowClass += ' me';
+            
+            row.className = rowClass;
+            
+            // Generate mini badge
+            const userSettings = user.profile_settings || profileSettings;
+            drawProfileBadge(miniCanvas, user.username, userSettings);
+            const badgeDataURL = miniCanvas.toDataURL();
+            
+            // Create mini badge image
+            const badgeImg = document.createElement('img');
+            badgeImg.src = badgeDataURL;
+            badgeImg.className = 'profile-mini-canvas';
+            
+            // Add video icon if user has video
+            let videoIcon = '';
+            if (user.profile_video) {
+                videoIcon = ' 🎥';
+            }
+            
             row.innerHTML = `
-                <td>${i + 1}</td>
-                <td>${r.username}</td>
-                <td>${r.jumlah_klik || 0}</td>
+                <td>${index + 1}</td>
+                <td class="profile-cell">
+                    <div style="position: relative;">
+                        ${badgeImg.outerHTML}
+                        ${user.profile_photo ? `<img src="${user.profile_photo}" style="position: absolute; top: -15px; right: -15px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">` : ''}
+                    </div>
+                </td>
+                <td>${user.username}${videoIcon}</td>
+                <td>${user.jumlah_klik || 0}</td>
             `;
+            
+            // Add click event to view profile details
+            row.addEventListener('click', function() {
+                if (user.username === currentUser) {
+                    openProfileModal();
+                } else {
+                    alert(`Profil ${user.username}\nKlik: ${user.jumlah_klik || 0}`);
+                }
+            });
+            
             boardTbody.appendChild(row);
         });
     } catch (error) {
@@ -338,9 +707,14 @@ document.addEventListener('DOMContentLoaded', function() {
     generateVerificationCode();
     loadBoard();
     
-    // Check if user is already logged in (optional - bisa disimpan di localStorage)
+    // Add event listener for close panel button
+    document.getElementById('close-panel').addEventListener('click', function() {
+        panel.classList.remove('show');
+    });
+    
+    // Check if user is already logged in (from localStorage)
     const savedUser = localStorage.getItem('klikUser');
     if (savedUser) {
-        // Jika ingin fitur auto-login, bisa diimplementasikan di sini
+        // Optional: Implement auto-login here
     }
 });
