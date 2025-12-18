@@ -29,6 +29,7 @@ td{border-bottom:1px solid #aaa;padding:6px}
 </div>
 
 <div id="panel">
+  <button onclick="logout()">Logout</button>
   <button onclick="panel.classList.remove('show')">Tutup</button>
 
   <h3>DAFTAR</h3>
@@ -89,6 +90,12 @@ async function login(){
   });
   if(error) return alert(error.message);
   loadMe(); loadBoard(); panel.classList.add('show');
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  count.textContent = '0';
+  panel.classList.remove('show');
 }
 
 async function loadMe(){
