@@ -123,6 +123,20 @@ button.logout{
   background:#c62828;
 }
 
+.user-info{
+  background:#f5f5f5;
+  padding:15px;
+  border-radius:8px;
+  margin:10px 0;
+  text-align:center;
+  border:2px solid #4CAF50;
+}
+
+.user-info h3{
+  color:#4CAF50;
+  margin-bottom:8px;
+}
+
 /* ===== VERIFIKASI KODE ===== */
 #verif-code-container {
   background:#f9f9f9;
@@ -850,9 +864,20 @@ function afterLogin(){
 
   const panel = document.getElementById('panel');
   panel.innerHTML = `
-    <button onclick="panel.classList.remove('show')">Tutup</button>
+    <button onclick="panel.classList.remove('show')">✕ Tutup Panel</button>
+    <hr>
+    
+    <div class="user-info">
+      <h3>🟢 LOGGED IN AS</h3>
+      <p><strong>${currentUser}</strong></p>
+      <p>Klik Anda: <strong>${currentClick}</strong></p>
+    </div>
+    
     <button onclick="openGlobalChat()">💬 Chat Global</button>
     <button class="logout" onclick="logout()">🚪 Log Out</button>
+    
+    <hr>
+    
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
     <div id="board-container">
       <table id="board"></table>
@@ -862,12 +887,18 @@ function afterLogin(){
   loadUserBackground();
   checkUnreadMessages();
   startRealtime();
+  
+  // Simpan user ke localStorage
+  localStorage.setItem('klikUser', currentUser);
 }
 
 function logout(){
   currentUser = null;
   currentClick = 0;
   document.getElementById('count').textContent = 0;
+  
+  // Hapus dari localStorage
+  localStorage.removeItem('klikUser');
 
   const panel = document.getElementById('panel');
   panel.innerHTML = `
@@ -1605,15 +1636,26 @@ document.addEventListener('DOMContentLoaded', function() {
   const savedUser = localStorage.getItem('klikUser');
   if(savedUser) {
     currentUser = savedUser;
-    afterLogin();
+    // Coba ambil data user dari database
+    (async () => {
+      try {
+        const {data} = await sb.from(TABLE_KLIKUSER)
+          .select('jumlah_klik')
+          .eq('username', savedUser)
+          .single();
+        
+        if(data) {
+          currentClick = data.jumlah_klik || 0;
+          afterLogin();
+        } else {
+          localStorage.removeItem('klikUser');
+        }
+      } catch (error) {
+        localStorage.removeItem('klikUser');
+      }
+    })();
   }
 });
-
-// Save user to localStorage saat login
-function afterLogin(){
-  localStorage.setItem('klikUser', currentUser);
-  // ... kode afterLogin sebelumnya ...
-}
 </script>
 
 </body>
