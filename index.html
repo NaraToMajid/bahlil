@@ -57,22 +57,35 @@ const sb = supabase.createClient(
 );
 
 let currentUser = null;
+let currentClick = 0;
 
 btn.onclick = () => panel.classList.add('show');
 
-photo.onclick = async () => {
-  sound.currentTime=0; sound.play();
-  sound.currentTime=0; sound.play();
+function hideAuthUI(){
+  panel.classList.remove('show');
+  panel.innerHTML = `
+    <button onclick="panel.classList.remove('show')">Tutup</button>
+    <h3>Leaderboard</h3>
+    <table id="board"></table>
+  `;
+}
 
+photo.onclick = async () => {
   if(!currentUser) return alert('Login dulu');
 
-  count.textContent++;
+  // suara 2x
+  sound.currentTime=0; sound.play();
+  sound.currentTime=0; sound.play();
+
+  // update lokal
+  currentClick++;
+  count.textContent = currentClick;
   count.classList.add('bump');
   setTimeout(()=>count.classList.remove('bump'),150);
 
-  await sb
-    .from('KLIKUSER')
-    .update({ jumlah_klik: Number(count.textContent) })
+  // update DB (fire & forget)
+  sb.from('KLIKUSER')
+    .update({ jumlah_klik: currentClick })
     .eq('username', currentUser);
 };
 
@@ -85,7 +98,8 @@ async function register(){
   if(error) return alert('Username sudah dipakai');
 
   currentUser = u;
-  loadMe();
+  await loadMe();
+  hideAuthUI();
   loadBoard();
 }
 
@@ -103,7 +117,10 @@ async function login(){
   if(!data) return alert('Login gagal');
 
   currentUser = u;
-  count.textContent = data.jumlah_klik;
+  currentClick = data.jumlah_klik;
+  count.textContent = currentClick;
+
+  hideAuthUI();
   loadBoard();
 }
 
@@ -114,7 +131,10 @@ async function loadMe(){
     .eq('username',currentUser)
     .single();
 
-  if(data) count.textContent = data.jumlah_klik;
+  if(data){
+    currentClick = data.jumlah_klik;
+    count.textContent = currentClick;
+  }
 }
 
 async function loadBoard(){
@@ -123,9 +143,12 @@ async function loadBoard(){
     .select('*')
     .order('jumlah_klik',{ascending:false});
 
-  board.innerHTML='';
+  const boardEl = document.getElementById('board');
+  if(!boardEl) return;
+
+  boardEl.innerHTML='';
   data.forEach((r,i)=>{
-    board.innerHTML+=`<tr>
+    boardEl.innerHTML+=`<tr>
       <td>${i+1}</td>
       <td>${r.username}</td>
       <td>${r.jumlah_klik}</td>
@@ -133,8 +156,20 @@ async function loadBoard(){
   });
 }
 
+// REALTIME
 sb.channel('rt')
-.on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},loadBoard)
+.on('postgres_changes',
+  {event:'UPDATE',schema:'public',table:'KLIKUSER'},
+  payload=>{
+    loadBoard();
+
+    // kalau update milik user sendiri → sinkron
+    if(payload.new.username === currentUser){
+      currentClick = payload.new.jumlah_klik;
+      count.textContent = currentClick;
+    }
+  }
+)
 .subscribe();
 
 loadBoard();
