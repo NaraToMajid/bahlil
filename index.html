@@ -1,239 +1,783 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Klik Counter</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#000;height:100vh;font-family:Arial,sans-serif}.counter{position:absolute;top:50%;left:50%;transform:translate(-50%,-250%);font-size:5rem;color:#fff;font-family:'Arial Black',sans-serif;z-index:2;text-shadow:0 0 15px #fff;font-weight:900}.circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;cursor:pointer;border:3px solid #fff;overflow:hidden;z-index:1;transition:transform .05s}.circle:active{transform:translate(-50%,-50%)scale(.95)}.btn{position:fixed;top:20px;right:20px;width:50px;height:50px;background:#000;color:#fff;border:2px solid #fff;border-radius:50%;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;font-size:1.2rem}.panel{position:fixed;top:0;right:-400px;width:380px;height:100vh;background:#000;border-left:2px solid #444;transition:.3s;z-index:99;display:flex;flex-direction:column}.panel.open{right:0}.header{padding:20px;border-bottom:2px solid #444;display:flex;justify-content:space-between;align-items:center}.header h2{color:#fff;font-size:1.4rem}.close{background:none;border:none;color:#fff;cursor:pointer;font-size:1.5rem}.auth{padding:20px;border-bottom:2px solid #444}.form{display:none;flex-direction:column;gap:15px}.form.active{display:flex}.btns{display:flex;gap:10px}.auth-btn{flex:1;padding:10px;background:#333;color:#fff;border:1px solid #666;cursor:pointer;border-radius:4px}.input{display:flex;flex-direction:column;gap:8px}.input label{color:#ccc;font-size:.9rem}.input input{padding:10px;background:#111;border:1px solid #444;color:#fff;border-radius:4px}.submit{padding:10px;background:#444;color:#fff;border:none;cursor:pointer;border-radius:4px}.content{flex:1;overflow-y:auto;padding:15px}.item{display:flex;align-items:center;padding:12px;background:#111;border:1px solid #333;margin-bottom:8px;border-radius:6px}.item.current{border-color:#fff;background:#222}.rank{width:40px;color:#fff;font-weight:bold;font-size:1.2rem}.info{flex:1;margin-left:15px}.name{color:#fff;font-size:1rem}.score{color:#fff;font-weight:bold;font-size:1.1rem}.error{color:#ff4444;font-size:.8rem;display:none}.error.show{display:block}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Klik Counter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .counter {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            color: #fff;
+            font-family: 'Arial Black', sans-serif;
+            text-shadow: 0 0 20px #00ffff;
+            font-weight: 900;
+            text-align: center;
+            width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .counter {
+                top: 20%;
+                font-size: 5rem;
+            }
+        }
+        
+        .circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #fff;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+        
+        @media (max-width: 480px) {
+            .circle {
+                width: 200px;
+                height: 200px;
+            }
+        }
+        
+        .circle:active {
+            transform: translate(-50%, -50%) scale(0.95);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+        }
+        
+        .circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 480px) {
+            .btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+                top: 15px;
+                right: 15px;
+            }
+        }
+        
+        .panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            transition: 0.4s;
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        
+        @media (min-width: 768px) {
+            .panel {
+                width: 400px;
+            }
+        }
+        
+        .panel.open {
+            right: 0;
+        }
+        
+        .header {
+            padding: 25px;
+            border-bottom: 2px solid #00ffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .header h2 {
+            color: #fff;
+            font-size: 1.8rem;
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.8rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth {
+            padding: 25px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .form {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form.active {
+            display: flex;
+        }
+        
+        .btns {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .auth-btn {
+            flex: 1;
+            padding: 15px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .auth-btn:hover {
+            background: #333;
+            border-color: #00ffff;
+        }
+        
+        .input {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .input label {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+        
+        .input input {
+            padding: 15px;
+            background: #111;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .input input:focus {
+            outline: none;
+            border-color: #00ffff;
+        }
+        
+        .submit {
+            padding: 15px;
+            background: #00ffff;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .submit:hover {
+            background: #00cccc;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid #333;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .item:hover {
+            transform: translateX(5px);
+            border-color: #00ffff;
+        }
+        
+        .item.current {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .rank {
+            width: 50px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+        
+        .info {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
+        .name {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .score {
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        
+        .error {
+            color: #ff4444;
+            font-size: 0.9rem;
+            padding: 10px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .user-info {
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info h3 {
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+        
+        .logout-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .click-animation {
+            animation: clickEffect 0.3s ease;
+        }
+        
+        @keyframes clickEffect {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(0.9); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
 </head>
 <body>
-<div class="counter" id="counter">0</div>
-<div class="circle" id="circle"></div>
-<button class="btn" id="toggle"><i class="fas fa-trophy"></i></button>
-<div class="panel" id="panel">
-<div class="header"><h2><i class="fas fa-crown"></i> LEADERBOARD</h2><button class="close" id="close"><i class="fas fa-times"></i></button></div>
-<div class="auth">
-<div class="btns"><button class="auth-btn" id="showLogin"><i class="fas fa-sign-in-alt"></i> Login</button><button class="auth-btn" id="showRegister"><i class="fas fa-user-plus"></i> Register</button></div>
-<div class="form" id="loginForm"><div class="input"><label><i class="fas fa-user"></i> Username</label><input type="text" id="user"></div><div class="input"><label><i class="fas fa-lock"></i> Password</label><input type="password" id="pass"></div><div class="error" id="loginErr"></div><button class="submit" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button></div>
-<div class="form" id="registerForm"><div class="input"><label><i class="fas fa-user"></i> Username</label><input type="text" id="regUser"></div><div class="input"><label><i class="fas fa-lock"></i> Password</label><input type="password" id="regPass"></div><div class="error" id="regErr"></div><button class="submit" id="regBtn"><i class="fas fa-user-plus"></i> Register</button></div>
-</div>
-<div class="content" id="content"><div class="item"><div class="rank">1</div><div class="info"><div class="name">Loading...</div></div><div class="score">0</div></div></div>
-</div>
-
-<script>
-// Variabel
-let clicks = 0;
-let currentUser = null;
-let audio = new Audio('suara.mp3');
-audio.volume = 0.5;
-
-// Supabase config
-const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
-
-// Load foto
-const circle = document.getElementById('circle');
-const img = new Image();
-img.src = 'foto.webp';
-img.onload = () => {
-    circle.innerHTML = '';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    circle.appendChild(img);
-};
-img.onerror = () => {
-    circle.innerHTML = '<div style="width:100%;height:100%;background:#333;display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem;"><i class="fas fa-mouse-pointer"></i></div>';
-};
-
-// Fungsi fetch ke Supabase
-async function supabaseFetch(table, method = 'GET', data = null) {
-    const url = `${SUPABASE_URL}/rest/v1/${table}`;
-    const headers = {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json'
-    };
+    <div class="counter" id="counter">0</div>
     
-    if (method === 'GET') {
-        const res = await fetch(url + '?select=*', { headers });
-        return await res.json();
-    }
+    <div class="circle" id="circle">
+        <!-- Foto akan dimuat via JavaScript -->
+    </div>
     
-    if (method === 'POST') {
-        const res = await fetch(url, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(data)
+    <button class="btn" id="toggle" title="Leaderboard">
+        <i class="fas fa-trophy"></i>
+    </button>
+    
+    <div class="panel" id="panel">
+        <div class="header">
+            <h2><i class="fas fa-crown"></i> LEADERBOARD</h2>
+            <button class="close" id="close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="auth" id="auth">
+            <!-- Login/Register forms akan dimuat di sini -->
+        </div>
+        
+        <div class="content" id="content">
+            <div class="item">
+                <div class="rank">1</div>
+                <div class="info">
+                    <div class="name">Loading...</div>
+                </div>
+                <div class="score">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi Supabase
+        const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
+        
+        // Inisialisasi Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Variabel global
+        let clicks = 0;
+        let currentUser = null;
+        let audio = null;
+        
+        // DOM Elements
+        const counter = document.getElementById('counter');
+        const circle = document.getElementById('circle');
+        const toggle = document.getElementById('toggle');
+        const panel = document.getElementById('panel');
+        const closeBtn = document.getElementById('close');
+        const authDiv = document.getElementById('auth');
+        const contentDiv = document.getElementById('content');
+        
+        // Initialize aplikasi
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Setup audio
+            audio = new Audio('suara.mp3');
+            audio.volume = 0.7;
+            audio.preload = 'auto';
+            
+            // Load foto
+            loadPhoto();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load leaderboard
+            await loadLeaderboard();
+            
+            // Setup auth forms
+            setupAuthForms();
         });
-        return await res.json();
-    }
-    
-    if (method === 'PATCH') {
-        const res = await fetch(url + '?id=eq.' + data.id, {
-            method: 'PATCH',
-            headers,
-            body: JSON.stringify(data.update)
-        });
-        return await res.json();
-    }
-}
-
-// Handle klik
-document.getElementById('circle').addEventListener('click', async () => {
-    clicks++;
-    document.getElementById('counter').textContent = clicks;
-    
-    // Suara cepat
-    const sound = audio.cloneNode();
-    sound.playbackRate = 2.0;
-    sound.play();
-    
-    // Update database jika login
-    if (currentUser) {
-        try {
-            await fetch(`${SUPABASE_URL}/rest/v1/user_klik?id=eq.${currentUser.id}`, {
-                method: 'PATCH',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ click_count: clicks })
+        
+        function loadPhoto() {
+            const img = new Image();
+            img.src = 'foto.webp';
+            img.onload = () => {
+                circle.innerHTML = '';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                circle.appendChild(img);
+            };
+            img.onerror = () => {
+                circle.innerHTML = `
+                    <div style="
+                        width: 100%;
+                        height: 100%;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #fff;
+                        font-size: 3rem;
+                    ">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </div>
+                `;
+            };
+        }
+        
+        function setupEventListeners() {
+            // Klik pada lingkaran
+            circle.addEventListener('click', handleClick);
+            
+            // Tombol leaderboard
+            toggle.addEventListener('click', () => {
+                panel.classList.toggle('open');
+                loadLeaderboard();
             });
-            loadLeaderboard();
-        } catch(e) {}
-    }
-});
-
-// Load leaderboard
-async function loadLeaderboard() {
-    try {
-        const data = await supabaseFetch('user_klik');
-        const list = document.getElementById('content');
-        list.innerHTML = '';
+            
+            // Tombol close panel
+            closeBtn.addEventListener('click', () => {
+                panel.classList.remove('open');
+            });
+            
+            // Tutup panel ketika klik di luar pada mobile
+            panel.addEventListener('click', (e) => {
+                if (e.target === panel) {
+                    panel.classList.remove('open');
+                }
+            });
+        }
         
-        data.sort((a,b) => b.click_count - a.click_count);
+        async function handleClick() {
+            // Efek animasi
+            circle.classList.add('click-animation');
+            setTimeout(() => circle.classList.remove('click-animation'), 300);
+            
+            // Update counter
+            clicks++;
+            counter.textContent = clicks;
+            
+            // Efek glow pada counter
+            counter.style.textShadow = '0 0 30px #00ffff';
+            setTimeout(() => {
+                counter.style.textShadow = '0 0 20px #00ffff';
+            }, 200);
+            
+            // Play suara
+            playSound();
+            
+            // Update skor di database jika user login
+            if (currentUser) {
+                await updateUserScore();
+            }
+        }
         
-        data.forEach((user, i) => {
-            const div = document.createElement('div');
-            div.className = 'item' + (currentUser && user.username === currentUser.username ? ' current' : '');
-            div.innerHTML = `
-                <div class="rank">${i+1}</div>
-                <div class="info"><div class="name">${user.username}</div></div>
-                <div class="score">${user.click_count || 0}</div>
+        function playSound() {
+            if (!audio) return;
+            
+            try {
+                const audioClone = audio.cloneNode();
+                audioClone.volume = 0.7;
+                audioClone.playbackRate = 1.5;
+                audioClone.play().catch(e => console.log("Audio error:", e));
+            } catch (error) {
+                console.log("Audio play failed:", error);
+            }
+        }
+        
+        function setupAuthForms() {
+            authDiv.innerHTML = `
+                <div class="btns">
+                    <button class="auth-btn" id="showLogin">
+                        <i class="fas fa-sign-in-alt"></i> LOGIN
+                    </button>
+                    <button class="auth-btn" id="showRegister">
+                        <i class="fas fa-user-plus"></i> REGISTER
+                    </button>
+                </div>
+                
+                <div class="form" id="loginForm">
+                    <div class="input">
+                        <label><i class="fas fa-user"></i> USERNAME</label>
+                        <input type="text" id="username" placeholder="Masukkan username">
+                    </div>
+                    <div class="input">
+                        <label><i class="fas fa-lock"></i> PASSWORD</label>
+                        <input type="password" id="password" placeholder="Masukkan password">
+                    </div>
+                    <div class="error" id="loginError"></div>
+                    <button class="submit" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> LOGIN
+                    </button>
+                </div>
+                
+                <div class="form" id="registerForm">
+                    <div class="input">
+                        <label><i class="fas fa-user"></i> USERNAME</label>
+                        <input type="text" id="regUsername" placeholder="Buat username">
+                    </div>
+                    <div class="input">
+                        <label><i class="fas fa-lock"></i> PASSWORD</label>
+                        <input type="password" id="regPassword" placeholder="Buat password">
+                    </div>
+                    <div class="error" id="registerError"></div>
+                    <button class="submit" id="registerBtn">
+                        <i class="fas fa-user-plus"></i> REGISTER
+                    </button>
+                </div>
             `;
-            list.appendChild(div);
-        });
-    } catch(e) {
-        document.getElementById('content').innerHTML = '<div class="item"><div class="info"><div class="name">Error load data</div></div></div>';
-    }
-}
-
-// Login
-document.getElementById('loginBtn').addEventListener('click', async () => {
-    const user = document.getElementById('user').value.trim();
-    const pass = document.getElementById('pass').value.trim();
-    
-    if (!user || !pass) {
-        document.getElementById('loginErr').textContent = 'Isi username dan password';
-        document.getElementById('loginErr').classList.add('show');
-        return;
-    }
-    
-    try {
-        const data = await supabaseFetch('user_klik');
-        const found = data.find(u => u.username === user && u.password === pass);
-        
-        if (found) {
-            currentUser = found;
-            clicks = found.click_count || 0;
-            document.getElementById('counter').textContent = clicks;
-            document.getElementById('auth').innerHTML = `<div style="color:#fff;padding:15px;text-align:center">Login sebagai: <b>${user}</b><br>Klik: ${clicks}</div>`;
-            loadLeaderboard();
-        } else {
-            document.getElementById('loginErr').textContent = 'Username/password salah';
-            document.getElementById('loginErr').classList.add('show');
-        }
-    } catch(e) {
-        document.getElementById('loginErr').textContent = 'Database error';
-        document.getElementById('loginErr').classList.add('show');
-    }
-});
-
-// Register
-document.getElementById('regBtn').addEventListener('click', async () => {
-    const user = document.getElementById('regUser').value.trim();
-    const pass = document.getElementById('regPass').value.trim();
-    
-    if (!user || !pass) {
-        document.getElementById('regErr').textContent = 'Isi username dan password';
-        document.getElementById('regErr').classList.add('show');
-        return;
-    }
-    
-    if (pass.length < 4) {
-        document.getElementById('regErr').textContent = 'Password minimal 4 karakter';
-        document.getElementById('regErr').classList.add('show');
-        return;
-    }
-    
-    try {
-        const data = await supabaseFetch('user_klik');
-        const exists = data.find(u => u.username === user);
-        
-        if (exists) {
-            document.getElementById('regErr').textContent = 'Username sudah ada';
-            document.getElementById('regErr').classList.add('show');
-            return;
+            
+            // Add event listeners untuk form
+            document.getElementById('showLogin').addEventListener('click', () => {
+                document.getElementById('loginForm').classList.add('active');
+                document.getElementById('registerForm').classList.remove('active');
+                document.getElementById('showLogin').style.display = 'none';
+                document.getElementById('showRegister').style.display = 'none';
+            });
+            
+            document.getElementById('showRegister').addEventListener('click', () => {
+                document.getElementById('registerForm').classList.add('active');
+                document.getElementById('loginForm').classList.remove('active');
+                document.getElementById('showLogin').style.display = 'none';
+                document.getElementById('showRegister').style.display = 'none';
+            });
+            
+            // Login button
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            
+            // Register button
+            document.getElementById('registerBtn').addEventListener('click', handleRegister);
+            
+            // Enter key support
+            document.getElementById('username')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+            
+            document.getElementById('password')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+            
+            document.getElementById('regUsername')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleRegister();
+            });
+            
+            document.getElementById('regPassword')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleRegister();
+            });
         }
         
-        const newUser = await supabaseFetch('user_klik', 'POST', {
-            username: user,
-            password: pass,
-            click_count: 0
-        });
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!username || !password) {
+                showError(errorDiv, 'Username dan password harus diisi');
+                return;
+            }
+            
+            try {
+                // Cari user di database
+                const { data, error } = await supabase
+                    .from('user_klik')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+                
+                if (error || !data) {
+                    showError(errorDiv, 'Username atau password salah');
+                    return;
+                }
+                
+                // Set current user
+                currentUser = data;
+                clicks = data.click_count || 0;
+                counter.textContent = clicks;
+                
+                // Update UI
+                showUserInfo();
+                await loadLeaderboard();
+                
+            } catch (error) {
+                showError(errorDiv, 'Terjadi kesalahan saat login');
+                console.error('Login error:', error);
+            }
+        }
         
-        if (newUser && newUser[0]) {
-            currentUser = newUser[0];
+        async function handleRegister() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const errorDiv = document.getElementById('registerError');
+            
+            if (!username || !password) {
+                showError(errorDiv, 'Username dan password harus diisi');
+                return;
+            }
+            
+            if (password.length < 4) {
+                showError(errorDiv, 'Password minimal 4 karakter');
+                return;
+            }
+            
+            try {
+                // Cek apakah username sudah ada
+                const { data: existingUser } = await supabase
+                    .from('user_klik')
+                    .select('id')
+                    .eq('username', username)
+                    .single();
+                
+                if (existingUser) {
+                    showError(errorDiv, 'Username sudah digunakan');
+                    return;
+                }
+                
+                // Buat user baru
+                const { data: newUser, error } = await supabase
+                    .from('user_klik')
+                    .insert([
+                        {
+                            username: username,
+                            password: password,
+                            click_count: 0
+                        }
+                    ])
+                    .select()
+                    .single();
+                
+                if (error) {
+                    showError(errorDiv, 'Gagal membuat akun: ' + error.message);
+                    return;
+                }
+                
+                // Set current user
+                currentUser = newUser;
+                clicks = 0;
+                counter.textContent = clicks;
+                
+                // Update UI
+                showUserInfo();
+                await loadLeaderboard();
+                
+            } catch (error) {
+                showError(errorDiv, 'Terjadi kesalahan: ' + error.message);
+                console.error('Register error:', error);
+            }
+        }
+        
+        function showUserInfo() {
+            if (!currentUser) return;
+            
+            authDiv.innerHTML = `
+                <div class="user-info">
+                    <h3><i class="fas fa-user-circle"></i> ${currentUser.username}</h3>
+                    <p>Skor Anda: <strong>${clicks}</strong></p>
+                    <button class="logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> LOGOUT
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        }
+        
+        function handleLogout() {
+            currentUser = null;
             clicks = 0;
-            document.getElementById('counter').textContent = 0;
-            document.getElementById('auth').innerHTML = `<div style="color:#fff;padding:15px;text-align:center">Register berhasil!<br>Login sebagai: <b>${user}</b></div>`;
-            loadLeaderboard();
+            counter.textContent = clicks;
+            setupAuthForms();
         }
-    } catch(e) {
-        document.getElementById('regErr').textContent = 'Gagal register';
-        document.getElementById('regErr').classList.add('show');
-    }
-});
-
-// Toggle panel
-document.getElementById('toggle').addEventListener('click', () => {
-    document.getElementById('panel').classList.toggle('open');
-    loadLeaderboard();
-});
-document.getElementById('close').addEventListener('click', () => {
-    document.getElementById('panel').classList.remove('open');
-});
-
-// Show login/register form
-document.getElementById('showLogin').addEventListener('click', () => {
-    document.getElementById('loginForm').classList.add('active');
-    document.getElementById('registerForm').classList.remove('active');
-    document.getElementById('showLogin').style.display = 'none';
-    document.getElementById('showRegister').style.display = 'none';
-});
-document.getElementById('showRegister').addEventListener('click', () => {
-    document.getElementById('registerForm').classList.add('active');
-    document.getElementById('loginForm').classList.remove('active');
-    document.getElementById('showLogin').style.display = 'none';
-    document.getElementById('showRegister').style.display = 'none';
-});
-
-// Load awal
-loadLeaderboard();
-</script>
+        
+        async function updateUserScore() {
+            if (!currentUser) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('user_klik')
+                    .update({ click_count: clicks })
+                    .eq('id', currentUser.id);
+                
+                if (error) {
+                    console.error('Update score error:', error);
+                }
+                
+                await loadLeaderboard();
+                
+            } catch (error) {
+                console.error('Update score error:', error);
+            }
+        }
+        
+        async function loadLeaderboard() {
+            try {
+                const { data, error } = await supabase
+                    .from('user_klik')
+                    .select('id, username, click_count')
+                    .order('click_count', { ascending: false });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (!data || data.length === 0) {
+                    contentDiv.innerHTML = `
+                        <div class="item">
+                            <div class="info">
+                                <div class="name">Belum ada data</div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                data.forEach((user, index) => {
+                    const isCurrent = currentUser && user.id === currentUser.id;
+                    html += `
+                        <div class="item ${isCurrent ? 'current' : ''}">
+                            <div class="rank">${index + 1}</div>
+                            <div class="info">
+                                <div class="name">${user.username}</div>
+                            </div>
+                            <div class="score">${user.click_count || 0}</div>
+                        </div>
+                    `;
+                });
+                
+                contentDiv.innerHTML = html;
+                
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="item">
+                        <div class="info">
+                            <div class="name">Error loading data</div>
+                        </div>
+                    </div>
+                `;
+                console.error('Load leaderboard error:', error);
+            }
+        }
+        
+        function showError(element, message) {
+            element.textContent = message;
+            element.classList.add('show');
+            setTimeout(() => {
+                element.classList.remove('show');
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
