@@ -36,11 +36,11 @@
   <div class="panel" id="panel">
     <button class="close" id="close">Tutup</button>
 
-    <h3>Daftar / Login</h3>
-    <input type="text" id="username" placeholder="Username (daftar)" />
+    <h3>Masuk / Daftar</h3>
+    <input type="text" id="username" placeholder="Username (wajib saat daftar)" />
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
-    <button id="register">Masuk / Daftar</button>
+    <button id="authBtn">Masuk / Daftar</button>
 
     <table id="board"></table>
   </div>
@@ -58,7 +58,6 @@
 
     const countEl=document.getElementById('count');
     const sound=document.getElementById('sound');
-    sound.volume = 1.0;
 
     photo.onclick=async()=>{
       sound.currentTime=0;
@@ -72,18 +71,35 @@
       if(user) await sb.rpc('inc_click');
     };
 
-    register.onclick=async()=>{
-      const emailVal=email.value;
-      const passVal=password.value;
-      let { error } = await sb.auth.signInWithPassword({email:emailVal,password:passVal});
+    authBtn.onclick=async()=>{
+      const emailVal=email.value.trim();
+      const passVal=password.value.trim();
+      if(!emailVal || !passVal) return;
+
+      let { data, error } = await sb.auth.signInWithPassword({
+        email: emailVal,
+        password: passVal
+      });
+
       if(error){
-        const { data } = await sb.auth.signUp({email:emailVal,password:passVal});
-        if(data?.user){
-          await sb.from('KLIKUSER').insert({user_id:data.user.id,username:username.value});
-        }
+        const signup = await sb.auth.signUp({
+          email: emailVal,
+          password: passVal
+        });
+
+        if(signup.error) return;
+
+        if(!username.value) return;
+
+        await sb.from('KLIKUSER').insert({
+          user_id: signup.data.user.id,
+          username: username.value
+        });
       }
+
       panel.classList.add('active');
       loadMyCount();
+      loadBoard();
     };
 
     async function loadBoard(){
@@ -100,6 +116,8 @@
       const { data } = await sb.from('KLIKUSER').select('jumlah_klik').eq('user_id',user.id).single();
       if(data) countEl.innerText=data.jumlah_klik;
     }
+
+    sb.auth.onAuthStateChange(()=>{loadMyCount();loadBoard();});
 
     sb.channel('rt')
       .on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},()=>{loadBoard();loadMyCount();})
