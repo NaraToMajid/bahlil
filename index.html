@@ -189,22 +189,6 @@ let audio = null;
 const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
 
-// Inisialisasi Supabase
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : {
-    from: () => ({
-        select: () => ({
-            eq: () => ({
-                single: async () => ({ data: null, error: new Error('Supabase not loaded') })
-            }),
-            order: () => ({
-                limit: async () => ({ data: [], error: null })
-            }),
-            insert: async () => ({ data: null, error: new Error('Supabase not loaded') }),
-            update: async () => ({ error: new Error('Supabase not loaded') })
-        })
-    })
-};
-
 // DOM Elements
 const counter = document.getElementById('counter');
 const circle = document.getElementById('circle');
@@ -247,7 +231,124 @@ const initAudio = () => {
     audio = new Audio('suara.mp3');
     audio.volume = 0.5;
     audio.preload = 'auto';
-    audio.load();
+};
+
+// Supabase client sederhana
+const supabaseClient = {
+    async query(table, method, data = null) {
+        const url = `${SUPABASE_URL}/rest/v1/${table}`;
+        const headers = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        };
+        
+        try {
+            let options = {
+                method: method,
+                headers: headers
+            };
+            
+            if (data && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
+                options.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(url, options);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            if (method === 'DELETE' || response.status === 204) {
+                return { data: null, error: null };
+            }
+            
+            const result = await response.json();
+            return { data: result, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+    
+    from(table) {
+        return {
+            select: (columns = '*') => ({
+                eq: (column, value) => ({
+                    single: async () => {
+                        const url = `${SUPABASE_URL}/rest/v1/${table}?${column}=eq.${encodeURIComponent(value)}&select=${columns}`;
+                        const headers = {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        };
+                        
+                        try {
+                            const response = await fetch(url, { headers });
+                            if (!response.ok) throw new Error('Not found');
+                            const data = await response.json();
+                            return { data: data[0], error: data[0] ? null : new Error('Not found') };
+                        } catch (error) {
+                            return { data: null, error };
+                        }
+                    }
+                }),
+                order: (column, { ascending = true } = {}) => ({
+                    limit: async (limit) => {
+                        const order = ascending ? 'asc' : 'desc';
+                        const url = `${SUPABASE_URL}/rest/v1/${table}?select=${columns}&order=${column}.${order}&limit=${limit}`;
+                        const headers = {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        };
+                        
+                        try {
+                            const response = await fetch(url, { headers });
+                            const data = await response.json();
+                            return { data, error: null };
+                        } catch (error) {
+                            return { data: null, error };
+                        }
+                    }
+                })
+            }),
+            
+            insert: async (data) => {
+                return await supabaseClient.query(table, 'POST', data);
+            },
+            
+            update: async (data) => ({
+                eq: async (column, value) => {
+                    const url = `${SUPABASE_URL}/rest/v1/${table}?${column}=eq.${encodeURIComponent(value)}`;
+                    const headers = {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    };
+                    
+                    try {
+                        const response = await fetch(url, {
+                            method: 'PATCH',
+                            headers: headers,
+                            body: JSON.stringify(data)
+                        });
+                        
+                        if (!response.ok) throw new Error('Update failed');
+                        const result = await response.json();
+                        return { data: result, error: null };
+                    } catch (error) {
+                        return { data: null, error };
+                    }
+                }
+            }),
+            
+            delete: async () => ({
+                eq: async (column, value) => {
+                    return await supabaseClient.query(`${table}?${column}=eq.${encodeURIComponent(value)}`, 'DELETE');
+                }
+            })
+        };
+    }
 };
 
 // Setup event listeners
@@ -288,22 +389,6 @@ const setupEventListeners = () => {
     
     // Tombol register
     regBtn.addEventListener('click', handleRegister);
-    
-    // Enter key untuk login
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-    passInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-    
-    // Enter key untuk register
-    regUserInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleRegister();
-    });
-    regPassInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleRegister();
-    });
 };
 
 // Handle klik pada lingkaran
@@ -356,7 +441,7 @@ const playSound = () => {
         // Buat audio baru setiap kali untuk response cepat
         const audioClone = new Audio('suara.mp3');
         audioClone.volume = 0.5;
-        audioClone.playbackRate = 1.5; // Percepat suara 1.5x
+        audioClone.playbackRate = 2.0; // Percepat suara 2x
         audioClone.play().catch(e => console.log("Audio play error"));
     } catch (e) {
         console.log("Audio error:", e);
@@ -375,12 +460,7 @@ const handleLogin = async () => {
     
     try {
         // Query ke tabel KLIKUSER
-        const { data, error } = await supabase
-            .from('KLIKUSER')
-            .select('*')
-            .eq('username', username)
-            .eq('password', password)
-            .single();
+        const { data, error } = await supabaseClient.from('KLIKUSER').select().eq('username', username).eq('password', password).single();
         
         if (error || !data) {
             showError(loginErr, "Username atau password salah");
@@ -403,7 +483,7 @@ const handleLogin = async () => {
         loadLeaderboard();
         
     } catch (error) {
-        showError(loginErr, "Database error: " + error.message);
+        showError(loginErr, "Error: " + error.message);
     }
 };
 
@@ -424,39 +504,30 @@ const handleRegister = async () => {
     
     try {
         // Cek apakah username sudah ada
-        const { data: existing } = await supabase
-            .from('KLIKUSER')
-            .select('id')
-            .eq('username', username)
-            .single();
+        const { data: existing, error: checkError } = await supabaseClient.from('KLIKUSER').select('id').eq('username', username).single();
         
-        if (existing) {
+        if (existing && !checkError) {
             showError(regErr, "Username sudah digunakan");
             return;
         }
         
         // Buat user baru
-        const { data: newUser, error } = await supabase
-            .from('KLIKUSER')
-            .insert([
-                { 
-                    username: username, 
-                    password: password,
-                    click_count: 0,
-                    created_at: new Date().toISOString()
-                }
-            ])
-            .select()
-            .single();
+        const { data: newUser, error } = await supabaseClient.from('KLIKUSER').insert([
+            { 
+                username: username, 
+                password: password,
+                click_count: 0
+            }
+        ]);
         
         if (error) {
-            showError(regErr, "Gagal membuat akun: " + error.message);
+            showError(regErr, "Gagal membuat akun");
             return;
         }
         
         currentUser = {
-            id: newUser.id,
-            username: newUser.username,
+            id: newUser[0].id,
+            username: newUser[0].username,
             click_count: 0
         };
         
@@ -464,7 +535,7 @@ const handleRegister = async () => {
         loadLeaderboard();
         
     } catch (error) {
-        showError(regErr, "Database error: " + error.message);
+        showError(regErr, "Error: " + error.message);
     }
 };
 
@@ -473,13 +544,9 @@ const updateScore = async () => {
     if (!currentUser) return;
     
     try {
-        await supabase
-            .from('KLIKUSER')
-            .update({ 
-                click_count: clicks,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', currentUser.id);
+        await supabaseClient.from('KLIKUSER').update({ 
+            click_count: clicks
+        }).eq('id', currentUser.id);
         
         loadLeaderboard();
     } catch (error) {
@@ -490,16 +557,16 @@ const updateScore = async () => {
 // Load leaderboard dari tabel KLIKUSER
 const loadLeaderboard = async () => {
     try {
-        // Ambil semua user dari tabel KLIKUSER
-        const { data, error } = await supabase
-            .from('KLIKUSER')
-            .select('username, click_count')
-            .order('click_count', { ascending: false });
+        // Ambil semua user dari tabel KLIKUSER dengan fetch langsung
+        const url = `${SUPABASE_URL}/rest/v1/KLIKUSER?select=username,click_count&order=click_count.desc`;
+        const headers = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+        };
         
-        if (error) {
-            content.innerHTML = '<div class="item"><div class="info"><div class="name">Error: ' + error.message + '</div></div></div>';
-            return;
-        }
+        const response = await fetch(url, { headers });
+        if (!response.ok) throw new Error('Failed to fetch');
+        const data = await response.json();
         
         if (!data || data.length === 0) {
             content.innerHTML = '<div class="item"><div class="info"><div class="name">Belum ada data pengguna</div></div></div>';
@@ -523,7 +590,7 @@ const loadLeaderboard = async () => {
         content.innerHTML = html;
         
     } catch (error) {
-        content.innerHTML = '<div class="item"><div class="info"><div class="name">Connection error</div></div></div>';
+        content.innerHTML = '<div class="item"><div class="info"><div class="name">Loading data...</div></div></div>';
     }
 };
 
