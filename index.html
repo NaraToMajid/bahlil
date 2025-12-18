@@ -7,17 +7,20 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
     body{background:#bfbfbf;min-height:100vh;display:flex;align-items:center;justify-content:center}
-    .center{position:relative;text-align:center}
-    .count{margin-bottom:12px;font-size:24px}
-    .photo{width:220px;height:220px;border-radius:50%;border:8px solid #e0e0e0;overflow:hidden;cursor:pointer;margin:auto}
+    .center{text-align:center}
+    .count{font-size:32px;margin-bottom:14px;transition:.2s}
+    .count.bump{transform:scale(1.2)}
+    .photo{width:220px;height:220px;border-radius:50%;border:8px solid #e0e0e0;overflow:hidden;cursor:pointer;margin:auto;transition:.2s}
+    .photo:active{transform:scale(0.95)}
     .photo img{width:100%;height:100%;object-fit:cover}
     .leaderboard-btn{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:#333;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
     .panel{position:fixed;top:0;right:0;width:320px;height:100%;background:#e5e5e5;transform:translateX(100%);transition:.3s;padding:16px;overflow:auto}
     .panel.active{transform:translateX(0)}
-    .close{margin-bottom:8px}
+    h3{margin-top:12px}
     input,button{width:100%;padding:8px;margin-top:8px}
+    .close{margin-bottom:8px}
     table{width:100%;margin-top:12px;border-collapse:collapse}
-    td,th{padding:6px;border-bottom:1px solid #aaa;text-align:left}
+    td{padding:6px;border-bottom:1px solid #aaa}
   </style>
 </head>
 <body>
@@ -31,14 +34,19 @@
   </div>
 
   <div class="panel" id="panel">
-    <button class="close" id="close">X</button>
-    <div id="auth">
-      <input type="text" id="username" />
-      <input type="email" id="email" />
-      <input type="password" id="password" />
-      <button id="register">Daftar</button>
-      <button id="login">Login</button>
-    </div>
+    <button class="close" id="close">Tutup</button>
+
+    <h3>Daftar</h3>
+    <input type="text" id="reg_username" placeholder="Username" />
+    <input type="email" id="reg_email" placeholder="Email" />
+    <input type="password" id="reg_password" placeholder="Password" />
+    <button id="register">Daftar</button>
+
+    <h3>Login</h3>
+    <input type="email" id="log_email" placeholder="Email" />
+    <input type="password" id="log_password" placeholder="Password" />
+    <button id="login">Login</button>
+
     <table id="board"></table>
   </div>
 
@@ -50,34 +58,48 @@
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const panel = document.getElementById('panel');
-    document.getElementById('lbBtn').onclick = ()=>panel.classList.add('active');
-    document.getElementById('close').onclick = ()=>panel.classList.remove('active');
+    const panel=document.getElementById('panel');
+    lbBtn.onclick=()=>panel.classList.add('active');
+    close.onclick=()=>panel.classList.remove('active');
 
-    const sound = document.getElementById('sound');
-    document.getElementById('photo').onclick = async ()=>{
+    const countEl=document.getElementById('count');
+    const sound=document.getElementById('sound');
+
+    photo.onclick=async()=>{
       sound.currentTime=0; sound.play();
+      countEl.innerText = Number(countEl.innerText)+1;
+      countEl.classList.add('bump');
+      setTimeout(()=>countEl.classList.remove('bump'),150);
       const { data:{user} } = await sb.auth.getUser();
       if(user) await sb.rpc('inc_click');
     };
 
-    document.getElementById('register').onclick = async ()=>{
-      const { data } = await sb.auth.signUp({email:email.value,password:password.value});
+    register.onclick=async()=>{
+      const { data } = await sb.auth.signUp({
+        email:reg_email.value,
+        password:reg_password.value
+      });
       if(data?.user){
-        await sb.from('KLIKUSER').insert({user_id:data.user.id,username:username.value});
+        await sb.from('KLIKUSER').insert({
+          user_id:data.user.id,
+          username:reg_username.value
+        });
       }
     };
 
-    document.getElementById('login').onclick = async ()=>{
-      await sb.auth.signInWithPassword({email:email.value,password:password.value});
+    login.onclick=async()=>{
+      await sb.auth.signInWithPassword({
+        email:log_email.value,
+        password:log_password.value
+      });
+      loadMyCount();
     };
 
     async function loadBoard(){
       const { data } = await sb.from('KLIKUSER').select('*').order('jumlah_klik',{ascending:false});
-      const t=document.getElementById('board');
-      t.innerHTML='';
+      board.innerHTML='';
       data?.forEach((r,i)=>{
-        t.innerHTML+=`<tr><td>${i+1}</td><td>${r.username}</td><td>${r.jumlah_klik}</td></tr>`;
+        board.innerHTML+=`<tr><td>${i+1}</td><td>${r.username}</td><td>${r.jumlah_klik}</td></tr>`;
       });
     }
 
@@ -85,10 +107,10 @@
       const { data:{user} } = await sb.auth.getUser();
       if(!user) return;
       const { data } = await sb.from('KLIKUSER').select('jumlah_klik').eq('user_id',user.id).single();
-      if(data) document.getElementById('count').innerText = data.jumlah_klik;
+      if(data) countEl.innerText=data.jumlah_klik;
     }
 
-    sb.channel('realtime')
+    sb.channel('rt')
       .on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},()=>{loadBoard();loadMyCount();})
       .subscribe();
 
