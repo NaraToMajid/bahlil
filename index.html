@@ -362,6 +362,23 @@ td{
   border-radius:3px;
   font-size:12px;
 }
+
+/* ===== LOADING ===== */
+.loading{
+  text-align:center;
+  padding:20px;
+  color:#666;
+}
+
+/* ===== ERROR MESSAGE ===== */
+.error-message{
+  background:#ffebee;
+  color:#c62828;
+  padding:10px;
+  border-radius:5px;
+  margin:10px 0;
+  font-size:14px;
+}
 </style>
 </head>
 
@@ -372,7 +389,7 @@ td{
 <div id="app">
   <div id="count">0</div>
   <div id="photo">
-    <img src="foto.webp">
+    <img src="foto.webp" alt="Klik saya!">
   </div>
 </div>
 
@@ -400,7 +417,9 @@ td{
   <hr>
 
   <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-  <table id="board"></table>
+  <div id="board-container">
+    <table id="board"></table>
+  </div>
 </div>
 
 <!-- Modal Chat -->
@@ -491,6 +510,7 @@ setInterval(function() {
   }
 }, 1000);
 
+// Inisialisasi Supabase Client
 const sb = supabase.createClient(
   'https://bxhrnnwfqlsoviysqcdw.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
@@ -506,6 +526,7 @@ let brushSize = 3;
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let tablesCreated = false;
 
 // Inisialisasi canvas
 const canvas = document.getElementById('bg-canvas');
@@ -515,33 +536,101 @@ const ctx = canvas.getContext('2d');
 ctx.fillStyle = '#ffffff';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+// Fungsi untuk membuat tabel jika belum ada
+async function createTablesIfNotExist() {
+  try {
+    // Cek apakah tabel KLIKUSER sudah ada
+    const { error: checkError } = await sb
+      .from('KLIKUSER')
+      .select('id')
+      .limit(1);
+    
+    if (checkError && checkError.message.includes('does not exist')) {
+      console.log('Tabel belum ada, mencoba membuat...');
+      
+      // Buat tabel menggunakan RPC (jika ada) atau tampilkan petunjuk
+      showTableCreationInstructions();
+      return false;
+    }
+    
+    tablesCreated = true;
+    return true;
+  } catch (e) {
+    console.error('Error checking tables:', e);
+    showTableCreationInstructions();
+    return false;
+  }
+}
+
+// Tampilkan petunjuk membuat tabel
+function showTableCreationInstructions() {
+  const boardContainer = document.getElementById('board-container');
+  if (boardContainer) {
+    boardContainer.innerHTML = `
+      <div class="error-message">
+        <strong>Tabel database belum dibuat!</strong>
+        <p>Silakan buka SQL Editor di Supabase dan jalankan query berikut:</p>
+        <pre style="background:#f5f5f5;padding:10px;border-radius:5px;overflow:auto;font-size:12px;">
+CREATE TABLE KLIKUSER (
+    id BIGSERIAL PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    jumlah_klik INTEGER DEFAULT 0,
+    background_data TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE KLIKCHAT (
+    id BIGSERIAL PRIMARY KEY,
+    sender TEXT NOT NULL,
+    receiver TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    read BOOLEAN DEFAULT FALSE
+);
+        </pre>
+      </div>
+    `;
+  }
+}
+
 // Generate verification code
 function generateVerificationCode() {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  document.getElementById('verif-code').textContent = code;
+  const verifCodeElement = document.getElementById('verif-code');
+  if (verifCodeElement) {
+    verifCodeElement.textContent = code;
+  }
   verificationCode = code;
   
   // Tambahkan fungsi klik untuk copy
-  document.getElementById('verif-code').onclick = function() {
-    navigator.clipboard.writeText(code);
-    document.getElementById('copy-hint').textContent = '✓ Kode disalin!';
-    setTimeout(() => {
-      document.getElementById('copy-hint').textContent = 'Klik untuk menyalin, lalu tempel di bawah';
-    }, 2000);
-  };
+  if (verifCodeElement) {
+    verifCodeElement.onclick = function() {
+      navigator.clipboard.writeText(code).then(() => {
+        const copyHint = document.getElementById('copy-hint');
+        if (copyHint) {
+          copyHint.textContent = '✓ Kode disalin!';
+          setTimeout(() => {
+            copyHint.textContent = 'Klik untuk menyalin, lalu tempel di bawah';
+          }, 2000);
+        }
+      });
+    };
+  }
 }
 
 // Panggil saat halaman dimuat
 generateVerificationCode();
 
-btn.onclick = () => {
-  panel.classList.add('show');
+// Event listener untuk tombol panel
+document.getElementById('btn').onclick = () => {
+  document.getElementById('panel').classList.add('show');
   generateVerificationCode(); // Generate kode baru setiap kali panel dibuka
   loadBoard(); // Refresh leaderboard
 };
 
 /* ===== CLICK FOTO ===== */
-photo.onclick = async () => {
+document.getElementById('photo').onclick = async () => {
   if(!currentUser){
     alert('Login dulu');
     return;
@@ -557,18 +646,22 @@ photo.onclick = async () => {
   }
 
   currentClick++;
-  count.textContent = currentClick;
+  document.getElementById('count').textContent = currentClick;
 
-  await sb.from('KLIKUSER')
-    .update({ jumlah_klik: currentClick })
-    .eq('username', currentUser);
+  try {
+    await sb.from('KLIKUSER')
+      .update({ jumlah_klik: currentClick })
+      .eq('username', currentUser);
+  } catch (error) {
+    console.error('Error updating click count:', error);
+  }
 };
 
 /* ===== AUTH ===== */
 async function register(){
-  const u = reg_user.value.trim();
-  const p = reg_pass.value.trim();
-  const v = reg_verif.value.trim();
+  const u = document.getElementById('reg_user').value.trim();
+  const p = document.getElementById('reg_pass').value.trim();
+  const v = document.getElementById('reg_verif').value.trim();
   
   if(!u || !p || !v) return alert('Isi semua kolom');
   
@@ -582,43 +675,56 @@ async function register(){
   if(u.length < 3) return alert('Username minimal 3 karakter');
   if(p.length < 6) return alert('Password minimal 6 karakter');
 
-  const {error} = await sb.from('KLIKUSER')
-    .insert({ username:u, password:p });
+  try {
+    const {error} = await sb.from('KLIKUSER')
+      .insert({ username:u, password:p, jumlah_klik: 0 });
 
-  if(error) return alert('Username sudah ada');
+    if(error) return alert('Username sudah ada');
 
-  alert('Akun berhasil dibuat!');
-  currentUser = u;
-  currentClick = 0;
-  afterLogin();
+    alert('Akun berhasil dibuat!');
+    currentUser = u;
+    currentClick = 0;
+    afterLogin();
+  } catch (error) {
+    console.error('Registration error:', error);
+    alert('Error: ' + error.message);
+  }
 }
 
 async function login(){
-  const u = log_user.value.trim();
-  const p = log_pass.value.trim();
+  const u = document.getElementById('log_user').value.trim();
+  const p = document.getElementById('log_pass').value.trim();
 
-  const {data} = await sb.from('KLIKUSER')
-    .select('*')
-    .eq('username', u)
-    .eq('password', p)
-    .single();
+  try {
+    const {data, error} = await sb.from('KLIKUSER')
+      .select('*')
+      .eq('username', u)
+      .eq('password', p)
+      .single();
 
-  if(!data) return alert('Login gagal');
+    if(error || !data) return alert('Login gagal');
 
-  currentUser = u;
-  currentClick = data.jumlah_klik;
-  afterLogin();
+    currentUser = u;
+    currentClick = data.jumlah_klik || 0;
+    afterLogin();
+  } catch (error) {
+    console.error('Login error:', error);
+    alert('Error: ' + error.message);
+  }
 }
 
 /* ===== AFTER LOGIN ===== */
 function afterLogin(){
-  count.textContent = currentClick;
+  document.getElementById('count').textContent = currentClick;
 
+  const panel = document.getElementById('panel');
   panel.innerHTML = `
     <button onclick="panel.classList.remove('show')">Tutup</button>
     <button class="logout" onclick="logout()">🚪 Log Out</button>
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-    <table id="board"></table>
+    <div id="board-container">
+      <table id="board"></table>
+    </div>
   `;
   loadBoard();
   loadUserBackground();
@@ -628,8 +734,9 @@ function afterLogin(){
 function logout(){
   currentUser = null;
   currentClick = 0;
-  count.textContent = 0;
+  document.getElementById('count').textContent = 0;
 
+  const panel = document.getElementById('panel');
   panel.innerHTML = `
     <h3>DAFTAR</h3>
     <input id="reg_user" placeholder="Username">
@@ -654,7 +761,9 @@ function logout(){
     <hr>
 
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-    <table id="board"></table>
+    <div id="board-container">
+      <table id="board"></table>
+    </div>
   `;
   
   // Re-generate verification code setelah logout
@@ -665,45 +774,82 @@ function logout(){
 
 /* ===== LEADERBOARD DENGAN CHAT DAN EDITOR ===== */
 async function loadBoard(){
-  const {data} = await sb.from('KLIKUSER')
-    .select('*')
-    .order('jumlah_klik', { ascending:false });
+  const boardContainer = document.getElementById('board-container') || document.getElementById('board').parentElement;
+  
+  // Tampilkan loading
+  boardContainer.innerHTML = '<div class="loading">Memuat leaderboard...</div>';
+  
+  try {
+    const {data, error} = await sb.from('KLIKUSER')
+      .select('*')
+      .order('jumlah_klik', { ascending:false });
 
-  const board = document.getElementById('board');
-  if(!board) return;
-
-  board.innerHTML = '';
-  data.forEach((r,i)=>{
-    let cls='';
-    if(i===0)cls='gold';
-    else if(i===1)cls='silver';
-    else if(i===2)cls='bronze';
-    if(r.username===currentUser)cls+=' me';
-
-    // Load custom background jika ada
-    let style = '';
-    if(r.background_data) {
-      try {
-        const bgData = JSON.parse(r.background_data);
-        if(bgData.bgColor) {
-          style = `background: ${bgData.bgColor};`;
-        } else if(bgData.imageData) {
-          style = `background: url(${bgData.imageData}); background-size: cover;`;
-        }
-      } catch(e) {
-        console.error('Error parsing background data:', e);
+    if(error) {
+      console.error('Error loading leaderboard:', error);
+      if(error.message.includes('does not exist')) {
+        showTableCreationInstructions();
+        return;
       }
+      throw error;
     }
 
-    board.innerHTML += `
-      <tr class="${cls}" style="${style}">
-        <td>${i+1}</td>
-        <td class="username-cell" onclick="openChat('${r.username}')">${r.username}</td>
-        <td>${r.jumlah_klik}</td>
-        ${r.username===currentUser ? `<td><button class="menu-btn" onclick="openBgEditor()">⋮</button></td>` : '<td></td>'}
-      </tr>
+    const board = document.getElementById('board');
+    if(!board) {
+      // Buat tabel jika belum ada
+      boardContainer.innerHTML = '<table id="board"></table>';
+    }
+    
+    const table = document.getElementById('board');
+    table.innerHTML = '';
+    
+    if(data && data.length > 0) {
+      data.forEach((r,i)=>{
+        let cls='';
+        if(i===0)cls='gold';
+        else if(i===1)cls='silver';
+        else if(i===2)cls='bronze';
+        if(r.username===currentUser)cls+=' me';
+
+        // Load custom background jika ada
+        let style = '';
+        let bgStyle = '';
+        if(r.background_data) {
+          try {
+            const bgData = JSON.parse(r.background_data);
+            if(bgData.imageData) {
+              bgStyle = `background: url('${bgData.imageData}'); background-size: cover;`;
+            }
+          } catch(e) {
+            console.error('Error parsing background data:', e);
+          }
+        }
+
+        const row = document.createElement('tr');
+        row.className = cls;
+        row.style = bgStyle;
+        
+        row.innerHTML = `
+          <td>${i+1}</td>
+          <td class="username-cell" onclick="openChat('${r.username}')">${r.username}</td>
+          <td>${r.jumlah_klik || 0}</td>
+          ${r.username===currentUser ? `<td><button class="menu-btn" onclick="openBgEditor()">⋮</button></td>` : '<td></td>'}
+        `;
+        
+        table.appendChild(row);
+      });
+    } else {
+      table.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Belum ada data</td></tr>';
+    }
+    
+  } catch (error) {
+    console.error('Error in loadBoard:', error);
+    boardContainer.innerHTML = `
+      <div class="error-message">
+        Error memuat leaderboard: ${error.message}
+        <button onclick="loadBoard()" style="margin-top:10px;">Coba Lagi</button>
+      </div>
     `;
-  });
+  }
 }
 
 /* ===== CHAT FUNCTIONS ===== */
@@ -732,32 +878,45 @@ function closeChat() {
 }
 
 async function loadChatMessages() {
-  const {data} = await sb.from('KLIKCHAT')
-    .select('*')
-    .or(`and(sender.eq.${currentUser},receiver.eq.${chatTarget}),and(sender.eq.${chatTarget},receiver.eq.${currentUser})`)
-    .order('created_at', { ascending:true });
-
   const messagesDiv = document.getElementById('chat-messages');
-  messagesDiv.innerHTML = '';
+  messagesDiv.innerHTML = '<div class="loading">Memuat pesan...</div>';
+  
+  try {
+    const {data, error} = await sb.from('KLIKCHAT')
+      .select('*')
+      .or(`and(sender.eq.${currentUser},receiver.eq.${chatTarget}),and(sender.eq.${chatTarget},receiver.eq.${currentUser})`)
+      .order('created_at', { ascending:true });
 
-  if(data && data.length > 0) {
-    data.forEach(msg => {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `chat-message ${msg.sender === currentUser ? 'sent' : ''}`;
+    if(error) {
+      console.error('Error loading chat:', error);
+      messagesDiv.innerHTML = '<div class="error-message">Error memuat pesan</div>';
+      return;
+    }
+
+    messagesDiv.innerHTML = '';
+
+    if(data && data.length > 0) {
+      data.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${msg.sender === currentUser ? 'sent' : ''}`;
+        
+        const time = new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        messageDiv.innerHTML = `
+          <div class="sender">${msg.sender}</div>
+          <div>${msg.message}</div>
+          <div class="time">${time}</div>
+        `;
+        messagesDiv.appendChild(messageDiv);
+      });
       
-      const time = new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      messageDiv.innerHTML = `
-        <div class="sender">${msg.sender}</div>
-        <div>${msg.message}</div>
-        <div class="time">${time}</div>
-      `;
-      messagesDiv.appendChild(messageDiv);
-    });
-    
-    // Scroll ke bawah
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  } else {
-    messagesDiv.innerHTML = '<p style="text-align:center;color:#666;">Belum ada pesan. Mulai percakapan!</p>';
+      // Scroll ke bawah
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } else {
+      messagesDiv.innerHTML = '<p style="text-align:center;color:#666;">Belum ada pesan. Mulai percakapan!</p>';
+    }
+  } catch (error) {
+    console.error('Error loading messages:', error);
+    messagesDiv.innerHTML = '<div class="error-message">Error memuat pesan</div>';
   }
 }
 
@@ -772,25 +931,30 @@ async function sendChatMessage() {
     return;
   }
 
-  // Kirim pesan ke database
-  const {error} = await sb.from('KLIKCHAT')
-    .insert({
-      sender: currentUser,
-      receiver: chatTarget,
-      message: message
-    });
+  try {
+    // Kirim pesan ke database
+    const {error} = await sb.from('KLIKCHAT')
+      .insert({
+        sender: currentUser,
+        receiver: chatTarget,
+        message: message
+      });
 
-  if(error) {
+    if(error) {
+      console.error('Error sending message:', error);
+      alert('Gagal mengirim pesan');
+      return;
+    }
+
+    // Clear input
+    input.value = '';
+    
+    // Reload messages
+    await loadChatMessages();
+  } catch (error) {
     console.error('Error sending message:', error);
-    alert('Gagal mengirim pesan');
-    return;
+    alert('Error mengirim pesan: ' + error.message);
   }
-
-  // Clear input
-  input.value = '';
-  
-  // Reload messages
-  await loadChatMessages();
 }
 
 function handleChatKeyPress(e) {
@@ -801,6 +965,10 @@ function handleChatKeyPress(e) {
 
 /* ===== EDITOR LATAR BELAKANG FUNCTIONS ===== */
 function openBgEditor() {
+  if (!currentUser) {
+    alert('Anda harus login untuk mengedit background');
+    return;
+  }
   document.getElementById('bg-editor-modal').classList.add('show');
   loadUserBackground();
 }
@@ -818,6 +986,11 @@ function setTool(tool) {
   });
   
   event.target.classList.add('active');
+  
+  // Jika bucket, langsung isi
+  if (tool === 'bucket') {
+    fillBucket();
+  }
 }
 
 function setColor(color) {
@@ -829,6 +1002,7 @@ function setBrushSize(size) {
   document.getElementById('brush-size-label').textContent = size + 'px';
 }
 
+// Event listeners untuk canvas
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
@@ -878,17 +1052,9 @@ function stopDrawing() {
 }
 
 function fillBucket() {
-  if(canvasTool === 'bucket') {
-    ctx.fillStyle = canvasColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
+  ctx.fillStyle = canvasColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
-
-// Update bucket tool untuk langsung mengisi
-document.querySelector('[onclick="setTool(\'bucket\')"]').addEventListener('click', function() {
-  setTool('bucket');
-  fillBucket();
-});
 
 function clearCanvas() {
   ctx.fillStyle = '#ffffff';
@@ -901,55 +1067,69 @@ async function saveBackground() {
     return;
   }
   
-  // Konversi canvas ke data URL
-  const imageData = canvas.toDataURL('image/png');
-  
-  // Simpan ke database
-  const backgroundData = {
-    imageData: imageData,
-    savedAt: new Date().toISOString()
-  };
-  
-  const {error} = await sb.from('KLIKUSER')
-    .update({ background_data: JSON.stringify(backgroundData) })
-    .eq('username', currentUser);
-  
-  if(error) {
+  try {
+    // Konversi canvas ke data URL
+    const imageData = canvas.toDataURL('image/png');
+    
+    // Simpan ke database
+    const backgroundData = {
+      imageData: imageData,
+      savedAt: new Date().toISOString()
+    };
+    
+    const {error} = await sb.from('KLIKUSER')
+      .update({ background_data: JSON.stringify(backgroundData) })
+      .eq('username', currentUser);
+    
+    if(error) {
+      console.error('Error saving background:', error);
+      alert('Gagal menyimpan background');
+      return;
+    }
+    
+    alert('Background berhasil disimpan!');
+    closeBgEditor();
+    loadBoard();
+    
+    // Tampilkan preview
+    showPreview(backgroundData);
+  } catch (error) {
     console.error('Error saving background:', error);
-    alert('Gagal menyimpan background');
-    return;
+    alert('Error menyimpan background: ' + error.message);
   }
-  
-  alert('Background berhasil disimpan!');
-  closeBgEditor();
-  loadBoard();
-  
-  // Tampilkan preview
-  showPreview(backgroundData);
 }
 
 async function loadUserBackground() {
   if(!currentUser) return;
   
-  const {data} = await sb.from('KLIKUSER')
-    .select('background_data')
-    .eq('username', currentUser)
-    .single();
-  
-  if(data && data.background_data) {
-    try {
-      const bgData = JSON.parse(data.background_data);
-      if(bgData.imageData) {
-        const img = new Image();
-        img.onload = function() {
-          clearCanvas();
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
-        img.src = bgData.imageData;
-      }
-    } catch(e) {
-      console.error('Error loading background:', e);
+  try {
+    const {data, error} = await sb.from('KLIKUSER')
+      .select('background_data')
+      .eq('username', currentUser)
+      .single();
+    
+    if(error) {
+      console.error('Error loading background:', error);
+      return;
     }
+    
+    if(data && data.background_data) {
+      try {
+        const bgData = JSON.parse(data.background_data);
+        if(bgData.imageData) {
+          const img = new Image();
+          img.onload = function() {
+            clearCanvas();
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          };
+          img.src = bgData.imageData;
+        }
+      } catch(e) {
+        console.error('Error parsing background data:', e);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading user background:', error);
   }
 }
 
@@ -957,14 +1137,28 @@ function showPreview(bgData) {
   const previewDiv = document.getElementById('export-preview');
   previewDiv.innerHTML = `
     <p>Preview latar belakang Anda:</p>
-    <div class="preview-item" style="background: url(${bgData.imageData}); background-size: cover; padding: 20px; border: 2px solid #333;">
+    <div class="preview-item" style="background: url('${bgData.imageData}'); background-size: cover; padding: 15px 30px; border: 2px solid #333; display: inline-block;">
       ${currentUser}
     </div>
     <p><small>Background akan muncul di leaderboard</small></p>
   `;
 }
 
-loadBoard();
+// Inisialisasi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+  // Cek tabel saat halaman dimuat
+  createTablesIfNotExist().then(success => {
+    if (success) {
+      loadBoard();
+    }
+  });
+  
+  // Set event listener untuk bucket tool
+  const bucketBtn = document.querySelector('[onclick="setTool(\'bucket\')"]');
+  if (bucketBtn) {
+    bucketBtn.addEventListener('click', fillBucket);
+  }
+});
 </script>
 
 </body>
