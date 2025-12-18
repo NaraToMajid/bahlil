@@ -1,130 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-    body{background:#bfbfbf;min-height:100vh;display:flex;align-items:center;justify-content:center}
-    .center{text-align:center}
-    .count{font-size:32px;margin-bottom:14px;transition:.2s}
-    .count.bump{transform:scale(1.2)}
-    .photo{width:220px;height:220px;border-radius:50%;border:8px solid #e0e0e0;overflow:hidden;cursor:pointer;margin:auto;transition:.2s}
-    .photo:active{transform:scale(0.95)}
-    .photo img{width:100%;height:100%;object-fit:cover}
-    .leaderboard-btn{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:#333;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
-    .panel{position:fixed;top:0;right:0;width:320px;height:100%;background:#e5e5e5;transform:translateX(100%);transition:.3s;padding:16px;overflow:auto}
-    .panel.active{transform:translateX(0)}
-    h3{margin-top:12px}
-    input,button{width:100%;padding:8px;margin-top:8px}
-    .close{margin-bottom:8px}
-    table{width:100%;margin-top:12px;border-collapse:collapse}
-    td{padding:6px;border-bottom:1px solid #aaa}
-  </style>
+<meta charset="UTF-8">
+<title>Klik</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;background:#bfbfbf;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial}
+#count{font-size:32px;margin-bottom:12px;transition:.15s}
+.bump{transform:scale(1.2)}
+#photo{width:220px;height:220px;border-radius:50%;border:8px solid #eee;overflow:hidden;cursor:pointer}
+#photo img{width:100%;height:100%;object-fit:cover}
+#btn{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:#333;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#panel{position:fixed;right:0;top:0;width:320px;height:100%;background:#e5e5e5;transform:translateX(100%);transition:.3s;padding:16px;overflow:auto}
+#panel.show{transform:translateX(0)}
+input,button{width:100%;padding:8px;margin-top:8px}
+table{width:100%;margin-top:12px;border-collapse:collapse}
+td{border-bottom:1px solid #aaa;padding:6px}
+</style>
 </head>
 <body>
-  <div class="leaderboard-btn" id="lbBtn">★</div>
 
-  <div class="center">
-    <div class="count" id="count">0</div>
-    <div class="photo" id="photo">
-      <img src="foto.webp" />
-    </div>
-  </div>
+<div id="btn">★</div>
 
-  <div class="panel" id="panel">
-    <button class="close" id="close">Tutup</button>
+<div style="text-align:center">
+  <div id="count">0</div>
+  <div id="photo"><img src="foto.webp"></div>
+</div>
 
-    <h3>Masuk / Daftar</h3>
-    <input type="text" id="username" placeholder="Username (wajib saat daftar)" />
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="authBtn">Masuk / Daftar</button>
+<div id="panel">
+  <button onclick="panel.classList.remove('show')">Tutup</button>
+  <input id="username" placeholder="Username">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="auth()">Masuk / Daftar</button>
+  <table id="board"></table>
+</div>
 
-    <table id="board"></table>
-  </div>
+<audio id="sound" src="suara.mp3"></audio>
 
-  <audio id="sound" src="suara.mp3"></audio>
+<script>
+const sb = supabase.createClient(
+  'https://bxhrnnwfqlsoviysqcdw.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
+);
 
-  <script>
-    const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
+btn.onclick=()=>panel.classList.add('show');
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+photo.onclick=async()=>{
+  sound.currentTime=0; sound.play();
+  sound.currentTime=0; sound.play();
+  count.textContent=+count.textContent+1;
+  count.classList.add('bump');
+  setTimeout(()=>count.classList.remove('bump'),150);
+  const {data:{user}}=await sb.auth.getUser();
+  if(user) await sb.rpc('inc_click');
+};
 
-    lbBtn.onclick=()=>panel.classList.add('active');
-    close.onclick=()=>panel.classList.remove('active');
+async function auth(){
+  let {data,error}=await sb.auth.signInWithPassword({
+    email:email.value,
+    password:password.value
+  });
 
-    const countEl=document.getElementById('count');
-    const sound=document.getElementById('sound');
+  if(error){
+    let s=await sb.auth.signUp({
+      email:email.value,
+      password:password.value
+    });
+    if(s.error) return alert(s.error.message);
+    await sb.from('KLIKUSER').insert({
+      user_id:s.data.user.id,
+      username:username.value
+    });
+  }
+  loadMe(); loadBoard(); panel.classList.add('show');
+}
 
-    photo.onclick=async()=>{
-      sound.currentTime=0;
-      sound.play();
-      sound.currentTime=0;
-      sound.play();
-      countEl.innerText = Number(countEl.innerText)+1;
-      countEl.classList.add('bump');
-      setTimeout(()=>countEl.classList.remove('bump'),150);
-      const { data:{user} } = await sb.auth.getUser();
-      if(user) await sb.rpc('inc_click');
-    };
+async function loadMe(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user) return;
+  const {data}=await sb.from('KLIKUSER')
+    .select('jumlah_klik')
+    .eq('user_id',user.id)
+    .single();
+  if(data) count.textContent=data.jumlah_klik;
+}
 
-    authBtn.onclick=async()=>{
-      const emailVal=email.value.trim();
-      const passVal=password.value.trim();
-      if(!emailVal || !passVal) return;
+async function loadBoard(){
+  const {data}=await sb.from('KLIKUSER')
+    .select('*')
+    .order('jumlah_klik',{ascending:false});
+  board.innerHTML='';
+  data.forEach((r,i)=>{
+    board.innerHTML+=`<tr><td>${i+1}</td><td>${r.username}</td><td>${r.jumlah_klik}</td></tr>`;
+  });
+}
 
-      let { data, error } = await sb.auth.signInWithPassword({
-        email: emailVal,
-        password: passVal
-      });
+sb.channel('rt')
+.on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},()=>{loadBoard();loadMe();})
+.subscribe();
 
-      if(error){
-        const signup = await sb.auth.signUp({
-          email: emailVal,
-          password: passVal
-        });
-
-        if(signup.error) return;
-
-        if(!username.value) return;
-
-        await sb.from('KLIKUSER').insert({
-          user_id: signup.data.user.id,
-          username: username.value
-        });
-      }
-
-      panel.classList.add('active');
-      loadMyCount();
-      loadBoard();
-    };
-
-    async function loadBoard(){
-      const { data } = await sb.from('KLIKUSER').select('*').order('jumlah_klik',{ascending:false});
-      board.innerHTML='';
-      data?.forEach((r,i)=>{
-        board.innerHTML+=`<tr><td>${i+1}</td><td>${r.username}</td><td>${r.jumlah_klik}</td></tr>`;
-      });
-    }
-
-    async function loadMyCount(){
-      const { data:{user} } = await sb.auth.getUser();
-      if(!user) return;
-      const { data } = await sb.from('KLIKUSER').select('jumlah_klik').eq('user_id',user.id).single();
-      if(data) countEl.innerText=data.jumlah_klik;
-    }
-
-    sb.auth.onAuthStateChange(()=>{loadMyCount();loadBoard();});
-
-    sb.channel('rt')
-      .on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},()=>{loadBoard();loadMyCount();})
-      .subscribe();
-
-    loadBoard();
-    loadMyCount();
-  </script>
+loadBoard(); loadMe();
+</script>
 </body>
 </html>
