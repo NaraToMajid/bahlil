@@ -16,12 +16,12 @@
 html,body{
   width:100%;
   height:100%;
-  overflow:hidden; /* 🚫 ANTI SCROLL */
+  overflow:hidden;
   background:#bdbdbd;
   font-family:Arial, sans-serif;
 }
 
-/* ===== CENTER AREA ===== */
+/* ===== CENTER ===== */
 #app{
   width:100%;
   height:100%;
@@ -44,7 +44,6 @@ html,body{
   border:8px solid #eee;
   overflow:hidden;
   cursor:pointer;
-  flex-shrink:0;
 }
 
 #photo img{
@@ -53,7 +52,7 @@ html,body{
   object-fit:cover;
 }
 
-/* ===== BUTTON ===== */
+/* ===== BUTTON PANEL ===== */
 #btn{
   position:fixed;
   top:14px;
@@ -104,6 +103,11 @@ input,button{
 
 button{
   cursor:pointer;
+}
+
+button.logout{
+  background:#c62828;
+  color:#fff;
 }
 
 /* ===== LEADERBOARD ===== */
@@ -162,85 +166,112 @@ const sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
 );
 
-let currentUser=null;
-let currentClick=0;
+let currentUser = null;
+let currentClick = 0;
 
-btn.onclick=()=>panel.classList.add('show');
+btn.onclick = () => panel.classList.add('show');
 
-/* ===== CLICK FOTO (AUDIO OVERLAP FIX) ===== */
-photo.onclick=async()=>{
+/* ===== CLICK FOTO ===== */
+photo.onclick = async () => {
   if(!currentUser){
     alert('Login dulu');
     return;
   }
 
-  // 🔊 AUDIO TUMPUK (AMAN)
-  const audio=new Audio('suara.mp3');
-  audio.playbackRate=2;
+  const audio = new Audio('suara.mp3');
+  audio.playbackRate = 2;
   audio.play();
 
   currentClick++;
-  count.textContent=currentClick;
+  count.textContent = currentClick;
 
   await sb.from('KLIKUSER')
-    .update({jumlah_klik:currentClick})
-    .eq('username',currentUser);
+    .update({ jumlah_klik: currentClick })
+    .eq('username', currentUser);
 };
 
 /* ===== AUTH ===== */
 async function register(){
-  const u=reg_user.value.trim();
-  const p=reg_pass.value.trim();
-  if(!u||!p) return alert('Isi semua');
+  const u = reg_user.value.trim();
+  const p = reg_pass.value.trim();
+  if(!u || !p) return alert('Isi semua');
 
-  const {error}=await sb.from('KLIKUSER')
-    .insert({username:u,password:p});
+  const {error} = await sb.from('KLIKUSER')
+    .insert({ username:u, password:p });
 
   if(error) return alert('Username sudah ada');
 
-  currentUser=u;
-  currentClick=0;
+  currentUser = u;
+  currentClick = 0;
   afterLogin();
 }
 
 async function login(){
-  const u=log_user.value.trim();
-  const p=log_pass.value.trim();
+  const u = log_user.value.trim();
+  const p = log_pass.value.trim();
 
-  const {data}=await sb.from('KLIKUSER')
+  const {data} = await sb.from('KLIKUSER')
     .select('*')
-    .eq('username',u)
-    .eq('password',p)
+    .eq('username', u)
+    .eq('password', p)
     .single();
 
   if(!data) return alert('Login gagal');
 
-  currentUser=u;
-  currentClick=data.jumlah_klik;
+  currentUser = u;
+  currentClick = data.jumlah_klik;
   afterLogin();
 }
 
+/* ===== AFTER LOGIN ===== */
 function afterLogin(){
-  count.textContent=currentClick;
+  count.textContent = currentClick;
 
-  panel.innerHTML=`
+  panel.innerHTML = `
     <button onclick="panel.classList.remove('show')">Tutup</button>
+    <button class="logout" onclick="logout()">🚪 Log Out</button>
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
     <table id="board"></table>
   `;
   loadBoard();
 }
 
+/* ===== LOGOUT ===== */
+function logout(){
+  currentUser = null;
+  currentClick = 0;
+  count.textContent = 0;
+
+  panel.innerHTML = `
+    <h3>DAFTAR</h3>
+    <input id="reg_user" placeholder="Username">
+    <input id="reg_pass" type="password" placeholder="Password">
+    <button onclick="register()">Daftar</button>
+
+    <hr>
+
+    <h3>LOGIN</h3>
+    <input id="log_user" placeholder="Username">
+    <input id="log_pass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <hr>
+
+    <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
+    <table id="board"></table>
+  `;
+}
+
 /* ===== LEADERBOARD ===== */
 async function loadBoard(){
-  const {data}=await sb.from('KLIKUSER')
+  const {data} = await sb.from('KLIKUSER')
     .select('*')
-    .order('jumlah_klik',{ascending:false});
+    .order('jumlah_klik', { ascending:false });
 
-  const board=document.getElementById('board');
+  const board = document.getElementById('board');
   if(!board) return;
 
-  board.innerHTML='';
+  board.innerHTML = '';
   data.forEach((r,i)=>{
     let cls='';
     if(i===0)cls='gold';
@@ -248,7 +279,7 @@ async function loadBoard(){
     else if(i===2)cls='bronze';
     if(r.username===currentUser)cls+=' me';
 
-    board.innerHTML+=`
+    board.innerHTML += `
       <tr class="${cls}">
         <td>${i+1}</td>
         <td>${r.username}</td>
