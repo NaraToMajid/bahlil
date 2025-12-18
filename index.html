@@ -110,6 +110,34 @@ button.logout{
   color:#fff;
 }
 
+/* ===== VERIFIKASI KODE ===== */
+#verif-code-container {
+  background:#f9f9f9;
+  padding:10px;
+  border-radius:8px;
+  margin:10px 0;
+  text-align:center;
+}
+
+#verif-code{
+  font-size:24px;
+  font-weight:bold;
+  letter-spacing:3px;
+  color:#2196F3;
+  padding:10px;
+  background:#fff;
+  border-radius:5px;
+  border:2px dashed #bbb;
+  margin:8px 0;
+  user-select:all;
+}
+
+#copy-hint{
+  font-size:12px;
+  color:#666;
+  margin:5px 0;
+}
+
 /* ===== LEADERBOARD ===== */
 table{
   width:100%;
@@ -145,6 +173,14 @@ td{
   <h3>DAFTAR</h3>
   <input id="reg_user" placeholder="Username">
   <input id="reg_pass" type="password" placeholder="Password">
+  
+  <div id="verif-code-container">
+    <small>Salin kode verifikasi berikut:</small>
+    <div id="verif-code"></div>
+    <div id="copy-hint">Klik untuk menyalin, lalu tempel di bawah</div>
+  </div>
+  
+  <input id="reg_verif" placeholder="Tempel kode verifikasi di sini">
   <button onclick="register()">Daftar</button>
 
   <hr>
@@ -161,6 +197,47 @@ td{
 </div>
 
 <script>
+// ==== ANTI INSPECT & KLIK KANAN ====
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+document.addEventListener('keydown', function(e) {
+  // Block F12
+  if(e.key === 'F12') {
+    e.preventDefault();
+    return false;
+  }
+  
+  // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+  if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) {
+    e.preventDefault();
+    return false;
+  }
+  
+  if(e.ctrlKey && e.key === 'u') {
+    e.preventDefault();
+    return false;
+  }
+  
+  // Block DevTools dengan tombol lain
+  if(e.key === 'F8' || (e.ctrlKey && e.key === 'S') || (e.ctrlKey && e.key === 'C')) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+// Deteksi DevTools opening (basic detection)
+setInterval(function() {
+  const before = new Date();
+  debugger;
+  const after = new Date();
+  if(after - before > 100) {
+    window.location.reload();
+  }
+}, 1000);
+
 const sb = supabase.createClient(
   'https://bxhrnnwfqlsoviysqcdw.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
@@ -168,8 +245,31 @@ const sb = supabase.createClient(
 
 let currentUser = null;
 let currentClick = 0;
+let verificationCode = '';
 
-btn.onclick = () => panel.classList.add('show');
+// Generate verification code
+function generateVerificationCode() {
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  document.getElementById('verif-code').textContent = code;
+  verificationCode = code;
+  
+  // Tambahkan fungsi klik untuk copy
+  document.getElementById('verif-code').onclick = function() {
+    navigator.clipboard.writeText(code);
+    document.getElementById('copy-hint').textContent = '✓ Kode disalin!';
+    setTimeout(() => {
+      document.getElementById('copy-hint').textContent = 'Klik untuk menyalin, lalu tempel di bawah';
+    }, 2000);
+  };
+}
+
+// Panggil saat halaman dimuat
+generateVerificationCode();
+
+btn.onclick = () => {
+  panel.classList.add('show');
+  generateVerificationCode(); // Generate kode baru setiap kali panel dibuka
+};
 
 /* ===== CLICK FOTO ===== */
 photo.onclick = async () => {
@@ -194,13 +294,26 @@ photo.onclick = async () => {
 async function register(){
   const u = reg_user.value.trim();
   const p = reg_pass.value.trim();
-  if(!u || !p) return alert('Isi semua');
+  const v = reg_verif.value.trim();
+  
+  if(!u || !p || !v) return alert('Isi semua kolom');
+  
+  // Verifikasi kode
+  if(v !== verificationCode) {
+    alert('Kode verifikasi salah! Silakan salin kode yang benar dari atas.');
+    generateVerificationCode(); // Generate kode baru
+    return;
+  }
+  
+  if(u.length < 3) return alert('Username minimal 3 karakter');
+  if(p.length < 6) return alert('Password minimal 6 karakter');
 
   const {error} = await sb.from('KLIKUSER')
     .insert({ username:u, password:p });
 
   if(error) return alert('Username sudah ada');
 
+  alert('Akun berhasil dibuat!');
   currentUser = u;
   currentClick = 0;
   afterLogin();
@@ -246,6 +359,14 @@ function logout(){
     <h3>DAFTAR</h3>
     <input id="reg_user" placeholder="Username">
     <input id="reg_pass" type="password" placeholder="Password">
+    
+    <div id="verif-code-container">
+      <small>Salin kode verifikasi berikut:</small>
+      <div id="verif-code"></div>
+      <div id="copy-hint">Klik untuk menyalin, lalu tempel di bawah</div>
+    </div>
+    
+    <input id="reg_verif" placeholder="Tempel kode verifikasi di sini">
     <button onclick="register()">Daftar</button>
 
     <hr>
@@ -260,6 +381,11 @@ function logout(){
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
     <table id="board"></table>
   `;
+  
+  // Re-generate verification code setelah logout
+  setTimeout(() => {
+    generateVerificationCode();
+  }, 100);
 }
 
 /* ===== LEADERBOARD ===== */
