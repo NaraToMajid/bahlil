@@ -31,8 +31,9 @@ body { background: #000; height: 100vh; font-family: Arial, sans-serif; }
     border: 3px solid #fff; 
     overflow: hidden; 
     z-index: 1;
+    transition: transform 0.05s;
 }
-.circle img { width: 100%; height: 100%; object-fit: cover; }
+.circle:active { transform: translate(-50%, -50%) scale(0.95); }
 .btn { 
     position: fixed; 
     top: 20px; 
@@ -129,9 +130,7 @@ body { background: #000; height: 100vh; font-family: Arial, sans-serif; }
 <body>
 <div class="counter" id="counter">0</div>
 <div class="circle" id="circle">
-    <div style="width:100%;height:100%;background:#333;display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem;">
-        <i class="fas fa-mouse-pointer"></i>
-    </div>
+    <!-- Foto akan dimuat dari file foto.webp -->
 </div>
 <button class="btn" id="toggle"><i class="fas fa-trophy"></i></button>
 <div class="panel" id="panel">
@@ -181,10 +180,30 @@ body { background: #000; height: 100vh; font-family: Arial, sans-serif; }
 </div>
 
 <script>
-// Variabel global
+// Inisialisasi variabel
 let clicks = 0;
 let currentUser = null;
 let audio = null;
+
+// Konfigurasi Supabase
+const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
+
+// Inisialisasi Supabase
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : {
+    from: () => ({
+        select: () => ({
+            eq: () => ({
+                single: async () => ({ data: null, error: new Error('Supabase not loaded') })
+            }),
+            order: () => ({
+                limit: async () => ({ data: [], error: null })
+            }),
+            insert: async () => ({ data: null, error: new Error('Supabase not loaded') }),
+            update: async () => ({ error: new Error('Supabase not loaded') })
+        })
+    })
+};
 
 // DOM Elements
 const counter = document.getElementById('counter');
@@ -206,38 +225,49 @@ const content = document.getElementById('content');
 const loginErr = document.getElementById('loginErr');
 const regErr = document.getElementById('regErr');
 
-// Initialize Supabase
-const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
+// Load foto
+const loadPhoto = () => {
+    const img = new Image();
+    img.src = 'foto.webp';
+    img.onload = () => {
+        circle.innerHTML = '';
+        circle.appendChild(img);
+    };
+    img.onerror = () => {
+        circle.innerHTML = '<div style="width:100%;height:100%;background:#333;display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem;"><i class="fas fa-mouse-pointer"></i></div>';
+    };
+    img.alt = 'Klik disini';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+};
 
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
-// Initialize audio
-try {
+// Inisialisasi audio
+const initAudio = () => {
     audio = new Audio('suara.mp3');
-    audio.volume = 0.3;
+    audio.volume = 0.5;
     audio.preload = 'auto';
-} catch(e) {
-    console.log("Audio tidak tersedia");
-}
+    audio.load();
+};
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
+// Setup event listeners
+const setupEventListeners = () => {
     // Klik pada lingkaran
     circle.addEventListener('click', handleClick);
     
     // Tombol leaderboard
-    toggle.addEventListener('click', function() {
+    toggle.addEventListener('click', () => {
         panel.classList.toggle('open');
+        loadLeaderboard();
     });
     
     // Tombol close panel
-    closeBtn.addEventListener('click', function() {
+    closeBtn.addEventListener('click', () => {
         panel.classList.remove('open');
     });
     
     // Form login/register
-    showLogin.addEventListener('click', function() {
+    showLogin.addEventListener('click', () => {
         loginForm.classList.add('active');
         registerForm.classList.remove('active');
         showLogin.style.display = 'none';
@@ -245,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearErrors();
     });
     
-    showRegister.addEventListener('click', function() {
+    showRegister.addEventListener('click', () => {
         registerForm.classList.add('active');
         loginForm.classList.remove('active');
         showLogin.style.display = 'none';
@@ -259,53 +289,82 @@ document.addEventListener('DOMContentLoaded', function() {
     // Tombol register
     regBtn.addEventListener('click', handleRegister);
     
-    // Load leaderboard awal
-    loadLeaderboard();
-});
+    // Enter key untuk login
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    passInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    
+    // Enter key untuk register
+    regUserInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleRegister();
+    });
+    regPassInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleRegister();
+    });
+};
 
 // Handle klik pada lingkaran
-function handleClick() {
+const handleClick = () => {
     clicks++;
     counter.textContent = clicks;
     
-    // Efek visual
-    counter.style.textShadow = '0 0 20px #fff, 0 0 30px #fff';
+    // Efek visual pada counter
+    counter.style.textShadow = '0 0 25px #fff';
     setTimeout(() => {
         counter.style.textShadow = '0 0 15px #fff';
     }, 100);
     
-    // Efek klik pada lingkaran
-    circle.style.transform = 'translate(-50%, -50%) scale(0.95)';
-    setTimeout(() => {
-        circle.style.transform = 'translate(-50%, -50%) scale(1)';
-    }, 100);
-    
-    // Play suara
+    // Play suara dengan cepat
     playSound();
     
     // Update skor jika user login
-    if (currentUser && supabase) {
+    if (currentUser) {
         updateScore();
     }
-}
+};
 
-// Play suara
-function playSound() {
-    if (!audio) return;
+// Play suara dengan cepat
+const playSound = () => {
+    if (!audio) {
+        // Fallback sound jika audio tidak tersedia
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            oscillator.frequency.value = 1000;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + 0.1);
+        } catch (e) {
+            console.log("Fallback sound error");
+        }
+        return;
+    }
     
     try {
-        const audioClone = audio.cloneNode();
-        audioClone.volume = 0.3;
-        audioClone.play().catch(e => {
-            console.log("Gagal memainkan suara:", e);
-        });
-    } catch(e) {
-        console.log("Error playing sound:", e);
+        // Buat audio baru setiap kali untuk response cepat
+        const audioClone = new Audio('suara.mp3');
+        audioClone.volume = 0.5;
+        audioClone.playbackRate = 1.5; // Percepat suara 1.5x
+        audioClone.play().catch(e => console.log("Audio play error"));
+    } catch (e) {
+        console.log("Audio error:", e);
     }
-}
+};
 
 // Handle login
-async function handleLogin() {
+const handleLogin = async () => {
     const username = userInput.value.trim();
     const password = passInput.value.trim();
     
@@ -314,14 +373,10 @@ async function handleLogin() {
         return;
     }
     
-    if (!supabase) {
-        showError(loginErr, "Database tidak terhubung");
-        return;
-    }
-    
     try {
+        // Query ke tabel KLIKUSER
         const { data, error } = await supabase
-            .from('USER_KLIK')
+            .from('KLIKUSER')
             .select('*')
             .eq('username', username)
             .eq('password', password)
@@ -339,8 +394,8 @@ async function handleLogin() {
             click_count: data.click_count || 0
         };
         
-        // Update counter
-        clicks = currentUser.click_count;
+        // Update counter dari database
+        clicks = currentUser.click_count || 0;
         counter.textContent = clicks;
         
         // Tampilkan pesan sukses
@@ -348,13 +403,12 @@ async function handleLogin() {
         loadLeaderboard();
         
     } catch (error) {
-        showError(loginErr, "Terjadi kesalahan");
-        console.error("Login error:", error);
+        showError(loginErr, "Database error: " + error.message);
     }
-}
+};
 
 // Handle register
-async function handleRegister() {
+const handleRegister = async () => {
     const username = regUserInput.value.trim();
     const password = regPassInput.value.trim();
     
@@ -368,15 +422,10 @@ async function handleRegister() {
         return;
     }
     
-    if (!supabase) {
-        showError(regErr, "Database tidak terhubung");
-        return;
-    }
-    
     try {
         // Cek apakah username sudah ada
         const { data: existing } = await supabase
-            .from('USER_KLIK')
+            .from('KLIKUSER')
             .select('id')
             .eq('username', username)
             .single();
@@ -388,19 +437,20 @@ async function handleRegister() {
         
         // Buat user baru
         const { data: newUser, error } = await supabase
-            .from('USER_KLIK')
+            .from('KLIKUSER')
             .insert([
                 { 
                     username: username, 
                     password: password,
-                    click_count: 0
+                    click_count: 0,
+                    created_at: new Date().toISOString()
                 }
             ])
             .select()
             .single();
         
         if (error) {
-            showError(regErr, "Gagal membuat akun");
+            showError(regErr, "Gagal membuat akun: " + error.message);
             return;
         }
         
@@ -414,47 +464,45 @@ async function handleRegister() {
         loadLeaderboard();
         
     } catch (error) {
-        showError(regErr, "Terjadi kesalahan");
-        console.error("Register error:", error);
+        showError(regErr, "Database error: " + error.message);
     }
-}
+};
 
 // Update skor ke database
-async function updateScore() {
-    if (!currentUser || !supabase) return;
+const updateScore = async () => {
+    if (!currentUser) return;
     
     try {
         await supabase
-            .from('USER_KLIK')
-            .update({ click_count: clicks })
+            .from('KLIKUSER')
+            .update({ 
+                click_count: clicks,
+                updated_at: new Date().toISOString()
+            })
             .eq('id', currentUser.id);
         
         loadLeaderboard();
     } catch (error) {
         console.error("Update score error:", error);
     }
-}
+};
 
-// Load leaderboard
-async function loadLeaderboard() {
-    if (!supabase) {
-        content.innerHTML = '<div class="item"><div class="info"><div class="name">Database tidak terhubung</div></div></div>';
-        return;
-    }
-    
+// Load leaderboard dari tabel KLIKUSER
+const loadLeaderboard = async () => {
     try {
+        // Ambil semua user dari tabel KLIKUSER
         const { data, error } = await supabase
-            .from('USER_KLIK')
+            .from('KLIKUSER')
             .select('username, click_count')
             .order('click_count', { ascending: false });
         
         if (error) {
-            content.innerHTML = '<div class="item"><div class="info"><div class="name">Error loading data</div></div></div>';
+            content.innerHTML = '<div class="item"><div class="info"><div class="name">Error: ' + error.message + '</div></div></div>';
             return;
         }
         
         if (!data || data.length === 0) {
-            content.innerHTML = '<div class="item"><div class="info"><div class="name">Belum ada data</div></div></div>';
+            content.innerHTML = '<div class="item"><div class="info"><div class="name">Belum ada data pengguna</div></div></div>';
             return;
         }
         
@@ -475,13 +523,12 @@ async function loadLeaderboard() {
         content.innerHTML = html;
         
     } catch (error) {
-        console.error("Load leaderboard error:", error);
-        content.innerHTML = '<div class="item"><div class="info"><div class="name">Error loading leaderboard</div></div></div>';
+        content.innerHTML = '<div class="item"><div class="info"><div class="name">Connection error</div></div></div>';
     }
-}
+};
 
 // Tampilkan tombol auth
-function showAuthButtons() {
+const showAuthButtons = () => {
     loginForm.classList.remove('active');
     registerForm.classList.remove('active');
     showLogin.style.display = 'block';
@@ -491,22 +538,30 @@ function showAuthButtons() {
     regUserInput.value = '';
     regPassInput.value = '';
     clearErrors();
-}
+};
 
 // Tampilkan error
-function showError(element, message) {
+const showError = (element, message) => {
     element.textContent = message;
     element.classList.add('show');
     setTimeout(() => {
         element.classList.remove('show');
-    }, 3000);
-}
+    }, 5000);
+};
 
 // Hapus semua error
-function clearErrors() {
+const clearErrors = () => {
     loginErr.classList.remove('show');
     regErr.classList.remove('show');
-}
+};
+
+// Inisialisasi aplikasi
+document.addEventListener('DOMContentLoaded', () => {
+    loadPhoto();
+    initAudio();
+    setupEventListeners();
+    loadLeaderboard();
+});
 </script>
 </body>
 </html>
