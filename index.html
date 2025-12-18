@@ -1,251 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Klik Counter</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;height:100vh;font-family:Arial}
-.counter{position:absolute;top:20%;left:50%;transform:translateX(-50%);font-size:4rem;color:#fff;font-weight:bold}
-.circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;cursor:pointer;border:3px solid #fff;overflow:hidden;background:#111}
-.btn{position:fixed;top:20px;right:20px;width:50px;height:50px;background:#000;color:#fff;border:2px solid #fff;border-radius:50%;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
-.panel{position:fixed;top:0;right:-300px;width:280px;height:100vh;background:#000;border-left:2px solid #333;transition:0.3s;z-index:99;padding:20px;color:#fff}
-.panel.open{right:0}
-.input{margin:10px 0}
-.input input{width:100%;padding:10px;margin:5px 0;background:#222;border:1px solid #444;color:#fff}
-button{padding:10px;background:#00ffff;color:#000;border:none;cursor:pointer;width:100%;margin:5px 0}
-.item{background:#111;padding:10px;margin:5px 0;border-radius:5px;display:flex;justify-content:space-between}
-.error{color:red;font-size:12px;margin:5px 0}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title></title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+    body{background:#bfbfbf;min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .center{position:relative}
+    .photo{width:220px;height:220px;border-radius:50%;border:8px solid #e0e0e0;overflow:hidden;cursor:pointer}
+    .photo img{width:100%;height:100%;object-fit:cover}
+    .leaderboard-btn{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:#333;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .panel{position:fixed;top:0;right:0;width:320px;height:100%;background:#e5e5e5;transform:translateX(100%);transition:.3s;padding:16px;overflow:auto}
+    .panel.active{transform:translateX(0)}
+    input,button{width:100%;padding:8px;margin-top:8px}
+    table{width:100%;margin-top:12px;border-collapse:collapse}
+    td,th{padding:6px;border-bottom:1px solid #aaa;text-align:left}
+  </style>
 </head>
 <body>
-<div class="counter" id="counter">0</div>
-<div class="circle" id="circle"></div>
-<button class="btn" id="toggle">📊</button>
-<div class="panel" id="panel">
-    <h2>LEADERBOARD</h2>
+  <div class="leaderboard-btn" id="lbBtn">★</div>
+
+  <div class="center">
+    <div class="photo" id="photo">
+      <img src="foto.webp" />
+    </div>
+  </div>
+
+  <div class="panel" id="panel">
     <div id="auth">
-        <button onclick="showLogin()">LOGIN</button>
-        <button onclick="showRegister()">REGISTER</button>
+      <input type="email" id="email" />
+      <input type="password" id="password" />
+      <button id="login">Login</button>
+      <button id="register">Register</button>
     </div>
-    <div id="loginForm" style="display:none">
-        <div class="input"><input type="text" id="username" placeholder="Username"></div>
-        <div class="input"><input type="password" id="password" placeholder="Password"></div>
-        <div class="error" id="loginError"></div>
-        <button onclick="login()">LOGIN</button>
-        <button onclick="backToAuth()">BACK</button>
-    </div>
-    <div id="registerForm" style="display:none">
-        <div class="input"><input type="text" id="regUser" placeholder="Username"></div>
-        <div class="input"><input type="password" id="regPass" placeholder="Password"></div>
-        <div class="error" id="regError"></div>
-        <button onclick="register()">REGISTER</button>
-        <button onclick="backToAuth()">BACK</button>
-    </div>
-    <div id="userInfo" style="display:none">
-        <h3 id="currentUsername"></h3>
-        <button onclick="logout()">LOGOUT</button>
-    </div>
-    <div id="list" style="margin-top:20px"></div>
-</div>
+    <table id="board"></table>
+  </div>
 
-<script>
-// SUPABASE CONFIG
-const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <audio id="sound" src="suara.mp3"></audio>
 
-// VARIABLES
-let clicks = 0;
-let currentUser = null;
+  <script>
+    const SUPABASE_URL = 'https://bxhrnnwfqlsoviysqcdw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8';
 
-// LOAD IMAGE
-const img = new Image();
-img.src = 'foto.webp';
-img.onload = function() {
-    document.getElementById('circle').innerHTML = '';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    document.getElementById('circle').appendChild(img);
-};
-img.onerror = function() {
-    document.getElementById('circle').innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;">KLIK</div>';
-};
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// CLICK HANDLER
-document.getElementById('circle').addEventListener('click', async function() {
-    clicks++;
-    document.getElementById('counter').textContent = clicks;
-    
-    // Sound
-    try {
-        const audio = new Audio('suara.mp3');
-        audio.playbackRate = 2.0;
-        audio.play();
-    } catch(e) {}
-    
-    // Update DB
-    if(currentUser) {
-        try {
-            await supabase
-                .from('user_klik')
-                .update({ click_count: clicks })
-                .eq('id', currentUser.id);
-            loadLeaderboard();
-        } catch(e) {}
+    const panel = document.getElementById('panel');
+    document.getElementById('lbBtn').onclick = ()=>panel.classList.toggle('active');
+
+    const sound = document.getElementById('sound');
+    document.getElementById('photo').onclick = async ()=>{
+      sound.currentTime=0; sound.play();
+      const { data:{user} } = await sb.auth.getUser();
+      if(user){
+        await sb.rpc('inc_click');
+      }
+    };
+
+    document.getElementById('login').onclick = async ()=>{
+      await sb.auth.signInWithPassword({email:email.value,password:password.value});
+    };
+
+    document.getElementById('register').onclick = async ()=>{
+      await sb.auth.signUp({email:email.value,password:password.value});
+    };
+
+    async function loadBoard(){
+      const { data } = await sb.from('leaderboard').select('*').order('clicks',{ascending:false});
+      const t=document.getElementById('board');
+      t.innerHTML='';
+      data?.forEach(r=>{
+        t.innerHTML+=`<tr><td>${r.name}</td><td>${r.clicks}</td></tr>`;
+      });
     }
-});
 
-// PANEL TOGGLE
-document.getElementById('toggle').addEventListener('click', function() {
-    document.getElementById('panel').classList.toggle('open');
-    loadLeaderboard();
-});
-
-// AUTH FUNCTIONS
-function showLogin() {
-    document.getElementById('auth').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-}
-
-function showRegister() {
-    document.getElementById('auth').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-}
-
-function backToAuth() {
-    document.getElementById('auth').style.display = 'block';
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('userInfo').style.display = 'none';
-}
-
-async function login() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    
-    if(!username || !password) {
-        document.getElementById('loginError').textContent = 'Isi semua field';
-        return;
-    }
-    
-    try {
-        const { data, error } = await supabase
-            .from('user_klik')
-            .select('*')
-            .eq('username', username)
-            .eq('password', password)
-            .single();
-        
-        if(error || !data) {
-            document.getElementById('loginError').textContent = 'Username/password salah';
-            return;
-        }
-        
-        currentUser = data;
-        clicks = data.click_count || 0;
-        document.getElementById('counter').textContent = clicks;
-        document.getElementById('currentUsername').textContent = 'User: ' + username;
-        document.getElementById('userInfo').style.display = 'block';
-        document.getElementById('auth').style.display = 'none';
-        document.getElementById('loginForm').style.display = 'none';
-        loadLeaderboard();
-    } catch(e) {
-        document.getElementById('loginError').textContent = 'Error login';
-    }
-}
-
-async function register() {
-    const username = document.getElementById('regUser').value.trim();
-    const password = document.getElementById('regPass').value.trim();
-    
-    if(!username || !password) {
-        document.getElementById('regError').textContent = 'Isi semua field';
-        return;
-    }
-    
-    if(password.length < 4) {
-        document.getElementById('regError').textContent = 'Password minimal 4 karakter';
-        return;
-    }
-    
-    try {
-        // Check if exists
-        const { data: exists } = await supabase
-            .from('user_klik')
-            .select('id')
-            .eq('username', username)
-            .single();
-        
-        if(exists) {
-            document.getElementById('regError').textContent = 'Username sudah ada';
-            return;
-        }
-        
-        // Create user
-        const { data, error } = await supabase
-            .from('user_klik')
-            .insert([{
-                username: username,
-                password: password,
-                click_count: 0
-            }])
-            .select()
-            .single();
-        
-        if(error) throw error;
-        
-        currentUser = data;
-        clicks = 0;
-        document.getElementById('counter').textContent = clicks;
-        document.getElementById('currentUsername').textContent = 'User: ' + username;
-        document.getElementById('userInfo').style.display = 'block';
-        document.getElementById('auth').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'none';
-        loadLeaderboard();
-    } catch(e) {
-        document.getElementById('regError').textContent = 'Error register';
-    }
-}
-
-function logout() {
-    currentUser = null;
-    clicks = 0;
-    document.getElementById('counter').textContent = clicks;
-    backToAuth();
-}
-
-async function loadLeaderboard() {
-    try {
-        const { data, error } = await supabase
-            .from('user_klik')
-            .select('username, click_count')
-            .order('click_count', { ascending: false });
-        
-        if(error) throw error;
-        
-        let html = '';
-        if(data && data.length > 0) {
-            data.forEach((user, index) => {
-                html += `<div class="item">
-                    <span>${index + 1}. ${user.username}</span>
-                    <span style="color:#0ff">${user.click_count || 0}</span>
-                </div>`;
-            });
-        } else {
-            html = '<div>No data</div>';
-        }
-        
-        document.getElementById('list').innerHTML = html;
-    } catch(e) {
-        document.getElementById('list').innerHTML = '<div>Error loading</div>';
-    }
-}
-
-// INIT
-loadLeaderboard();
-</script>
+    sb.channel('realtime').on('postgres_changes',{event:'*',schema:'public',table:'leaderboard'},loadBoard).subscribe();
+    loadBoard();
+  </script>
 </body>
 </html>
