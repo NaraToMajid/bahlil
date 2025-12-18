@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Klik</title>
+<title>Klik User</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
 body{margin:0;background:#bfbfbf;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial}
@@ -11,9 +11,10 @@ body{margin:0;background:#bfbfbf;height:100vh;display:flex;align-items:center;ju
 #photo{width:220px;height:220px;border-radius:50%;border:8px solid #eee;overflow:hidden;cursor:pointer}
 #photo img{width:100%;height:100%;object-fit:cover}
 #btn{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:#333;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#panel{position:fixed;right:0;top:0;width:320px;height:100%;background:#e5e5e5;transform:translateX(100%);transition:.3s;padding:16px;overflow:auto}
+#panel{position:fixed;right:0;top:0;width:340px;height:100%;background:#e5e5e5;transform:translateX(100%);transition:.3s;padding:16px;overflow:auto}
 #panel.show{transform:translateX(0)}
 input,button{width:100%;padding:8px;margin-top:8px}
+hr{margin:16px 0}
 table{width:100%;margin-top:12px;border-collapse:collapse}
 td{border-bottom:1px solid #aaa;padding:6px}
 </style>
@@ -29,10 +30,20 @@ td{border-bottom:1px solid #aaa;padding:6px}
 
 <div id="panel">
   <button onclick="panel.classList.remove('show')">Tutup</button>
-  <input id="username" placeholder="Username">
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="auth()">Masuk / Daftar</button>
+
+  <h3>DAFTAR</h3>
+  <input id="reg_username" placeholder="Username">
+  <input id="reg_email" placeholder="Email">
+  <input id="reg_password" type="password" placeholder="Password">
+  <button onclick="register()">Daftar</button>
+
+  <hr>
+
+  <h3>LOGIN</h3>
+  <input id="log_email" placeholder="Email">
+  <input id="log_password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+
   <table id="board"></table>
 </div>
 
@@ -56,23 +67,27 @@ photo.onclick=async()=>{
   if(user) await sb.rpc('inc_click');
 };
 
-async function auth(){
-  let {data,error}=await sb.auth.signInWithPassword({
-    email:email.value,
-    password:password.value
+async function register(){
+  const {data,error}=await sb.auth.signUp({
+    email:reg_email.value,
+    password:reg_password.value
+  });
+  if(error) return alert(error.message);
+
+  await sb.from('KLIKUSER').insert({
+    user_id:data.user.id,
+    username:reg_username.value
   });
 
-  if(error){
-    let s=await sb.auth.signUp({
-      email:email.value,
-      password:password.value
-    });
-    if(s.error) return alert(s.error.message);
-    await sb.from('KLIKUSER').insert({
-      user_id:s.data.user.id,
-      username:username.value
-    });
-  }
+  loadMe(); loadBoard(); panel.classList.add('show');
+}
+
+async function login(){
+  const {error}=await sb.auth.signInWithPassword({
+    email:log_email.value,
+    password:log_password.value
+  });
+  if(error) return alert(error.message);
   loadMe(); loadBoard(); panel.classList.add('show');
 }
 
