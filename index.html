@@ -81,7 +81,7 @@ html,body{
   top:0;
   right:0;
   width:85%;
-  max-width:360px;
+  max-width:400px;
   height:100%;
   background:#eaeaea;
   transform:translateX(100%);
@@ -175,6 +175,7 @@ td{
   cursor:pointer;
   position:relative;
   transition:background-color 0.2s;
+  padding-right:25px !important;
 }
 
 .username-cell:hover{
@@ -185,6 +186,25 @@ td{
 .silver{background:#c0c0c0;}
 .bronze{background:#cd7f32;}
 .me{outline:2px solid #000;}
+
+/* ===== NOTIFIKASI CHAT ===== */
+.chat-notification{
+  position:absolute;
+  top:50%;
+  right:5px;
+  transform:translateY(-50%);
+  width:12px;
+  height:12px;
+  background:#ff4444;
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%{opacity:1;}
+  50%{opacity:0.5;}
+  100%{opacity:1;}
+}
 
 /* ===== MENU TITIK TIGA ===== */
 .menu-btn{
@@ -230,9 +250,9 @@ td{
 
 .modal-content{
   background:white;
-  width:90%;
-  max-width:400px;
-  max-height:80vh;
+  width:95%;
+  max-width:500px;
+  max-height:85vh;
   border-radius:10px;
   overflow:hidden;
   display:flex;
@@ -252,38 +272,79 @@ td{
   padding:15px;
   flex:1;
   overflow-y:auto;
-  max-height:50vh;
+  max-height:60vh;
 }
 
 .modal-footer{
   padding:15px;
   background:#f5f5f5;
   border-top:1px solid #ddd;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
 .chat-message{
-  margin-bottom:10px;
-  padding:8px;
-  border-radius:8px;
+  margin-bottom:15px;
+  padding:12px;
+  border-radius:10px;
   background:#f0f0f0;
+  max-width:85%;
+  word-wrap:break-word;
 }
 
 .chat-message.sent{
   background:#e3f2fd;
+  margin-left:auto;
   text-align:right;
 }
 
 .chat-message .sender{
   font-weight:bold;
   color:#333;
-  font-size:12px;
+  font-size:13px;
+  margin-bottom:5px;
 }
 
 .chat-message .time{
-  font-size:10px;
+  font-size:11px;
   color:#666;
   float:right;
   margin-left:5px;
+}
+
+.chat-message .content{
+  font-size:14px;
+  line-height:1.4;
+}
+
+.chat-message img{
+  max-width:100%;
+  border-radius:5px;
+  margin-top:5px;
+}
+
+/* ===== INPUT AREA ===== */
+.chat-input-area{
+  display:flex;
+  gap:10px;
+}
+
+#chat-input{
+  flex:1;
+}
+
+.upload-btn{
+  width:50px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+
+.file-input{
+  display:none;
 }
 
 /* ===== EDITOR LATAR BELAKANG ===== */
@@ -363,6 +424,77 @@ td{
   font-size:12px;
 }
 
+/* ===== UPLOAD GAMBAR ===== */
+.upload-container{
+  margin-top:15px;
+  padding:15px;
+  background:#f9f9f9;
+  border-radius:8px;
+  border:2px dashed #ccc;
+  text-align:center;
+}
+
+.upload-btn-main{
+  background:#2196F3;
+  margin-bottom:10px;
+}
+
+.upload-preview{
+  margin-top:10px;
+  max-width:100%;
+  max-height:200px;
+  border-radius:5px;
+  display:none;
+}
+
+/* ===== CHAT GLOBAL MODAL ===== */
+#global-chat-modal .modal-content{
+  width:95%;
+  max-width:600px;
+  height:80vh;
+}
+
+.global-chat-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 15px;
+  background:#f5f5f5;
+  border-bottom:1px solid #ddd;
+}
+
+.global-chat-body{
+  flex:1;
+  overflow-y:auto;
+  padding:15px;
+}
+
+.global-chat-footer{
+  padding:15px;
+  background:#f5f5f5;
+  border-top:1px solid #ddd;
+}
+
+.global-message{
+  margin-bottom:10px;
+  padding:10px;
+  background:#f0f0f0;
+  border-radius:8px;
+  max-width:80%;
+}
+
+.global-message.sent{
+  background:#e3f2fd;
+  margin-left:auto;
+  text-align:right;
+}
+
+.global-message .sender{
+  font-weight:bold;
+  color:#2196F3;
+  font-size:12px;
+}
+
 /* ===== LOADING ===== */
 .loading{
   text-align:center;
@@ -391,12 +523,67 @@ td{
   font-weight:bold;
   border:2px solid #333;
 }
+
+/* ===== GLOBAL CHAT BUTTON ===== */
+#global-chat-btn{
+  position:fixed;
+  top:70px;
+  right:14px;
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background:#2196F3;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+  z-index:10;
+  box-shadow:0 3px 6px rgba(0,0,0,0.2);
+}
+
+#global-chat-btn .notification{
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  width:20px;
+  height:20px;
+  background:#ff4444;
+  border-radius:50%;
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:#f1f1f1;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#888;
+  border-radius:4px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:#555;
+}
 </style>
 </head>
 
 <body>
 
 <div id="btn">★</div>
+<div id="global-chat-btn" onclick="openGlobalChat()">
+  💬
+  <div id="global-notification" class="notification" style="display:none"></div>
+</div>
 
 <div id="app">
   <div id="count">0</div>
@@ -434,7 +621,7 @@ td{
   </div>
 </div>
 
-<!-- Modal Chat -->
+<!-- Modal Chat Pribadi -->
 <div id="chat-modal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -443,8 +630,12 @@ td{
     </div>
     <div class="modal-body" id="chat-messages"></div>
     <div class="modal-footer">
-      <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleChatKeyPress(event)">
-      <button onclick="sendChatMessage()" style="margin-top:10px">Kirim</button>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleChatKeyPress(event)">
+        <button class="upload-btn" onclick="document.getElementById('chat-file-input').click()">📎</button>
+        <input type="file" id="chat-file-input" class="file-input" accept="image/*" onchange="uploadChatImage(event)">
+      </div>
+      <button onclick="sendChatMessage()">Kirim Pesan</button>
     </div>
   </div>
 </div>
@@ -471,6 +662,14 @@ td{
       <div id="canvas-container">
         <canvas id="bg-canvas" width="300" height="40"></canvas>
       </div>
+      
+      <div class="upload-container">
+        <p>Atau upload gambar:</p>
+        <button class="upload-btn-main" onclick="document.getElementById('bg-file-input').click()">📁 Upload Gambar</button>
+        <input type="file" id="bg-file-input" class="file-input" accept="image/*" onchange="uploadBackgroundImage(event)">
+        <img id="upload-preview" class="upload-preview" alt="Preview">
+      </div>
+      
       <div class="export-buttons">
         <button onclick="clearCanvas()">🧹 Hapus</button>
         <button onclick="saveBackground()">💾 Simpan</button>
@@ -480,20 +679,27 @@ td{
   </div>
 </div>
 
+<!-- Modal Chat Global -->
+<div id="global-chat-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>💬 Chat Global</h3>
+      <button onclick="closeGlobalChat()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="global-chat-body" id="global-chat-messages"></div>
+    <div class="global-chat-footer">
+      <div class="chat-input-area">
+        <input type="text" id="global-chat-input" placeholder="Ketik pesan global..." onkeypress="handleGlobalChatKeyPress(event)">
+        <button class="upload-btn" onclick="document.getElementById('global-file-input').click()">📎</button>
+        <input type="file" id="global-file-input" class="file-input" accept="image/*" onchange="uploadGlobalImage(event)">
+      </div>
+      <button onclick="sendGlobalMessage()">Kirim ke Global</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ==== ANTI INSPECT & KLIK KANAN ====
-document.addEventListener('contextmenu', function(e) {
-  e.preventDefault();
-  return false;
-});
-
-document.addEventListener('keydown', function(e) {
-  if(e.key === 'F12') e.preventDefault();
-  if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) e.preventDefault();
-  if(e.ctrlKey && e.key === 'u') e.preventDefault();
-});
-
-// Inisialisasi Supabase Client
+// ==== INISIALISASI ====
 const sb = supabase.createClient(
   'https://bxhrnnwfqlsoviysqcdw.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
@@ -509,18 +715,19 @@ let brushSize = 3;
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let unreadChats = new Set();
+let unreadGlobal = 0;
+
+// Nama tabel
+const TABLE_KLIKUSER = 'KLIKUSER';
+const TABLE_KLIKCHAT = 'KLIKCHAT';
+const TABLE_GLOBALCHAT = 'GLOBALCHAT';
 
 // Inisialisasi canvas
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
-
-// Set canvas background putih
 ctx.fillStyle = '#ffffff';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-// Nama tabel yang benar (case sensitive)
-const TABLE_KLIKUSER = 'KLIKUSER';
-const TABLE_KLIKCHAT = 'KLIKCHAT';
 
 // Generate verification code
 function generateVerificationCode() {
@@ -531,32 +738,23 @@ function generateVerificationCode() {
   }
   verificationCode = code;
   
-  if (verifCodeElement) {
-    verifCodeElement.onclick = function() {
-      navigator.clipboard.writeText(code).then(() => {
-        const copyHint = document.getElementById('copy-hint');
-        if (copyHint) {
-          copyHint.textContent = '✓ Kode disalin!';
-          setTimeout(() => {
-            copyHint.textContent = 'Klik untuk menyalin, lalu tempel di bawah';
-          }, 2000);
-        }
-      });
-    };
-  }
+  verifCodeElement.onclick = function() {
+    navigator.clipboard.writeText(code).then(() => {
+      document.getElementById('copy-hint').textContent = '✓ Kode disalin!';
+      setTimeout(() => {
+        document.getElementById('copy-hint').textContent = 'Klik untuk menyalin, lalu tempel di bawah';
+      }, 2000);
+    });
+  };
 }
 
-// Panggil saat halaman dimuat
-generateVerificationCode();
-
-// Event listener untuk tombol panel
+// Event listeners
 document.getElementById('btn').onclick = () => {
   document.getElementById('panel').classList.add('show');
   generateVerificationCode();
   loadBoard();
 };
 
-/* ===== CLICK FOTO ===== */
 document.getElementById('photo').onclick = async () => {
   if(!currentUser){
     alert('Login dulu');
@@ -573,7 +771,6 @@ document.getElementById('photo').onclick = async () => {
   document.getElementById('count').textContent = currentClick;
 
   try {
-    // Gunakan nama tabel dengan huruf besar
     await sb.from(TABLE_KLIKUSER)
       .update({ jumlah_klik: currentClick })
       .eq('username', currentUser);
@@ -600,7 +797,6 @@ async function register(){
   if(p.length < 6) return alert('Password minimal 6 karakter');
 
   try {
-    // Gunakan nama tabel dengan huruf besar
     const {error} = await sb.from(TABLE_KLIKUSER)
       .insert({ 
         username: u, 
@@ -610,11 +806,7 @@ async function register(){
       });
 
     if(error) {
-      if(error.message.includes('duplicate key')) {
-        alert('Username sudah ada!');
-      } else {
-        alert('Error: ' + error.message);
-      }
+      alert('Username sudah ada!');
       return;
     }
 
@@ -633,7 +825,6 @@ async function login(){
   const p = document.getElementById('log_pass').value.trim();
 
   try {
-    // Gunakan nama tabel dengan huruf besar
     const {data, error} = await sb.from(TABLE_KLIKUSER)
       .select('*')
       .eq('username', u)
@@ -654,13 +845,13 @@ async function login(){
   }
 }
 
-/* ===== AFTER LOGIN ===== */
 function afterLogin(){
   document.getElementById('count').textContent = currentClick;
 
   const panel = document.getElementById('panel');
   panel.innerHTML = `
     <button onclick="panel.classList.remove('show')">Tutup</button>
+    <button onclick="openGlobalChat()">💬 Chat Global</button>
     <button class="logout" onclick="logout()">🚪 Log Out</button>
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
     <div id="board-container">
@@ -669,9 +860,10 @@ function afterLogin(){
   `;
   loadBoard();
   loadUserBackground();
+  checkUnreadMessages();
+  startRealtime();
 }
 
-/* ===== LOGOUT ===== */
 function logout(){
   currentUser = null;
   currentClick = 0;
@@ -712,7 +904,7 @@ function logout(){
   }, 100);
 }
 
-/* ===== LEADERBOARD ===== */
+/* ===== LEADERBOARD DENGAN NOTIFIKASI ===== */
 async function loadBoard(){
   const boardContainer = document.getElementById('board-container');
   if (!boardContainer) return;
@@ -720,7 +912,6 @@ async function loadBoard(){
   boardContainer.innerHTML = '<div class="loading">Memuat leaderboard...</div>';
   
   try {
-    // Gunakan nama tabel dengan huruf besar
     const {data, error} = await sb.from(TABLE_KLIKUSER)
       .select('*')
       .order('jumlah_klik', { ascending:false });
@@ -747,7 +938,6 @@ async function loadBoard(){
         else if(i===2) cls='bronze';
         if(r.username===currentUser) cls+=' me';
 
-        // Load custom background
         let bgStyle = '';
         if(r.background_data) {
           try {
@@ -755,18 +945,22 @@ async function loadBoard(){
             if(bgData.imageData) {
               bgStyle = `background: url('${bgData.imageData}'); background-size: cover;`;
             }
-          } catch(e) {
-            console.error('Error parsing background:', e);
-          }
+          } catch(e) {}
         }
 
         const row = document.createElement('tr');
         row.className = cls;
         if(bgStyle) row.style.cssText = bgStyle;
         
+        // Cek apakah ada chat yang belum dibaca dari user ini
+        const hasUnread = unreadChats.has(r.username);
+        
         row.innerHTML = `
           <td>${i+1}</td>
-          <td class="username-cell" onclick="openChat('${r.username.replace(/'/g, "\\'")}')">${r.username}</td>
+          <td class="username-cell" onclick="openChat('${r.username.replace(/'/g, "\\'")}')">
+            ${r.username}
+            ${hasUnread ? '<div class="chat-notification"></div>' : ''}
+          </td>
           <td>${r.jumlah_klik || 0}</td>
           ${r.username===currentUser ? `<td><button class="menu-btn" onclick="openBgEditor()">⋮</button></td>` : '<td></td>'}
         `;
@@ -800,6 +994,11 @@ async function openChat(username) {
   document.getElementById('chat-modal').classList.add('show');
   document.getElementById('chat-input').focus();
   
+  // Hapus notifikasi untuk user ini
+  unreadChats.delete(username);
+  updateChatNotifications();
+  loadBoard();
+  
   await loadChatMessages();
 }
 
@@ -814,7 +1013,6 @@ async function loadChatMessages() {
   messagesDiv.innerHTML = '<div class="loading">Memuat pesan...</div>';
   
   try {
-    // Gunakan nama tabel dengan huruf besar
     const {data, error} = await sb.from(TABLE_KLIKCHAT)
       .select('*')
       .or(`and(sender.eq.${currentUser},receiver.eq.${chatTarget}),and(sender.eq.${chatTarget},receiver.eq.${currentUser})`)
@@ -834,9 +1032,17 @@ async function loadChatMessages() {
         messageDiv.className = `chat-message ${msg.sender === currentUser ? 'sent' : ''}`;
         
         const time = new Date(msg.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+        
+        let contentHTML = '';
+        if(msg.message.startsWith('data:image')) {
+          contentHTML = `<img src="${msg.message}" alt="Gambar">`;
+        } else {
+          contentHTML = msg.message;
+        }
+        
         messageDiv.innerHTML = `
           <div class="sender">${msg.sender}</div>
-          <div>${msg.message}</div>
+          <div class="content">${contentHTML}</div>
           <div class="time">${time}</div>
         `;
         messagesDiv.appendChild(messageDiv);
@@ -864,7 +1070,6 @@ async function sendChatMessage() {
   }
 
   try {
-    // Gunakan nama tabel dengan huruf besar
     const {error} = await sb.from(TABLE_KLIKCHAT)
       .insert({
         sender: currentUser,
@@ -873,7 +1078,6 @@ async function sendChatMessage() {
       });
 
     if(error) {
-      console.error('Error sending message:', error);
       alert('Gagal mengirim pesan: ' + error.message);
       return;
     }
@@ -892,7 +1096,50 @@ function handleChatKeyPress(e) {
   }
 }
 
-/* ===== EDITOR LATAR BELAKANG ===== */
+/* ===== UPLOAD GAMBAR CHAT ===== */
+async function uploadChatImage(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  if(!file.type.startsWith('image/')) {
+    alert('Hanya file gambar yang diizinkan!');
+    return;
+  }
+  
+  if(file.size > 5 * 1024 * 1024) {
+    alert('Ukuran file maksimal 5MB!');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const imageData = e.target.result;
+    
+    try {
+      const {error} = await sb.from(TABLE_KLIKCHAT)
+        .insert({
+          sender: currentUser,
+          receiver: chatTarget,
+          message: imageData
+        });
+
+      if(error) {
+        alert('Gagal mengirim gambar: ' + error.message);
+        return;
+      }
+
+      await loadChatMessages();
+    } catch (error) {
+      console.error('Error sending image:', error);
+      alert('Error mengirim gambar');
+    }
+  };
+  
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+/* ===== EDITOR BACKGROUND ===== */
 function openBgEditor() {
   if (!currentUser) {
     alert('Anda harus login untuk mengedit background');
@@ -964,9 +1211,6 @@ function draw(e) {
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-  } else if(canvasTool === 'bucket') {
-    // Bucket fill on click, not drag
-    return;
   }
   
   lastX = x;
@@ -977,7 +1221,7 @@ function stopDrawing() {
   isDrawing = false;
 }
 
-// Bucket tool handler
+// Bucket tool
 document.querySelector('[onclick="setTool(\'bucket\')"]').addEventListener('click', function() {
   setTool('bucket');
   ctx.fillStyle = canvasColor;
@@ -989,6 +1233,31 @@ function clearCanvas() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+/* ===== UPLOAD GAMBAR BACKGROUND ===== */
+function uploadBackgroundImage(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  if(!file.type.startsWith('image/')) {
+    alert('Hanya file gambar yang diizinkan!');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      clearCanvas();
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      document.getElementById('upload-preview').src = e.target.result;
+      document.getElementById('upload-preview').style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  
+  reader.readAsDataURL(file);
+}
+
 async function saveBackground() {
   if(!currentUser) {
     alert('Anda harus login untuk menyimpan background');
@@ -996,22 +1265,18 @@ async function saveBackground() {
   }
   
   try {
-    // Convert canvas to data URL
     const imageData = canvas.toDataURL('image/png');
     
-    // Save to database
     const backgroundData = {
       imageData: imageData,
       savedAt: new Date().toISOString()
     };
     
-    // Gunakan nama tabel dengan huruf besar
     const {error} = await sb.from(TABLE_KLIKUSER)
       .update({ background_data: JSON.stringify(backgroundData) })
       .eq('username', currentUser);
     
     if(error) {
-      console.error('Error saving background:', error);
       alert('Gagal menyimpan background: ' + error.message);
       return;
     }
@@ -1031,16 +1296,12 @@ async function loadUserBackground() {
   if(!currentUser) return;
   
   try {
-    // Gunakan nama tabel dengan huruf besar
     const {data, error} = await sb.from(TABLE_KLIKUSER)
       .select('background_data')
       .eq('username', currentUser)
       .single();
     
-    if(error) {
-      console.error('Error loading background:', error);
-      return;
-    }
+    if(error) return;
     
     if(data && data.background_data) {
       try {
@@ -1053,13 +1314,9 @@ async function loadUserBackground() {
           };
           img.src = bgData.imageData;
         }
-      } catch(e) {
-        console.error('Error parsing background:', e);
-      }
+      } catch(e) {}
     }
-  } catch (error) {
-    console.error('Error loading user background:', error);
-  }
+  } catch (error) {}
 }
 
 function showPreview(bgData) {
@@ -1073,40 +1330,290 @@ function showPreview(bgData) {
   `;
 }
 
-// Check if tables exist on load
-async function checkTables() {
+/* ===== CHAT GLOBAL ===== */
+async function openGlobalChat() {
+  if(!currentUser) {
+    alert('Anda harus login untuk chat global');
+    return;
+  }
+  
+  document.getElementById('global-chat-modal').classList.add('show');
+  document.getElementById('global-chat-input').focus();
+  
+  // Reset notifikasi global
+  unreadGlobal = 0;
+  updateGlobalNotification();
+  
+  await loadGlobalMessages();
+}
+
+function closeGlobalChat() {
+  document.getElementById('global-chat-modal').classList.remove('show');
+  document.getElementById('global-chat-input').value = '';
+}
+
+async function loadGlobalMessages() {
+  const messagesDiv = document.getElementById('global-chat-messages');
+  messagesDiv.innerHTML = '<div class="loading">Memuat chat global...</div>';
+  
   try {
-    // Cek tabel KLIKUSER
-    const { error: userError } = await sb
-      .from(TABLE_KLIKUSER)
-      .select('id')
-      .limit(1);
-    
-    // Cek tabel KLIKCHAT  
-    const { error: chatError } = await sb
-      .from(TABLE_KLIKCHAT)
-      .select('id')
-      .limit(1);
-    
-    if (userError && userError.message.includes('does not exist')) {
-      console.error('Tabel KLIKUSER tidak ditemukan!');
+    const {data, error} = await sb.from(TABLE_GLOBALCHAT)
+      .select('*')
+      .order('created_at', { ascending:false })
+      .limit(50);
+
+    if(error) {
+      console.error('Error loading global chat:', error);
+      messagesDiv.innerHTML = '<div class="error-message">Error memuat chat global</div>';
+      return;
     }
-    
-    if (chatError && chatError.message.includes('does not exist')) {
-      console.warn('Tabel KLIKCHAT tidak ditemukan. Chat tidak akan berfungsi.');
+
+    messagesDiv.innerHTML = '';
+
+    if(data && data.length > 0) {
+      data.reverse().forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `global-message ${msg.sender === currentUser ? 'sent' : ''}`;
+        
+        const time = new Date(msg.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+        
+        let contentHTML = '';
+        if(msg.message.startsWith('data:image')) {
+          contentHTML = `<img src="${msg.message}" alt="Gambar" style="max-width:200px;border-radius:5px;">`;
+        } else {
+          contentHTML = msg.message;
+        }
+        
+        messageDiv.innerHTML = `
+          <div class="sender">${msg.sender} - ${time}</div>
+          <div class="content">${contentHTML}</div>
+        `;
+        messagesDiv.appendChild(messageDiv);
+      });
+      
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } else {
+      messagesDiv.innerHTML = '<p style="text-align:center;color:#666;">Belum ada pesan global. Jadilah yang pertama!</p>';
     }
-    
-    loadBoard();
-  } catch (e) {
-    console.error('Error checking tables:', e);
+  } catch (error) {
+    console.error('Error loading global messages:', error);
+    messagesDiv.innerHTML = '<div class="error-message">Error memuat chat global</div>';
   }
 }
 
-// Inisialisasi saat halaman dimuat
+async function sendGlobalMessage() {
+  const input = document.getElementById('global-chat-input');
+  const message = input.value.trim();
+  
+  if(!message) return;
+  
+  if(!currentUser) {
+    alert('Anda harus login untuk mengirim pesan global');
+    return;
+  }
+
+  try {
+    const {error} = await sb.from(TABLE_GLOBALCHAT)
+      .insert({
+        sender: currentUser,
+        message: message
+      });
+
+    if(error) {
+      alert('Gagal mengirim pesan: ' + error.message);
+      return;
+    }
+
+    input.value = '';
+    await loadGlobalMessages();
+  } catch (error) {
+    console.error('Error sending global message:', error);
+    alert('Error mengirim pesan');
+  }
+}
+
+function handleGlobalChatKeyPress(e) {
+  if(e.key === 'Enter') {
+    sendGlobalMessage();
+  }
+}
+
+async function uploadGlobalImage(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  if(!file.type.startsWith('image/')) {
+    alert('Hanya file gambar yang diizinkan!');
+    return;
+  }
+  
+  if(file.size > 5 * 1024 * 1024) {
+    alert('Ukuran file maksimal 5MB!');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const imageData = e.target.result;
+    
+    try {
+      const {error} = await sb.from(TABLE_GLOBALCHAT)
+        .insert({
+          sender: currentUser,
+          message: imageData
+        });
+
+      if(error) {
+        alert('Gagal mengirim gambar: ' + error.message);
+        return;
+      }
+
+      await loadGlobalMessages();
+    } catch (error) {
+      console.error('Error sending global image:', error);
+      alert('Error mengirim gambar');
+    }
+  };
+  
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+/* ===== NOTIFIKASI ===== */
+async function checkUnreadMessages() {
+  if(!currentUser) return;
+  
+  try {
+    // Cek chat pribadi yang belum dibaca
+    const {data: chatData} = await sb.from(TABLE_KLIKCHAT)
+      .select('sender')
+      .eq('receiver', currentUser)
+      .eq('read', false);
+    
+    if(chatData) {
+      chatData.forEach(msg => {
+        unreadChats.add(msg.sender);
+      });
+      updateChatNotifications();
+      loadBoard();
+    }
+    
+    // Cek pesan global baru
+    const {data: globalData} = await sb.from(TABLE_GLOBALCHAT)
+      .select('id')
+      .order('created_at', {ascending: false})
+      .limit(1)
+      .single();
+    
+    if(globalData) {
+      const lastSeen = localStorage.getItem('lastSeenGlobal');
+      if(lastSeen && globalData.id > lastSeen) {
+        unreadGlobal++;
+        updateGlobalNotification();
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error checking unread messages:', error);
+  }
+}
+
+function updateChatNotifications() {
+  // Update notifikasi di leaderboard sudah dilakukan di loadBoard()
+}
+
+function updateGlobalNotification() {
+  const notification = document.getElementById('global-notification');
+  if(unreadGlobal > 0) {
+    notification.style.display = 'flex';
+    notification.textContent = unreadGlobal > 9 ? '9+' : unreadGlobal;
+  } else {
+    notification.style.display = 'none';
+  }
+}
+
+/* ===== REALTIME UPDATES ===== */
+function startRealtime() {
+  if(!currentUser) return;
+  
+  // Subscribe ke chat pribadi
+  const chatChannel = sb.channel('private-chat')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: TABLE_KLIKCHAT,
+        filter: `receiver=eq.${currentUser}`
+      },
+      (payload) => {
+        const sender = payload.new.sender;
+        unreadChats.add(sender);
+        updateChatNotifications();
+        loadBoard();
+        
+        // Tampilkan notifikasi desktop jika tidak di chat modal
+        if(!document.getElementById('chat-modal').classList.contains('show') || chatTarget !== sender) {
+          if(Notification.permission === 'granted') {
+            new Notification(`Pesan baru dari ${sender}`, {
+              body: payload.new.message.length > 50 ? 
+                payload.new.message.substring(0, 50) + '...' : 
+                payload.new.message,
+              icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png'
+            });
+          }
+        }
+      }
+    )
+    .subscribe();
+  
+  // Subscribe ke chat global
+  const globalChannel = sb.channel('global-chat')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: TABLE_GLOBALCHAT
+      },
+      (payload) => {
+        // Jika tidak di modal global chat, tambah notifikasi
+        if(!document.getElementById('global-chat-modal').classList.contains('show')) {
+          unreadGlobal++;
+          updateGlobalNotification();
+        }
+        
+        // Jika sedang melihat global chat, update langsung
+        if(document.getElementById('global-chat-modal').classList.contains('show')) {
+          loadGlobalMessages();
+        }
+      }
+    )
+    .subscribe();
+  
+  // Minta izin notifikasi
+  if('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+// Inisialisasi
 document.addEventListener('DOMContentLoaded', function() {
-  checkTables();
   generateVerificationCode();
+  
+  // Cek apakah sudah login dari session sebelumnya
+  const savedUser = localStorage.getItem('klikUser');
+  if(savedUser) {
+    currentUser = savedUser;
+    afterLogin();
+  }
 });
+
+// Save user to localStorage saat login
+function afterLogin(){
+  localStorage.setItem('klikUser', currentUser);
+  // ... kode afterLogin sebelumnya ...
+}
 </script>
 
 </body>
