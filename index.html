@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Klik</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0}body{background:#000;height:100vh;font-family:'Segoe UI',Arial,sans-serif}.counter{position:absolute;top:50%;left:50%;transform:translate(-50%,-200%);font-size:5rem;color:#fff;font-family:'Arial Black',Impact,sans-serif;z-index:2;text-shadow:0 0 10px #fff;letter-spacing:2px}.circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;cursor:pointer;border:3px solid #fff;overflow:hidden;z-index:1;transition:transform 0.1s}.circle:active{transform:translate(-50%,-50%)scale(.95)}.circle img{width:100%;height:100%;object-fit:cover}.btn{position:fixed;top:20px;right:20px;width:50px;height:50px;background:#000;color:#fff;border:2px solid #fff;border-radius:50%;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;font-size:1.2rem}.panel{position:fixed;top:0;right:-350px;width:340px;height:100vh;background:#000;border-left:2px solid #444;transition:.3s;z-index:99;display:flex;flex-direction:column}.panel.open{right:0}.header{padding:20px;border-bottom:2px solid #444;display:flex;justify-content:space-between;align-items:center}.header h2{color:#fff;font-size:1.4rem}.close{background:none;border:none;color:#fff;cursor:pointer;font-size:1.5rem}.auth{padding:20px;border-bottom:2px solid #444}.form{display:none;flex-direction:column;gap:12px}.form.active{display:flex}.btns{display:flex;gap:10px}.auth-btn{flex:1;padding:10px;background:#333;color:#fff;border:1px solid #666;cursor:pointer;border-radius:4px;font-size:0.9rem}.input{display:flex;flex-direction:column;gap:5px}.input label{color:#ccc;font-size:0.85rem}.input input{padding:10px;background:#111;border:1px solid #444;color:#fff;border-radius:4px}.submit{padding:10px;background:#444;color:#fff;border:none;cursor:pointer;border-radius:4px}.content{flex:1;overflow-y:auto;padding:15px}.item{display:flex;align-items:center;padding:12px;background:#111;border:1px solid #333;margin-bottom:8px;border-radius:6px}.item.current{border-color:#fff;background:#222}.rank{width:30px;color:#fff;font-weight:bold;font-size:1.1rem}.info{flex:1;margin-left:10px}.name{color:#fff;font-size:1rem}.score{color:#fff;font-weight:bold;font-size:1.1rem}.error{color:#ff4444;font-size:0.8rem;display:none}.error.show{display:block}
+</style></head><body>
+<div class="counter" id="counter">0</div>
+<div class="circle" id="circle"><img src="foto.webp" alt=""></div>
+<button class="btn" id="toggle"><i class="fas fa-trophy"></i></button>
+<div class="panel" id="panel">
+<div class="header"><h2><i class="fas fa-crown"></i> LEADERBOARD</h2><button class="close" id="close"><i class="fas fa-times"></i></button></div>
+<div class="auth">
+<div class="btns"><button class="auth-btn" id="showLogin"><i class="fas fa-sign-in-alt"></i> Login</button><button class="auth-btn" id="showRegister"><i class="fas fa-user-plus"></i> Register</button></div>
+<div class="form" id="loginForm"><div class="input"><label><i class="fas fa-user"></i> Username</label><input type="text" id="user"></div><div class="input"><label><i class="fas fa-lock"></i> Password</label><input type="password" id="pass"></div><div class="error" id="loginErr"></div><button class="submit" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button></div>
+<div class="form" id="registerForm"><div class="input"><label><i class="fas fa-user"></i> Username</label><input type="text" id="regUser"></div><div class="input"><label><i class="fas fa-lock"></i> Password</label><input type="password" id="regPass"></div><div class="error" id="regErr"></div><button class="submit" id="regBtn"><i class="fas fa-user-plus"></i> Register</button></div>
+</div>
+<div class="content" id="content">
+<div class="item"><div class="rank">1</div><div class="info"><div class="name">Loading...</div></div><div class="score">0</div></div>
+</div>
+</div>
+<script>
+const SUPABASE_URL='https://bxhrnnwfqlsoviysqcdw.supabase.co'
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
+const supabase=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)
+
+let clicks=0
+let audio=new Audio('suara.mp3')
+let currentUser=null
+
+const counter=document.getElementById('counter')
+const circle=document.getElementById('circle')
+const toggle=document.getElementById('toggle')
+const panel=document.getElementById('panel')
+const close=document.getElementById('close')
+const showLogin=document.getElementById('showLogin')
+const showRegister=document.getElementById('showRegister')
+const loginForm=document.getElementById('loginForm')
+const registerForm=document.getElementById('registerForm')
+const loginBtn=document.getElementById('loginBtn')
+const regBtn=document.getElementById('regBtn')
+const userInput=document.getElementById('user')
+const passInput=document.getElementById('pass')
+const regUserInput=document.getElementById('regUser')
+const regPassInput=document.getElementById('regPass')
+const content=document.getElementById('content')
+const loginErr=document.getElementById('loginErr')
+const regErr=document.getElementById('regErr')
+
+circle.addEventListener('click',()=>{
+clicks++
+counter.textContent=clicks
+counter.style.textShadow='0 0 20px #fff'
+setTimeout(()=>counter.style.textShadow='0 0 10px #fff',100)
+const a=audio.cloneNode()
+a.volume=0.3
+a.play().catch(e=>{})
+if(currentUser)updateScore()
+})
+
+toggle.addEventListener('click',()=>panel.classList.toggle('open'))
+close.addEventListener('click',()=>panel.classList.toggle('open'))
+showLogin.addEventListener('click',()=>{loginForm.classList.add('active');registerForm.classList.remove('active');showLogin.style.display='none';showRegister.style.display='none'})
+showRegister.addEventListener('click',()=>{registerForm.classList.add('active');loginForm.classList.remove('active');showLogin.style.display='none';showRegister.style.display='none'})
+
+loginBtn.addEventListener('click',async()=>{
+const u=userInput.value.trim()
+const p=passInput.value.trim()
+if(!u||!p){showError(loginErr,'Isi semua');return}
+const {data,error}=await supabase.from('USER_KLIK').select('*').eq('username',u).eq('password',p).single()
+if(error||!data){showError(loginErr,'Salah');return}
+currentUser={id:data.id,username:data.username}
+clicks=data.click_count||0
+counter.textContent=clicks
+showAuthButtons()
+loadLeaderboard()
+})
+
+regBtn.addEventListener('click',async()=>{
+const u=regUserInput.value.trim()
+const p=regPassInput.value.trim()
+if(!u||!p){showError(regErr,'Isi semua');return}
+if(p.length<4){showError(regErr,'Min 4 karakter');return}
+const {data:existing}=await supabase.from('USER_KLIK').select('id').eq('username',u).single()
+if(existing){showError(regErr,'Username ada');return}
+const {data:newUser}=await supabase.from('USER_KLIK').insert([{username:u,password:p,click_count:0}]).select().single()
+currentUser={id:newUser.id,username:newUser.username}
+showAuthButtons()
+loadLeaderboard()
+})
+
+function showAuthButtons(){
+loginForm.classList.remove('active')
+registerForm.classList.remove('active')
+showLogin.style.display='block'
+showRegister.style.display='block'
+userInput.value=''
+passInput.value=''
+regUserInput.value=''
+regPassInput.value=''
+loginErr.classList.remove('show')
+regErr.classList.remove('show')
+}
+
+async function updateScore(){
+await supabase.from('USER_KLIK').update({click_count:clicks}).eq('id',currentUser.id)
+loadLeaderboard()
+}
+
+async function loadLeaderboard(){
+const {data}=await supabase.from('USER_KLIK').select('username,click_count').order('click_count',{ascending:false})
+if(!data)return
+let html=''
+data.forEach((item,i)=>{
+const current=currentUser&&item.username===currentUser.username
+html+=`<div class="item ${current?'current':''}"><div class="rank">${i+1}</div><div class="info"><div class="name">${item.username}</div></div><div class="score">${item.click_count||0}</div></div>`
+})
+content.innerHTML=html
+}
+
+function showError(el,msg){
+el.textContent=msg
+el.classList.add('show')
+setTimeout(()=>el.classList.remove('show'),3000)
+}
+
+loadLeaderboard()
+</script>
+</body></html>
