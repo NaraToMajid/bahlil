@@ -2,159 +2,99 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Klik Game</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
+*{margin:0;padding:0;box-sizing:border-box}
+body{
   background:#bdbdbd;
-  font-family:Arial, sans-serif;
+  font-family:Arial;
+  overflow:hidden;
 }
-
-/* ===== CENTER ===== */
 #app{
-  width:100%;
-  height:100%;
+  height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:12px;
 }
-
-#count{
-  font-size:38px;
-  font-weight:bold;
-}
-
+#count{font-size:40px;font-weight:bold}
 #photo{
-  width:240px;
-  height:240px;
+  width:220px;height:220px;
   border-radius:50%;
   border:8px solid #eee;
   overflow:hidden;
   cursor:pointer;
 }
+#photo img{width:100%;height:100%;object-fit:cover}
 
-#photo img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-/* ===== BUTTON PANEL ===== */
 #btn{
   position:fixed;
-  top:14px;
-  right:14px;
-  width:46px;
-  height:46px;
+  top:15px;right:15px;
+  width:45px;height:45px;
+  background:#222;color:#fff;
   border-radius:50%;
-  background:#222;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
+  display:flex;align-items:center;justify-content:center;
   cursor:pointer;
-  z-index:10;
 }
 
-/* ===== PANEL ===== */
 #panel{
   position:fixed;
-  top:0;
-  right:0;
-  width:85%;
-  max-width:360px;
+  right:0;top:0;
+  width:85%;max-width:360px;
   height:100%;
   background:#eaeaea;
   transform:translateX(100%);
   transition:.3s;
-  padding:16px;
-  overflow-y:auto;
-  z-index:9;
+  padding:15px;
+  overflow:auto;
 }
-
-#panel.show{
-  transform:translateX(0);
-}
-
-h3{
-  margin-top:10px;
-}
+#panel.show{transform:translateX(0)}
 
 input,button{
   width:100%;
   padding:10px;
   margin-top:8px;
-  font-size:15px;
 }
 
-button{
-  cursor:pointer;
-}
+table{width:100%;margin-top:10px;border-collapse:collapse}
+td{padding:6px;border-bottom:1px solid #aaa;font-size:14px}
+.gold{background:#ffd700}
+.silver{background:#c0c0c0}
+.bronze{background:#cd7f32}
+.me{outline:2px solid #000}
 
-button.logout{
-  background:#c62828;
+/* CHAT */
+#chatBox{
+  position:fixed;
+  bottom:0;right:0;
+  width:100%;max-width:360px;
+  height:55%;
+  background:#222;
   color:#fff;
+  display:none;
+  flex-direction:column;
 }
-
-/* ===== VERIFIKASI KODE ===== */
-#verif-code-container {
-  background:#f9f9f9;
+#chatHeader{
+  background:#111;
   padding:10px;
-  border-radius:8px;
-  margin:10px 0;
-  text-align:center;
 }
-
-#verif-code{
-  font-size:24px;
-  font-weight:bold;
-  letter-spacing:3px;
-  color:#2196F3;
+#chatMessages{
+  flex:1;
   padding:10px;
-  background:#fff;
-  border-radius:5px;
-  border:2px dashed #bbb;
-  margin:8px 0;
-  user-select:all;
+  overflow-y:auto;
 }
-
-#copy-hint{
-  font-size:12px;
-  color:#666;
-  margin:5px 0;
+.chat-me{text-align:right;color:#4caf50}
+.chat-you{text-align:left}
+#chatInput{display:flex}
+#chatInput input{flex:1;border:none}
+#chatInput button{
+  width:70px;
+  background:#4caf50;
+  border:none;
 }
-
-/* ===== LEADERBOARD ===== */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-
-td{
-  padding:6px;
-  border-bottom:1px solid #aaa;
-  font-size:14px;
-}
-
-.gold{background:#ffd700;}
-.silver{background:#c0c0c0;}
-.bronze{background:#cd7f32;}
-.me{outline:2px solid #000;}
 </style>
 </head>
 
@@ -164,258 +104,152 @@ td{
 
 <div id="app">
   <div id="count">0</div>
-  <div id="photo">
-    <img src="foto.webp">
-  </div>
+  <div id="photo"><img src="foto.webp"></div>
 </div>
 
-<div id="panel">
-  <h3>DAFTAR</h3>
-  <input id="reg_user" placeholder="Username">
-  <input id="reg_pass" type="password" placeholder="Password">
-  
-  <div id="verif-code-container">
-    <small>Salin kode verifikasi berikut:</small>
-    <div id="verif-code"></div>
-    <div id="copy-hint">Klik untuk menyalin, lalu tempel di bawah</div>
+<div id="panel"></div>
+
+<div id="chatBox">
+  <div id="chatHeader"></div>
+  <div id="chatMessages"></div>
+  <div id="chatInput">
+    <input id="chatText" placeholder="Pesan...">
+    <button onclick="sendChat()">Kirim</button>
   </div>
-  
-  <input id="reg_verif" placeholder="Tempel kode verifikasi di sini">
-  <button onclick="register()">Daftar</button>
-
-  <hr>
-
-  <h3>LOGIN</h3>
-  <input id="log_user" placeholder="Username">
-  <input id="log_pass" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-
-  <hr>
-
-  <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-  <table id="board"></table>
 </div>
 
 <script>
-// ==== ANTI INSPECT & KLIK KANAN ====
-document.addEventListener('contextmenu', function(e) {
-  e.preventDefault();
-  return false;
-});
-
-document.addEventListener('keydown', function(e) {
-  // Block F12
-  if(e.key === 'F12') {
-    e.preventDefault();
-    return false;
-  }
-  
-  // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-  if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) {
-    e.preventDefault();
-    return false;
-  }
-  
-  if(e.ctrlKey && e.key === 'u') {
-    e.preventDefault();
-    return false;
-  }
-  
-  // Block DevTools dengan tombol lain
-  if(e.key === 'F8' || (e.ctrlKey && e.key === 'S') || (e.ctrlKey && e.key === 'C')) {
-    e.preventDefault();
-    return false;
-  }
-});
-
-// Deteksi DevTools opening (basic detection)
-setInterval(function() {
-  const before = new Date();
-  debugger;
-  const after = new Date();
-  if(after - before > 100) {
-    window.location.reload();
-  }
-}, 1000);
-
+// ===== SUPABASE =====
 const sb = supabase.createClient(
   'https://bxhrnnwfqlsoviysqcdw.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
+  'PASTE_ANON_KEY_MU'
 );
 
-let currentUser = null;
-let currentClick = 0;
-let verificationCode = '';
+let currentUser=null;
+let currentClick=0;
+let chatTarget=null;
 
-// Generate verification code
-function generateVerificationCode() {
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  document.getElementById('verif-code').textContent = code;
-  verificationCode = code;
-  
-  // Tambahkan fungsi klik untuk copy
-  document.getElementById('verif-code').onclick = function() {
-    navigator.clipboard.writeText(code);
-    document.getElementById('copy-hint').textContent = '✓ Kode disalin!';
-    setTimeout(() => {
-      document.getElementById('copy-hint').textContent = 'Klik untuk menyalin, lalu tempel di bawah';
-    }, 2000);
-  };
-}
+// ===== PANEL =====
+btn.onclick=()=>panel.classList.add('show');
 
-// Panggil saat halaman dimuat
-generateVerificationCode();
-
-btn.onclick = () => {
-  panel.classList.add('show');
-  generateVerificationCode(); // Generate kode baru setiap kali panel dibuka
-};
-
-/* ===== CLICK FOTO ===== */
-photo.onclick = async () => {
-  if(!currentUser){
-    alert('Login dulu');
-    return;
-  }
-
-  const audio = new Audio('suara.mp3');
-  audio.playbackRate = 2;
-  audio.play();
-
-  currentClick++;
-  count.textContent = currentClick;
-
-  await sb.from('KLIKUSER')
-    .update({ jumlah_klik: currentClick })
-    .eq('username', currentUser);
-};
-
-/* ===== AUTH ===== */
-async function register(){
-  const u = reg_user.value.trim();
-  const p = reg_pass.value.trim();
-  const v = reg_verif.value.trim();
-  
-  if(!u || !p || !v) return alert('Isi semua kolom');
-  
-  // Verifikasi kode
-  if(v !== verificationCode) {
-    alert('Kode verifikasi salah! Silakan salin kode yang benar dari atas.');
-    generateVerificationCode(); // Generate kode baru
-    return;
-  }
-  
-  if(u.length < 3) return alert('Username minimal 3 karakter');
-  if(p.length < 6) return alert('Password minimal 6 karakter');
-
-  const {error} = await sb.from('KLIKUSER')
-    .insert({ username:u, password:p });
-
-  if(error) return alert('Username sudah ada');
-
-  alert('Akun berhasil dibuat!');
-  currentUser = u;
-  currentClick = 0;
-  afterLogin();
-}
-
-async function login(){
-  const u = log_user.value.trim();
-  const p = log_pass.value.trim();
-
-  const {data} = await sb.from('KLIKUSER')
-    .select('*')
-    .eq('username', u)
-    .eq('password', p)
-    .single();
-
-  if(!data) return alert('Login gagal');
-
-  currentUser = u;
-  currentClick = data.jumlah_klik;
-  afterLogin();
-}
-
-/* ===== AFTER LOGIN ===== */
-function afterLogin(){
-  count.textContent = currentClick;
-
-  panel.innerHTML = `
-    <button onclick="panel.classList.remove('show')">Tutup</button>
-    <button class="logout" onclick="logout()">🚪 Log Out</button>
-    <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-    <table id="board"></table>
-  `;
-  loadBoard();
-}
-
-/* ===== LOGOUT ===== */
-function logout(){
-  currentUser = null;
-  currentClick = 0;
-  count.textContent = 0;
-
-  panel.innerHTML = `
-    <h3>DAFTAR</h3>
-    <input id="reg_user" placeholder="Username">
-    <input id="reg_pass" type="password" placeholder="Password">
-    
-    <div id="verif-code-container">
-      <small>Salin kode verifikasi berikut:</small>
-      <div id="verif-code"></div>
-      <div id="copy-hint">Klik untuk menyalin, lalu tempel di bawah</div>
-    </div>
-    
-    <input id="reg_verif" placeholder="Tempel kode verifikasi di sini">
-    <button onclick="register()">Daftar</button>
-
-    <hr>
-
-    <h3>LOGIN</h3>
-    <input id="log_user" placeholder="Username">
-    <input id="log_pass" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-
-    <hr>
-
-    <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
-    <table id="board"></table>
-  `;
-  
-  // Re-generate verification code setelah logout
-  setTimeout(() => {
-    generateVerificationCode();
-  }, 100);
-}
-
-/* ===== LEADERBOARD ===== */
-async function loadBoard(){
-  const {data} = await sb.from('KLIKUSER')
-    .select('*')
-    .order('jumlah_klik', { ascending:false });
-
-  const board = document.getElementById('board');
-  if(!board) return;
-
-  board.innerHTML = '';
-  data.forEach((r,i)=>{
-    let cls='';
-    if(i===0)cls='gold';
-    else if(i===1)cls='silver';
-    else if(i===2)cls='bronze';
-    if(r.username===currentUser)cls+=' me';
-
-    board.innerHTML += `
-      <tr class="${cls}">
-        <td>${i+1}</td>
-        <td>${r.username}</td>
-        <td>${r.jumlah_klik}</td>
-      </tr>
-    `;
-  });
-}
-
+function renderAuth(){
+panel.innerHTML=`
+<h3>DAFTAR</h3>
+<input id="ru" placeholder="Username">
+<input id="rp" type="password" placeholder="Password">
+<button onclick="register()">Daftar</button>
+<hr>
+<h3>LOGIN</h3>
+<input id="lu" placeholder="Username">
+<input id="lp" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<hr>
+<button onclick="loadBoard()">Refresh Leaderboard</button>
+<table id="board"></table>
+`;
 loadBoard();
+}
+renderAuth();
+
+// ===== CLICK =====
+photo.onclick=async()=>{
+ if(!currentUser)return alert('Login dulu');
+ currentClick++;
+ count.textContent=currentClick;
+ await sb.from('KLIKUSER')
+ .update({jumlah_klik:currentClick})
+ .eq('username',currentUser);
+};
+
+// ===== AUTH =====
+async function register(){
+ const u=ru.value,p=rp.value;
+ await sb.from('KLIKUSER').insert({username:u,password:p});
+ currentUser=u;currentClick=0;afterLogin();
+}
+async function login(){
+ const {data}=await sb.from('KLIKUSER')
+ .select('*').eq('username',lu.value)
+ .eq('password',lp.value).single();
+ if(!data)return alert('Gagal');
+ currentUser=data.username;
+ currentClick=data.jumlah_klik;
+ afterLogin();
+}
+function afterLogin(){
+ count.textContent=currentClick;
+ panel.innerHTML=`
+<button onclick="panel.classList.remove('show')">Tutup</button>
+<button onclick="logout()">Logout</button>
+<input type="color" onchange="saveColor(this.value)">
+<button onclick="loadBoard()">Leaderboard</button>
+<table id="board"></table>
+`;
+loadBoard();
+}
+function logout(){
+ currentUser=null;currentClick=0;count.textContent=0;
+ renderAuth();
+}
+
+// ===== COLOR =====
+async function saveColor(c){
+ await sb.from('KLIKUSER')
+ .update({name_color:c})
+ .eq('username',currentUser);
+ loadBoard();
+}
+
+// ===== LEADERBOARD =====
+async function loadBoard(){
+ const {data}=await sb.from('KLIKUSER')
+ .select('*').order('jumlah_klik',{ascending:false});
+ if(!board)return;
+ board.innerHTML='';
+ data.forEach((r,i)=>{
+  let cls=i==0?'gold':i==1?'silver':i==2?'bronze':'';
+  if(r.username==currentUser)cls+=' me';
+  board.innerHTML+=`
+  <tr class="${cls}">
+   <td>${i+1}</td>
+   <td style="background:${r.name_color};cursor:pointer"
+    onclick="openChat('${r.username}')">${r.username}</td>
+   <td>${r.jumlah_klik}</td>
+  </tr>`;
+ });
+}
+
+// ===== CHAT =====
+function openChat(u){
+ if(u==currentUser)return;
+ chatTarget=u;
+ chatBox.style.display='flex';
+ chatHeader.innerText='Chat dengan '+u;
+ loadChat();
+}
+async function loadChat(){
+ const {data}=await sb.from('KLIK_CHAT')
+ .select('*')
+ .or(`and(from_user.eq.${currentUser},to_user.eq.${chatTarget}),
+      and(from_user.eq.${chatTarget},to_user.eq.${currentUser})`)
+ .order('created_at');
+ chatMessages.innerHTML='';
+ data.forEach(m=>{
+  chatMessages.innerHTML+=`
+  <div class="${m.from_user==currentUser?'chat-me':'chat-you'}">
+   ${m.message}
+  </div>`;
+ });
+ chatMessages.scrollTop=999999;
+}
+async function sendChat(){
+ const msg=chatText.value;
+ if(!msg)return;
+ await sb.from('KLIK_CHAT')
+ .insert({from_user:currentUser,to_user:chatTarget,message:msg});
+ chatText.value='';
+ loadChat();
+}
 </script>
 
 </body>
