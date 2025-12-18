@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Klik Counter</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,11 +18,12 @@
             height: 100vh;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            position: relative;
         }
         
         .counter {
             position: absolute;
-            top: 15%;
+            top: 20%;
             left: 50%;
             transform: translateX(-50%);
             font-size: 4rem;
@@ -32,13 +33,7 @@
             font-weight: 900;
             text-align: center;
             width: 100%;
-        }
-        
-        @media (min-width: 768px) {
-            .counter {
-                top: 20%;
-                font-size: 5rem;
-            }
+            z-index: 10;
         }
         
         .circle {
@@ -46,26 +41,15 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 250px;
-            height: 250px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             cursor: pointer;
             border: 4px solid #fff;
             overflow: hidden;
-            z-index: 1;
+            z-index: 10;
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-        }
-        
-        @media (max-width: 480px) {
-            .circle {
-                width: 200px;
-                height: 200px;
-            }
-        }
-        
-        .circle:active {
-            transform: translate(-50%, -50%) scale(0.95);
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+            background: #111;
         }
         
         .circle img {
@@ -78,8 +62,8 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: #000;
             color: #fff;
             border: 2px solid #fff;
@@ -89,37 +73,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        @media (max-width: 480px) {
-            .btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1.3rem;
-                top: 15px;
-                right: 15px;
-            }
+            font-size: 1.3rem;
         }
         
         .panel {
             position: fixed;
             top: 0;
-            right: -100%;
-            width: 100%;
+            right: -400px;
+            width: 350px;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
-            transition: 0.4s;
+            background: #000;
+            border-left: 2px solid #444;
+            transition: 0.3s;
             z-index: 99;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(10px);
-        }
-        
-        @media (min-width: 768px) {
-            .panel {
-                width: 400px;
-            }
         }
         
         .panel.open {
@@ -127,17 +95,16 @@
         }
         
         .header {
-            padding: 25px;
-            border-bottom: 2px solid #00ffff;
+            padding: 20px;
+            border-bottom: 2px solid #444;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0, 0, 0, 0.9);
         }
         
         .header h2 {
             color: #fff;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
         }
         
         .close {
@@ -145,23 +112,18 @@
             border: none;
             color: #fff;
             cursor: pointer;
-            font-size: 1.8rem;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 1.5rem;
         }
         
         .auth {
-            padding: 25px;
-            border-bottom: 1px solid #333;
+            padding: 20px;
+            border-bottom: 2px solid #444;
         }
         
         .form {
             display: none;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         
         .form.active {
@@ -170,101 +132,75 @@
         
         .btns {
             display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 10px;
         }
         
         .auth-btn {
             flex: 1;
-            padding: 15px;
-            background: #222;
-            color: #fff;
-            border: 1px solid #444;
-            cursor: pointer;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .auth-btn:hover {
+            padding: 12px;
             background: #333;
-            border-color: #00ffff;
+            color: #fff;
+            border: 1px solid #666;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 0.9rem;
         }
         
         .input {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .input label {
-            color: #aaa;
-            font-size: 0.95rem;
+            color: #ccc;
+            font-size: 0.9rem;
         }
         
         .input input {
-            padding: 15px;
+            padding: 12px;
             background: #111;
             border: 1px solid #444;
             color: #fff;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        
-        .input input:focus {
-            outline: none;
-            border-color: #00ffff;
+            border-radius: 5px;
         }
         
         .submit {
-            padding: 15px;
+            padding: 12px;
             background: #00ffff;
             color: #000;
             border: none;
             cursor: pointer;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 5px;
             font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .submit:hover {
-            background: #00cccc;
         }
         
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 15px;
         }
         
         .item {
             display: flex;
             align-items: center;
-            padding: 15px;
-            background: rgba(30, 30, 30, 0.8);
+            padding: 12px;
+            background: #111;
             border: 1px solid #333;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        
-        .item:hover {
-            transform: translateX(5px);
-            border-color: #00ffff;
+            margin-bottom: 8px;
+            border-radius: 8px;
         }
         
         .item.current {
             border-color: #00ffff;
-            background: rgba(0, 255, 255, 0.1);
+            background: #222;
         }
         
         .rank {
-            width: 50px;
+            width: 40px;
             color: #fff;
             font-weight: bold;
-            font-size: 1.4rem;
-            text-align: center;
+            font-size: 1.2rem;
         }
         
         .info {
@@ -274,22 +210,18 @@
         
         .name {
             color: #fff;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
+            font-size: 1rem;
         }
         
         .score {
             color: #00ffff;
             font-weight: bold;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
         }
         
         .error {
             color: #ff4444;
-            font-size: 0.9rem;
-            padding: 10px;
-            background: rgba(255, 68, 68, 0.1);
-            border-radius: 5px;
+            font-size: 0.8rem;
             display: none;
         }
         
@@ -300,20 +232,14 @@
         .user-info {
             color: #fff;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             background: rgba(0, 255, 255, 0.1);
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .user-info h3 {
-            margin-bottom: 10px;
-            color: #00ffff;
+            border-radius: 8px;
         }
         
         .logout-btn {
-            margin-top: 15px;
-            padding: 10px 20px;
+            margin-top: 10px;
+            padding: 8px 15px;
             background: #ff4444;
             color: white;
             border: none;
@@ -322,14 +248,42 @@
             font-size: 0.9rem;
         }
         
-        .click-animation {
-            animation: clickEffect 0.3s ease;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .counter {
+                font-size: 3.5rem;
+                top: 15%;
+            }
+            
+            .circle {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .panel {
+                width: 100%;
+                right: -100%;
+            }
         }
         
-        @keyframes clickEffect {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(0.9); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+        @media (max-width: 480px) {
+            .counter {
+                font-size: 3rem;
+                top: 10%;
+            }
+            
+            .circle {
+                width: 160px;
+                height: 160px;
+            }
         }
     </style>
 </head>
@@ -340,7 +294,7 @@
         <!-- Foto akan dimuat via JavaScript -->
     </div>
     
-    <button class="btn" id="toggle" title="Leaderboard">
+    <button class="btn" id="toggle">
         <i class="fas fa-trophy"></i>
     </button>
     
@@ -353,7 +307,7 @@
         </div>
         
         <div class="auth" id="auth">
-            <!-- Login/Register forms akan dimuat di sini -->
+            <!-- Login/Register forms -->
         </div>
         
         <div class="content" id="content">
@@ -380,17 +334,8 @@
         let currentUser = null;
         let audio = null;
         
-        // DOM Elements
-        const counter = document.getElementById('counter');
-        const circle = document.getElementById('circle');
-        const toggle = document.getElementById('toggle');
-        const panel = document.getElementById('panel');
-        const closeBtn = document.getElementById('close');
-        const authDiv = document.getElementById('auth');
-        const contentDiv = document.getElementById('content');
-        
         // Initialize aplikasi
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Setup audio
             audio = new Audio('suara.mp3');
             audio.volume = 0.7;
@@ -402,14 +347,15 @@
             // Setup event listeners
             setupEventListeners();
             
-            // Load leaderboard
-            await loadLeaderboard();
-            
             // Setup auth forms
             setupAuthForms();
+            
+            // Load leaderboard
+            loadLeaderboard();
         });
         
         function loadPhoto() {
+            const circle = document.getElementById('circle');
             const img = new Image();
             img.src = 'foto.webp';
             img.onload = () => {
@@ -424,12 +370,12 @@
                     <div style="
                         width: 100%;
                         height: 100%;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        background: #333;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: #fff;
-                        font-size: 3rem;
+                        font-size: 2.5rem;
                     ">
                         <i class="fas fa-mouse-pointer"></i>
                     </div>
@@ -439,41 +385,29 @@
         
         function setupEventListeners() {
             // Klik pada lingkaran
-            circle.addEventListener('click', handleClick);
+            document.getElementById('circle').addEventListener('click', handleClick);
             
             // Tombol leaderboard
-            toggle.addEventListener('click', () => {
-                panel.classList.toggle('open');
-                loadLeaderboard();
+            document.getElementById('toggle').addEventListener('click', () => {
+                document.getElementById('panel').classList.toggle('open');
             });
             
             // Tombol close panel
-            closeBtn.addEventListener('click', () => {
-                panel.classList.remove('open');
-            });
-            
-            // Tutup panel ketika klik di luar pada mobile
-            panel.addEventListener('click', (e) => {
-                if (e.target === panel) {
-                    panel.classList.remove('open');
-                }
+            document.getElementById('close').addEventListener('click', () => {
+                document.getElementById('panel').classList.remove('open');
             });
         }
         
         async function handleClick() {
-            // Efek animasi
-            circle.classList.add('click-animation');
-            setTimeout(() => circle.classList.remove('click-animation'), 300);
-            
-            // Update counter
             clicks++;
-            counter.textContent = clicks;
+            document.getElementById('counter').textContent = clicks;
             
-            // Efek glow pada counter
-            counter.style.textShadow = '0 0 30px #00ffff';
+            // Efek visual
+            const circle = document.getElementById('circle');
+            circle.style.transform = 'translate(-50%, -50%) scale(0.95)';
             setTimeout(() => {
-                counter.style.textShadow = '0 0 20px #00ffff';
-            }, 200);
+                circle.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 100);
             
             // Play suara
             playSound();
@@ -491,13 +425,14 @@
                 const audioClone = audio.cloneNode();
                 audioClone.volume = 0.7;
                 audioClone.playbackRate = 1.5;
-                audioClone.play().catch(e => console.log("Audio error:", e));
+                audioClone.play().catch(e => console.log("Audio error"));
             } catch (error) {
-                console.log("Audio play failed:", error);
+                console.log("Audio play failed");
             }
         }
         
         function setupAuthForms() {
+            const authDiv = document.getElementById('auth');
             authDiv.innerHTML = `
                 <div class="btns">
                     <button class="auth-btn" id="showLogin">
@@ -511,11 +446,11 @@
                 <div class="form" id="loginForm">
                     <div class="input">
                         <label><i class="fas fa-user"></i> USERNAME</label>
-                        <input type="text" id="username" placeholder="Masukkan username">
+                        <input type="text" id="username" placeholder="Username">
                     </div>
                     <div class="input">
                         <label><i class="fas fa-lock"></i> PASSWORD</label>
-                        <input type="password" id="password" placeholder="Masukkan password">
+                        <input type="password" id="password" placeholder="Password">
                     </div>
                     <div class="error" id="loginError"></div>
                     <button class="submit" id="loginBtn">
@@ -526,11 +461,11 @@
                 <div class="form" id="registerForm">
                     <div class="input">
                         <label><i class="fas fa-user"></i> USERNAME</label>
-                        <input type="text" id="regUsername" placeholder="Buat username">
+                        <input type="text" id="regUsername" placeholder="Username">
                     </div>
                     <div class="input">
                         <label><i class="fas fa-lock"></i> PASSWORD</label>
-                        <input type="password" id="regPassword" placeholder="Buat password">
+                        <input type="password" id="regPassword" placeholder="Password">
                     </div>
                     <div class="error" id="registerError"></div>
                     <button class="submit" id="registerBtn">
@@ -539,7 +474,7 @@
                 </div>
             `;
             
-            // Add event listeners untuk form
+            // Event listeners untuk form
             document.getElementById('showLogin').addEventListener('click', () => {
                 document.getElementById('loginForm').classList.add('active');
                 document.getElementById('registerForm').classList.remove('active');
@@ -559,23 +494,6 @@
             
             // Register button
             document.getElementById('registerBtn').addEventListener('click', handleRegister);
-            
-            // Enter key support
-            document.getElementById('username')?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleLogin();
-            });
-            
-            document.getElementById('password')?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleLogin();
-            });
-            
-            document.getElementById('regUsername')?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleRegister();
-            });
-            
-            document.getElementById('regPassword')?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleRegister();
-            });
         }
         
         async function handleLogin() {
@@ -605,7 +523,7 @@
                 // Set current user
                 currentUser = data;
                 clicks = data.click_count || 0;
-                counter.textContent = clicks;
+                document.getElementById('counter').textContent = clicks;
                 
                 // Update UI
                 showUserInfo();
@@ -613,7 +531,6 @@
                 
             } catch (error) {
                 showError(errorDiv, 'Terjadi kesalahan saat login');
-                console.error('Login error:', error);
             }
         }
         
@@ -659,28 +576,28 @@
                     .single();
                 
                 if (error) {
-                    showError(errorDiv, 'Gagal membuat akun: ' + error.message);
+                    showError(errorDiv, 'Gagal membuat akun');
                     return;
                 }
                 
                 // Set current user
                 currentUser = newUser;
                 clicks = 0;
-                counter.textContent = clicks;
+                document.getElementById('counter').textContent = clicks;
                 
                 // Update UI
                 showUserInfo();
                 await loadLeaderboard();
                 
             } catch (error) {
-                showError(errorDiv, 'Terjadi kesalahan: ' + error.message);
-                console.error('Register error:', error);
+                showError(errorDiv, 'Terjadi kesalahan');
             }
         }
         
         function showUserInfo() {
             if (!currentUser) return;
             
+            const authDiv = document.getElementById('auth');
             authDiv.innerHTML = `
                 <div class="user-info">
                     <h3><i class="fas fa-user-circle"></i> ${currentUser.username}</h3>
@@ -697,7 +614,7 @@
         function handleLogout() {
             currentUser = null;
             clicks = 0;
-            counter.textContent = clicks;
+            document.getElementById('counter').textContent = clicks;
             setupAuthForms();
         }
         
@@ -732,6 +649,8 @@
                     throw error;
                 }
                 
+                const contentDiv = document.getElementById('content');
+                
                 if (!data || data.length === 0) {
                     contentDiv.innerHTML = `
                         <div class="item">
@@ -760,6 +679,7 @@
                 contentDiv.innerHTML = html;
                 
             } catch (error) {
+                const contentDiv = document.getElementById('content');
                 contentDiv.innerHTML = `
                     <div class="item">
                         <div class="info">
@@ -767,7 +687,6 @@
                         </div>
                     </div>
                 `;
-                console.error('Load leaderboard error:', error);
             }
         }
         
