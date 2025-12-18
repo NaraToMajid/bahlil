@@ -36,16 +36,11 @@
   <div class="panel" id="panel">
     <button class="close" id="close">Tutup</button>
 
-    <h3>Daftar</h3>
-    <input type="text" id="reg_username" placeholder="Username" />
-    <input type="email" id="reg_email" placeholder="Email" />
-    <input type="password" id="reg_password" placeholder="Password" />
-    <button id="register">Daftar</button>
-
-    <h3>Login</h3>
-    <input type="email" id="log_email" placeholder="Email" />
-    <input type="password" id="log_password" placeholder="Password" />
-    <button id="login">Login</button>
+    <h3>Daftar / Login</h3>
+    <input type="text" id="username" placeholder="Username (daftar)" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="register">Masuk / Daftar</button>
 
     <table id="board"></table>
   </div>
@@ -58,15 +53,18 @@
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const panel=document.getElementById('panel');
     lbBtn.onclick=()=>panel.classList.add('active');
     close.onclick=()=>panel.classList.remove('active');
 
     const countEl=document.getElementById('count');
     const sound=document.getElementById('sound');
+    sound.volume = 1.0;
 
     photo.onclick=async()=>{
-      sound.currentTime=0; sound.play();
+      sound.currentTime=0;
+      sound.play();
+      sound.currentTime=0;
+      sound.play();
       countEl.innerText = Number(countEl.innerText)+1;
       countEl.classList.add('bump');
       setTimeout(()=>countEl.classList.remove('bump'),150);
@@ -75,23 +73,16 @@
     };
 
     register.onclick=async()=>{
-      const { data } = await sb.auth.signUp({
-        email:reg_email.value,
-        password:reg_password.value
-      });
-      if(data?.user){
-        await sb.from('KLIKUSER').insert({
-          user_id:data.user.id,
-          username:reg_username.value
-        });
+      const emailVal=email.value;
+      const passVal=password.value;
+      let { error } = await sb.auth.signInWithPassword({email:emailVal,password:passVal});
+      if(error){
+        const { data } = await sb.auth.signUp({email:emailVal,password:passVal});
+        if(data?.user){
+          await sb.from('KLIKUSER').insert({user_id:data.user.id,username:username.value});
+        }
       }
-    };
-
-    login.onclick=async()=>{
-      await sb.auth.signInWithPassword({
-        email:log_email.value,
-        password:log_password.value
-      });
+      panel.classList.add('active');
       loadMyCount();
     };
 
