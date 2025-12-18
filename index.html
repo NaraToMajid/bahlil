@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Klik Realtime</title>
+<title>Klik Game</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <style>
@@ -15,41 +15,27 @@ body{
   justify-content:center;
   font-family:Arial;
 }
-#count{
-  font-size:36px;
-  margin-bottom:12px;
-  transition:.15s;
-}
-.bump{transform:scale(1.25)}
+#count{font-size:36px;margin-bottom:12px}
 #photo{
-  width:220px;
-  height:220px;
+  width:220px;height:220px;
   border-radius:50%;
   border:8px solid #eee;
   overflow:hidden;
   cursor:pointer;
 }
 #photo img{width:100%;height:100%;object-fit:cover}
+
 #btn{
-  position:fixed;
-  top:16px;
-  right:16px;
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  background:#333;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  position:fixed;top:16px;right:16px;
+  width:44px;height:44px;border-radius:50%;
+  background:#333;color:#fff;
+  display:flex;align-items:center;justify-content:center;
   cursor:pointer;
 }
+
 #panel{
-  position:fixed;
-  right:0;
-  top:0;
-  width:340px;
-  height:100%;
+  position:fixed;right:0;top:0;
+  width:340px;height:100%;
   background:#e5e5e5;
   transform:translateX(100%);
   transition:.3s;
@@ -57,11 +43,15 @@ body{
   overflow:auto;
 }
 #panel.show{transform:translateX(0)}
+
 input,button{width:100%;padding:8px;margin-top:8px}
-hr{margin:16px 0}
 table{width:100%;border-collapse:collapse;margin-top:10px}
-td{border-bottom:1px solid #aaa;padding:6px}
-.me{background:#caffca}
+td{padding:6px;border-bottom:1px solid #aaa}
+
+.gold{background:#ffd700}
+.silver{background:#c0c0c0}
+.bronze{background:#cd7f32}
+.me{outline:2px solid #000}
 </style>
 </head>
 
@@ -88,7 +78,8 @@ td{border-bottom:1px solid #aaa;padding:6px}
   <button onclick="login()">Login</button>
 
   <hr>
-  <h3>Leaderboard</h3>
+
+  <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
   <table id="board"></table>
 </div>
 
@@ -105,21 +96,19 @@ let currentClick = 0;
 
 btn.onclick = () => panel.classList.add('show');
 
-photo.onclick = () => {
+photo.onclick = async () => {
   if(!currentUser) return alert('Login dulu');
 
-  // suara 2x
-  sound.currentTime = 0; sound.play();
-  sound.currentTime = 0; sound.play();
+  // suara 2x LEBIH CEPAT
+  sound.pause();
+  sound.currentTime = 0;
+  sound.playbackRate = 2;
+  sound.play();
 
-  // UPDATE LOKAL (INI KUNCI REALTIME)
   currentClick++;
   count.textContent = currentClick;
-  count.classList.add('bump');
-  setTimeout(()=>count.classList.remove('bump'),150);
 
-  // UPDATE DB (ASYNC)
-  sb.from('KLIKUSER')
+  await sb.from('KLIKUSER')
     .update({ jumlah_klik: currentClick })
     .eq('username', currentUser);
 };
@@ -127,10 +116,10 @@ photo.onclick = () => {
 async function register(){
   const u = reg_user.value.trim();
   const p = reg_pass.value.trim();
-  if(!u || !p) return alert('Isi semua');
+  if(!u||!p) return alert('Isi semua');
 
   const {error} = await sb.from('KLIKUSER').insert({username:u,password:p});
-  if(error) return alert('Username sudah dipakai');
+  if(error) return alert('Username sudah ada');
 
   currentUser = u;
   currentClick = 0;
@@ -141,8 +130,7 @@ async function login(){
   const u = log_user.value.trim();
   const p = log_pass.value.trim();
 
-  const {data} = await sb
-    .from('KLIKUSER')
+  const {data} = await sb.from('KLIKUSER')
     .select('*')
     .eq('username',u)
     .eq('password',p)
@@ -158,10 +146,9 @@ async function login(){
 function afterLogin(){
   count.textContent = currentClick;
 
-  // HILANGKAN FORM
   panel.innerHTML = `
     <button onclick="panel.classList.remove('show')">Tutup</button>
-    <h3>Leaderboard</h3>
+    <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
     <table id="board"></table>
   `;
 
@@ -169,18 +156,23 @@ function afterLogin(){
 }
 
 async function loadBoard(){
-  const {data} = await sb
-    .from('KLIKUSER')
+  const {data} = await sb.from('KLIKUSER')
     .select('*')
     .order('jumlah_klik',{ascending:false});
 
   const board = document.getElementById('board');
   if(!board) return;
 
-  board.innerHTML='';
+  board.innerHTML = '';
   data.forEach((r,i)=>{
-    board.innerHTML+=`
-      <tr class="${r.username===currentUser?'me':''}">
+    let cls = '';
+    if(i===0) cls='gold';
+    else if(i===1) cls='silver';
+    else if(i===2) cls='bronze';
+    if(r.username===currentUser) cls+=' me';
+
+    board.innerHTML += `
+      <tr class="${cls}">
         <td>${i+1}</td>
         <td>${r.username}</td>
         <td>${r.jumlah_klik}</td>
@@ -188,23 +180,6 @@ async function loadBoard(){
     `;
   });
 }
-
-// REALTIME LISTENER (LEADERBOARD + SYNC)
-sb.channel('rt')
-.on(
-  'postgres_changes',
-  {event:'UPDATE',schema:'public',table:'KLIKUSER'},
-  payload=>{
-    loadBoard();
-
-    // sinkron kalau update dari device lain
-    if(payload.new.username === currentUser){
-      currentClick = payload.new.jumlah_klik;
-      count.textContent = currentClick;
-    }
-  }
-)
-.subscribe();
 
 loadBoard();
 </script>
