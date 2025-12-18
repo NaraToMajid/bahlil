@@ -2,8 +2,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Klik User</title>
+<title>Klik Game</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
 <style>
 body{margin:0;background:#bfbfbf;height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial}
 #count{font-size:32px;margin-bottom:12px;transition:.15s}
@@ -19,6 +20,7 @@ table{width:100%;margin-top:12px;border-collapse:collapse}
 td{border-bottom:1px solid #aaa;padding:6px}
 </style>
 </head>
+
 <body>
 
 <div id="btn">★</div>
@@ -32,16 +34,15 @@ td{border-bottom:1px solid #aaa;padding:6px}
   <button onclick="panel.classList.remove('show')">Tutup</button>
 
   <h3>DAFTAR</h3>
-  <input id="reg_username" placeholder="Username">
-  <input id="reg_email" placeholder="Email">
-  <input id="reg_password" type="password" placeholder="Password">
+  <input id="reg_user" placeholder="Username">
+  <input id="reg_pass" type="password" placeholder="Password">
   <button onclick="register()">Daftar</button>
 
   <hr>
 
   <h3>LOGIN</h3>
-  <input id="log_email" placeholder="Email">
-  <input id="log_password" type="password" placeholder="Password">
+  <input id="log_user" placeholder="Username">
+  <input id="log_pass" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
 
   <table id="board"></table>
@@ -55,59 +56,79 @@ const sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
 );
 
-btn.onclick=()=>panel.classList.add('show');
+btn.onclick = () => panel.classList.add('show');
 
-photo.onclick=async()=>{
-  sound.currentTime=0; sound.play();
-  sound.currentTime=0; sound.play();
-  count.textContent=+count.textContent+1;
+photo.onclick = async () => {
+  sound.currentTime = 0; sound.play();
+  sound.currentTime = 0; sound.play();
+
+  count.textContent++;
   count.classList.add('bump');
   setTimeout(()=>count.classList.remove('bump'),150);
-  const {data:{user}}=await sb.auth.getUser();
+
+  const {data:{user}} = await sb.auth.getUser();
   if(user) await sb.rpc('inc_click');
 };
 
+function makeEmail(username){
+  return username + '@app.local';
+}
+
 async function register(){
-  const {data,error}=await sb.auth.signUp({
-    email:reg_email.value,
-    password:reg_password.value
+  const email = makeEmail(reg_user.value);
+  const pass = reg_pass.value;
+
+  const { error } = await sb.auth.signUp({
+    email,
+    password: pass,
+    options:{
+      data:{ username: reg_user.value }
+    }
   });
+
   if(error) return alert(error.message);
-
-  await sb.from('KLIKUSER').insert({
-    user_id:data.user.id,
-    username:reg_username.value
-  });
-
-  loadMe(); loadBoard(); panel.classList.add('show');
+  loadMe(); loadBoard();
 }
 
 async function login(){
-  const {error}=await sb.auth.signInWithPassword({
-    email:log_email.value,
-    password:log_password.value
+  const email = makeEmail(log_user.value);
+  const pass = log_pass.value;
+
+  const { error } = await sb.auth.signInWithPassword({
+    email,
+    password: pass
   });
+
   if(error) return alert(error.message);
-  loadMe(); loadBoard(); panel.classList.add('show');
+  loadMe(); loadBoard();
 }
 
 async function loadMe(){
-  const {data:{user}}=await sb.auth.getUser();
+  const {data:{user}} = await sb.auth.getUser();
   if(!user) return;
-  const {data}=await sb.from('KLIKUSER')
+
+  const {data} = await sb
+    .from('KLIKUSER')
     .select('jumlah_klik')
-    .eq('user_id',user.id)
+    .eq('user_id', user.id)
     .single();
-  if(data) count.textContent=data.jumlah_klik;
+
+  if(data) count.textContent = data.jumlah_klik;
 }
 
 async function loadBoard(){
-  const {data}=await sb.from('KLIKUSER')
+  const {data} = await sb
+    .from('KLIKUSER')
     .select('*')
-    .order('jumlah_klik',{ascending:false});
-  board.innerHTML='';
+    .order('jumlah_klik', {ascending:false});
+
+  board.innerHTML = '';
   data.forEach((r,i)=>{
-    board.innerHTML+=`<tr><td>${i+1}</td><td>${r.username}</td><td>${r.jumlah_klik}</td></tr>`;
+    board.innerHTML += `<tr>
+      <td>${i+1}</td>
+      <td>${r.username}</td>
+      <td>${r.jumlah_klik}</td>
+    </tr>`;
   });
 }
 
