@@ -44,12 +44,17 @@ html,body{
   border:8px solid #eee;
   overflow:hidden;
   cursor:pointer;
+  transition:transform 0.2s;
 }
 
 #photo img{
   width:100%;
   height:100%;
   object-fit:cover;
+}
+
+#photo:active{
+  transform:scale(0.95);
 }
 
 /* ===== BUTTON PANEL ===== */
@@ -99,15 +104,23 @@ input,button{
   padding:10px;
   margin-top:8px;
   font-size:15px;
+  border:1px solid #ccc;
+  border-radius:5px;
 }
 
 button{
   cursor:pointer;
+  background:#4CAF50;
+  color:white;
+  border:none;
+}
+
+button:hover{
+  opacity:0.9;
 }
 
 button.logout{
   background:#c62828;
-  color:#fff;
 }
 
 /* ===== VERIFIKASI KODE ===== */
@@ -130,6 +143,7 @@ button.logout{
   border:2px dashed #bbb;
   margin:8px 0;
   user-select:all;
+  cursor:pointer;
 }
 
 #copy-hint{
@@ -145,16 +159,209 @@ table{
   margin-top:10px;
 }
 
+tr{
+  position:relative;
+}
+
 td{
-  padding:6px;
+  padding:8px 6px;
   border-bottom:1px solid #aaa;
   font-size:14px;
+  position:relative;
+  z-index:1;
+}
+
+.username-cell{
+  cursor:pointer;
+  position:relative;
+  transition:background-color 0.2s;
+}
+
+.username-cell:hover{
+  background-color:rgba(0,0,0,0.05);
 }
 
 .gold{background:#ffd700;}
 .silver{background:#c0c0c0;}
 .bronze{background:#cd7f32;}
 .me{outline:2px solid #000;}
+
+/* ===== MENU TITIK TIGA ===== */
+.menu-btn{
+  position:absolute;
+  right:5px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  font-size:16px;
+  color:#666;
+  cursor:pointer;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2;
+}
+
+.menu-btn:hover{
+  background-color:rgba(0,0,0,0.1);
+  border-radius:50%;
+}
+
+/* ===== CHAT MODAL ===== */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-content{
+  background:white;
+  width:90%;
+  max-width:400px;
+  max-height:80vh;
+  border-radius:10px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.modal-header{
+  background:#4CAF50;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-body{
+  padding:15px;
+  flex:1;
+  overflow-y:auto;
+  max-height:50vh;
+}
+
+.modal-footer{
+  padding:15px;
+  background:#f5f5f5;
+  border-top:1px solid #ddd;
+}
+
+.chat-message{
+  margin-bottom:10px;
+  padding:8px;
+  border-radius:8px;
+  background:#f0f0f0;
+}
+
+.chat-message.sent{
+  background:#e3f2fd;
+  text-align:right;
+}
+
+.chat-message .sender{
+  font-weight:bold;
+  color:#333;
+  font-size:12px;
+}
+
+.chat-message .time{
+  font-size:10px;
+  color:#666;
+  float:right;
+  margin-left:5px;
+}
+
+/* ===== EDITOR LATAR BELAKANG ===== */
+#bg-editor-modal .modal-content{
+  max-width:500px;
+}
+
+.editor-tools{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+  flex-wrap:wrap;
+}
+
+.editor-tool-btn{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  border:2px solid #ccc;
+  border-radius:5px;
+  background:white;
+}
+
+.editor-tool-btn.active{
+  border-color:#4CAF50;
+}
+
+#color-picker{
+  width:40px;
+  height:40px;
+  border:none;
+  cursor:pointer;
+  padding:0;
+}
+
+.tool-size{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+#canvas-container{
+  display:flex;
+  justify-content:center;
+  margin:15px 0;
+}
+
+#bg-canvas{
+  border:2px solid #ccc;
+  background:white;
+  cursor:crosshair;
+}
+
+.export-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.export-buttons button{
+  flex:1;
+}
+
+#export-preview{
+  margin-top:15px;
+  text-align:center;
+}
+
+.preview-item{
+  display:inline-block;
+  padding:5px 10px;
+  margin:2px;
+  border-radius:3px;
+  font-size:12px;
+}
 </style>
 </head>
 
@@ -194,6 +401,52 @@ td{
 
   <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
   <table id="board"></table>
+</div>
+
+<!-- Modal Chat -->
+<div id="chat-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="chat-title">Chat dengan ...</h3>
+      <button onclick="closeChat()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body" id="chat-messages"></div>
+    <div class="modal-footer">
+      <input type="text" id="chat-input" placeholder="Ketik pesan..." onkeypress="handleChatKeyPress(event)">
+      <button onclick="sendChatMessage()" style="margin-top:10px">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editor Latar Belakang -->
+<div id="bg-editor-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Edit Latar Belakang Leaderboard</h3>
+      <button onclick="closeBgEditor()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="editor-tools">
+        <button class="editor-tool-btn active" onclick="setTool('pencil')" title="Pensil">✏️</button>
+        <button class="editor-tool-btn" onclick="setTool('eraser')" title="Penghapus">🧽</button>
+        <button class="editor-tool-btn" onclick="setTool('bucket')" title="Ember">🪣</button>
+        <input type="color" id="color-picker" value="#4CAF50" onchange="setColor(this.value)">
+        <div class="tool-size">
+          <label>Ukuran:</label>
+          <input type="range" id="brush-size" min="1" max="20" value="3" onchange="setBrushSize(this.value)">
+          <span id="brush-size-label">3px</span>
+        </div>
+      </div>
+      <div id="canvas-container">
+        <canvas id="bg-canvas" width="300" height="40"></canvas>
+      </div>
+      <div class="export-buttons">
+        <button onclick="clearCanvas()">🧹 Hapus</button>
+        <button onclick="saveBackground()">💾 Simpan</button>
+      </div>
+      <div id="export-preview"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -246,6 +499,21 @@ const sb = supabase.createClient(
 let currentUser = null;
 let currentClick = 0;
 let verificationCode = '';
+let chatTarget = null;
+let canvasTool = 'pencil';
+let canvasColor = '#4CAF50';
+let brushSize = 3;
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+// Inisialisasi canvas
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+
+// Set canvas background putih
+ctx.fillStyle = '#ffffff';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 // Generate verification code
 function generateVerificationCode() {
@@ -269,6 +537,7 @@ generateVerificationCode();
 btn.onclick = () => {
   panel.classList.add('show');
   generateVerificationCode(); // Generate kode baru setiap kali panel dibuka
+  loadBoard(); // Refresh leaderboard
 };
 
 /* ===== CLICK FOTO ===== */
@@ -278,9 +547,14 @@ photo.onclick = async () => {
     return;
   }
 
-  const audio = new Audio('suara.mp3');
-  audio.playbackRate = 2;
-  audio.play();
+  // Coba mainkan audio (jika ada)
+  try {
+    const audio = new Audio('suara.mp3');
+    audio.playbackRate = 2;
+    audio.play();
+  } catch(e) {
+    // Jika audio gagal, lanjutkan saja
+  }
 
   currentClick++;
   count.textContent = currentClick;
@@ -347,6 +621,7 @@ function afterLogin(){
     <table id="board"></table>
   `;
   loadBoard();
+  loadUserBackground();
 }
 
 /* ===== LOGOUT ===== */
@@ -388,7 +663,7 @@ function logout(){
   }, 100);
 }
 
-/* ===== LEADERBOARD ===== */
+/* ===== LEADERBOARD DENGAN CHAT DAN EDITOR ===== */
 async function loadBoard(){
   const {data} = await sb.from('KLIKUSER')
     .select('*')
@@ -405,14 +680,288 @@ async function loadBoard(){
     else if(i===2)cls='bronze';
     if(r.username===currentUser)cls+=' me';
 
+    // Load custom background jika ada
+    let style = '';
+    if(r.background_data) {
+      try {
+        const bgData = JSON.parse(r.background_data);
+        if(bgData.bgColor) {
+          style = `background: ${bgData.bgColor};`;
+        } else if(bgData.imageData) {
+          style = `background: url(${bgData.imageData}); background-size: cover;`;
+        }
+      } catch(e) {
+        console.error('Error parsing background data:', e);
+      }
+    }
+
     board.innerHTML += `
-      <tr class="${cls}">
+      <tr class="${cls}" style="${style}">
         <td>${i+1}</td>
-        <td>${r.username}</td>
+        <td class="username-cell" onclick="openChat('${r.username}')">${r.username}</td>
         <td>${r.jumlah_klik}</td>
+        ${r.username===currentUser ? `<td><button class="menu-btn" onclick="openBgEditor()">⋮</button></td>` : '<td></td>'}
       </tr>
     `;
   });
+}
+
+/* ===== CHAT FUNCTIONS ===== */
+async function openChat(username) {
+  if(!currentUser) {
+    alert('Anda harus login untuk mengirim chat');
+    return;
+  }
+  
+  if(username === currentUser) {
+    alert('Tidak bisa chat dengan diri sendiri');
+    return;
+  }
+  
+  chatTarget = username;
+  document.getElementById('chat-title').textContent = `Chat dengan ${username}`;
+  document.getElementById('chat-modal').classList.add('show');
+  document.getElementById('chat-input').focus();
+  
+  await loadChatMessages();
+}
+
+function closeChat() {
+  document.getElementById('chat-modal').classList.remove('show');
+  chatTarget = null;
+}
+
+async function loadChatMessages() {
+  const {data} = await sb.from('KLIKCHAT')
+    .select('*')
+    .or(`and(sender.eq.${currentUser},receiver.eq.${chatTarget}),and(sender.eq.${chatTarget},receiver.eq.${currentUser})`)
+    .order('created_at', { ascending:true });
+
+  const messagesDiv = document.getElementById('chat-messages');
+  messagesDiv.innerHTML = '';
+
+  if(data && data.length > 0) {
+    data.forEach(msg => {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${msg.sender === currentUser ? 'sent' : ''}`;
+      
+      const time = new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      messageDiv.innerHTML = `
+        <div class="sender">${msg.sender}</div>
+        <div>${msg.message}</div>
+        <div class="time">${time}</div>
+      `;
+      messagesDiv.appendChild(messageDiv);
+    });
+    
+    // Scroll ke bawah
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  } else {
+    messagesDiv.innerHTML = '<p style="text-align:center;color:#666;">Belum ada pesan. Mulai percakapan!</p>';
+  }
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const message = input.value.trim();
+  
+  if(!message) return;
+  
+  if(!currentUser || !chatTarget) {
+    alert('Error: Pengirim atau penerima tidak valid');
+    return;
+  }
+
+  // Kirim pesan ke database
+  const {error} = await sb.from('KLIKCHAT')
+    .insert({
+      sender: currentUser,
+      receiver: chatTarget,
+      message: message
+    });
+
+  if(error) {
+    console.error('Error sending message:', error);
+    alert('Gagal mengirim pesan');
+    return;
+  }
+
+  // Clear input
+  input.value = '';
+  
+  // Reload messages
+  await loadChatMessages();
+}
+
+function handleChatKeyPress(e) {
+  if(e.key === 'Enter') {
+    sendChatMessage();
+  }
+}
+
+/* ===== EDITOR LATAR BELAKANG FUNCTIONS ===== */
+function openBgEditor() {
+  document.getElementById('bg-editor-modal').classList.add('show');
+  loadUserBackground();
+}
+
+function closeBgEditor() {
+  document.getElementById('bg-editor-modal').classList.remove('show');
+}
+
+function setTool(tool) {
+  canvasTool = tool;
+  
+  // Update active button
+  document.querySelectorAll('.editor-tool-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  event.target.classList.add('active');
+}
+
+function setColor(color) {
+  canvasColor = color;
+}
+
+function setBrushSize(size) {
+  brushSize = parseInt(size);
+  document.getElementById('brush-size-label').textContent = size + 'px';
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
+
+function startDrawing(e) {
+  isDrawing = true;
+  const rect = canvas.getBoundingClientRect();
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+}
+
+function draw(e) {
+  if(!isDrawing) return;
+  
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  
+  if(canvasTool === 'pencil') {
+    ctx.strokeStyle = canvasColor;
+    ctx.lineWidth = brushSize;
+    
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  } else if(canvasTool === 'eraser') {
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = brushSize * 2;
+    
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+  
+  lastX = x;
+  lastY = y;
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+function fillBucket() {
+  if(canvasTool === 'bucket') {
+    ctx.fillStyle = canvasColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Update bucket tool untuk langsung mengisi
+document.querySelector('[onclick="setTool(\'bucket\')"]').addEventListener('click', function() {
+  setTool('bucket');
+  fillBucket();
+});
+
+function clearCanvas() {
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+async function saveBackground() {
+  if(!currentUser) {
+    alert('Anda harus login untuk menyimpan background');
+    return;
+  }
+  
+  // Konversi canvas ke data URL
+  const imageData = canvas.toDataURL('image/png');
+  
+  // Simpan ke database
+  const backgroundData = {
+    imageData: imageData,
+    savedAt: new Date().toISOString()
+  };
+  
+  const {error} = await sb.from('KLIKUSER')
+    .update({ background_data: JSON.stringify(backgroundData) })
+    .eq('username', currentUser);
+  
+  if(error) {
+    console.error('Error saving background:', error);
+    alert('Gagal menyimpan background');
+    return;
+  }
+  
+  alert('Background berhasil disimpan!');
+  closeBgEditor();
+  loadBoard();
+  
+  // Tampilkan preview
+  showPreview(backgroundData);
+}
+
+async function loadUserBackground() {
+  if(!currentUser) return;
+  
+  const {data} = await sb.from('KLIKUSER')
+    .select('background_data')
+    .eq('username', currentUser)
+    .single();
+  
+  if(data && data.background_data) {
+    try {
+      const bgData = JSON.parse(data.background_data);
+      if(bgData.imageData) {
+        const img = new Image();
+        img.onload = function() {
+          clearCanvas();
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = bgData.imageData;
+      }
+    } catch(e) {
+      console.error('Error loading background:', e);
+    }
+  }
+}
+
+function showPreview(bgData) {
+  const previewDiv = document.getElementById('export-preview');
+  previewDiv.innerHTML = `
+    <p>Preview latar belakang Anda:</p>
+    <div class="preview-item" style="background: url(${bgData.imageData}); background-size: cover; padding: 20px; border: 2px solid #333;">
+      ${currentUser}
+    </div>
+    <p><small>Background akan muncul di leaderboard</small></p>
+  `;
 }
 
 loadBoard();
