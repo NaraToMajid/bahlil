@@ -13,45 +13,83 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:Arial;
+  font-family:Arial, sans-serif;
 }
-#count{font-size:36px;margin-bottom:12px}
+
+#count{
+  font-size:36px;
+  margin-bottom:12px;
+}
+
 #photo{
-  width:220px;height:220px;
+  width:220px;
+  height:220px;
   border-radius:50%;
   border:8px solid #eee;
   overflow:hidden;
   cursor:pointer;
 }
-#photo img{width:100%;height:100%;object-fit:cover}
+
+#photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
 #btn{
-  position:fixed;top:16px;right:16px;
-  width:44px;height:44px;border-radius:50%;
-  background:#333;color:#fff;
-  display:flex;align-items:center;justify-content:center;
+  position:fixed;
+  top:16px;
+  right:16px;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background:#333;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
+  font-size:20px;
 }
 
 #panel{
-  position:fixed;right:0;top:0;
-  width:340px;height:100%;
+  position:fixed;
+  right:0;
+  top:0;
+  width:340px;
+  height:100%;
   background:#e5e5e5;
   transform:translateX(100%);
   transition:.3s;
   padding:16px;
   overflow:auto;
 }
-#panel.show{transform:translateX(0)}
 
-input,button{width:100%;padding:8px;margin-top:8px}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-td{padding:6px;border-bottom:1px solid #aaa}
+#panel.show{
+  transform:translateX(0);
+}
 
-.gold{background:#ffd700}
-.silver{background:#c0c0c0}
-.bronze{background:#cd7f32}
-.me{outline:2px solid #000}
+input,button{
+  width:100%;
+  padding:8px;
+  margin-top:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+td{
+  padding:6px;
+  border-bottom:1px solid #aaa;
+}
+
+.gold{background:#ffd700;}
+.silver{background:#c0c0c0;}
+.bronze{background:#cd7f32;}
+.me{outline:2px solid #000;}
 </style>
 </head>
 
@@ -61,7 +99,9 @@ td{padding:6px;border-bottom:1px solid #aaa}
 
 <div style="text-align:center">
   <div id="count">0</div>
-  <div id="photo"><img src="foto.webp"></div>
+  <div id="photo">
+    <img src="foto.webp">
+  </div>
 </div>
 
 <div id="panel">
@@ -83,8 +123,6 @@ td{padding:6px;border-bottom:1px solid #aaa}
   <table id="board"></table>
 </div>
 
-<audio id="sound" src="suara.mp3"></audio>
-
 <script>
 const sb = supabase.createClient(
   'https://bxhrnnwfqlsoviysqcdw.supabase.co',
@@ -96,29 +134,42 @@ let currentClick = 0;
 
 btn.onclick = () => panel.classList.add('show');
 
+/* =======================
+   KLIK FOTO (SUARA FIX)
+======================= */
 photo.onclick = async () => {
-  if(!currentUser) return alert('Login dulu');
+  if(!currentUser){
+    alert('Login dulu');
+    return;
+  }
 
-  // suara 2x LEBIH CEPAT
-  sound.pause();
-  sound.currentTime = 0;
-  sound.playbackRate = 2;
-  sound.play();
+  // 🔊 SUARA SELALU KELUAR (BISA NUMPUK)
+  const audio = new Audio('suara.mp3');
+  audio.playbackRate = 2;
+  audio.play();
 
+  // UPDATE UI
   currentClick++;
   count.textContent = currentClick;
 
+  // UPDATE DATABASE
   await sb.from('KLIKUSER')
     .update({ jumlah_klik: currentClick })
     .eq('username', currentUser);
 };
 
+/* =======================
+   AUTH
+======================= */
 async function register(){
   const u = reg_user.value.trim();
   const p = reg_pass.value.trim();
-  if(!u||!p) return alert('Isi semua');
+  if(!u || !p) return alert('Isi semua');
 
-  const {error} = await sb.from('KLIKUSER').insert({username:u,password:p});
+  const {error} = await sb
+    .from('KLIKUSER')
+    .insert({ username:u, password:p });
+
   if(error) return alert('Username sudah ada');
 
   currentUser = u;
@@ -130,7 +181,8 @@ async function login(){
   const u = log_user.value.trim();
   const p = log_pass.value.trim();
 
-  const {data} = await sb.from('KLIKUSER')
+  const {data} = await sb
+    .from('KLIKUSER')
     .select('*')
     .eq('username',u)
     .eq('password',p)
@@ -146,6 +198,7 @@ async function login(){
 function afterLogin(){
   count.textContent = currentClick;
 
+  // HILANGKAN FORM
   panel.innerHTML = `
     <button onclick="panel.classList.remove('show')">Tutup</button>
     <button onclick="loadBoard()">🔄 Refresh Leaderboard</button>
@@ -155,8 +208,12 @@ function afterLogin(){
   loadBoard();
 }
 
+/* =======================
+   LEADERBOARD
+======================= */
 async function loadBoard(){
-  const {data} = await sb.from('KLIKUSER')
+  const {data} = await sb
+    .from('KLIKUSER')
     .select('*')
     .order('jumlah_klik',{ascending:false});
 
@@ -169,7 +226,7 @@ async function loadBoard(){
     if(i===0) cls='gold';
     else if(i===1) cls='silver';
     else if(i===2) cls='bronze';
-    if(r.username===currentUser) cls+=' me';
+    if(r.username===currentUser) cls += ' me';
 
     board.innerHTML += `
       <tr class="${cls}">
