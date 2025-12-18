@@ -56,61 +56,62 @@ const sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4aHJubndmcWxzb3ZpeXNxY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3ODkzNDIsImV4cCI6MjA4MTM2NTM0Mn0.O7fpv0TrDd-8ZE3Z9B5zWyAuWROPis5GRnKMxmqncX8'
 );
 
+let currentUser = null;
+
 btn.onclick = () => panel.classList.add('show');
 
 photo.onclick = async () => {
-  sound.currentTime = 0; sound.play();
-  sound.currentTime = 0; sound.play();
+  sound.currentTime=0; sound.play();
+  sound.currentTime=0; sound.play();
+
+  if(!currentUser) return alert('Login dulu');
 
   count.textContent++;
   count.classList.add('bump');
   setTimeout(()=>count.classList.remove('bump'),150);
 
-  const {data:{user}} = await sb.auth.getUser();
-  if(user) await sb.rpc('inc_click');
+  await sb
+    .from('KLIKUSER')
+    .update({ jumlah_klik: Number(count.textContent) })
+    .eq('username', currentUser);
 };
 
-function makeEmail(username){
-  return username + '@gmail.com';
-}
-
 async function register(){
-  const email = makeEmail(reg_user.value);
-  const pass = reg_pass.value;
+  const u = reg_user.value;
+  const p = reg_pass.value;
+  if(!u||!p) return alert('Isi semua');
 
-  const { error } = await sb.auth.signUp({
-    email,
-    password: pass,
-    options:{
-      data:{ username: reg_user.value }
-    }
-  });
+  const {error} = await sb.from('KLIKUSER').insert({username:u,password:p});
+  if(error) return alert('Username sudah dipakai');
 
-  if(error) return alert(error.message);
-  loadMe(); loadBoard();
+  currentUser = u;
+  loadMe();
+  loadBoard();
 }
 
 async function login(){
-  const email = makeEmail(log_user.value);
-  const pass = log_pass.value;
-
-  const { error } = await sb.auth.signInWithPassword({
-    email,
-    password: pass
-  });
-
-  if(error) return alert(error.message);
-  loadMe(); loadBoard();
-}
-
-async function loadMe(){
-  const {data:{user}} = await sb.auth.getUser();
-  if(!user) return;
+  const u = log_user.value;
+  const p = log_pass.value;
 
   const {data} = await sb
     .from('KLIKUSER')
+    .select('*')
+    .eq('username',u)
+    .eq('password',p)
+    .single();
+
+  if(!data) return alert('Login gagal');
+
+  currentUser = u;
+  count.textContent = data.jumlah_klik;
+  loadBoard();
+}
+
+async function loadMe(){
+  const {data} = await sb
+    .from('KLIKUSER')
     .select('jumlah_klik')
-    .eq('user_id', user.id)
+    .eq('username',currentUser)
     .single();
 
   if(data) count.textContent = data.jumlah_klik;
@@ -120,11 +121,11 @@ async function loadBoard(){
   const {data} = await sb
     .from('KLIKUSER')
     .select('*')
-    .order('jumlah_klik', {ascending:false});
+    .order('jumlah_klik',{ascending:false});
 
-  board.innerHTML = '';
+  board.innerHTML='';
   data.forEach((r,i)=>{
-    board.innerHTML += `<tr>
+    board.innerHTML+=`<tr>
       <td>${i+1}</td>
       <td>${r.username}</td>
       <td>${r.jumlah_klik}</td>
@@ -133,10 +134,10 @@ async function loadBoard(){
 }
 
 sb.channel('rt')
-.on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},()=>{loadBoard();loadMe();})
+.on('postgres_changes',{event:'*',schema:'public',table:'KLIKUSER'},loadBoard)
 .subscribe();
 
-loadBoard(); loadMe();
+loadBoard();
 </script>
 </body>
 </html>
