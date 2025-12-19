@@ -392,6 +392,7 @@ h1, h2, h3, h4 {
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid #333;
+  cursor: pointer;
 }
 
 .leaderboard-desktop .user-avatar img {
@@ -508,6 +509,7 @@ h1, h2, h3, h4 {
   overflow: hidden;
   flex-shrink: 0;
   border: 1px solid #333;
+  cursor: pointer;
 }
 
 .user-avatar-mobile img {
@@ -626,7 +628,7 @@ h1, h2, h3, h4 {
   letter-spacing: 0.5px;
 }
 
-.input-group input {
+.input-group input, .input-group textarea {
   width: 100%;
   padding: 12px 15px;
   background: rgba(255, 255, 255, 0.05);
@@ -635,12 +637,18 @@ h1, h2, h3, h4 {
   color: #fff;
   font-size: 15px;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
-.input-group input:focus {
+.input-group input:focus, .input-group textarea:focus {
   outline: none;
   border-color: #555;
   background: rgba(255, 255, 255, 0.08);
+}
+
+.input-group textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .btn {
@@ -684,6 +692,79 @@ h1, h2, h3, h4 {
 .btn-danger:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: #555;
+}
+
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* ===== PROFILE EDITOR ===== */
+.profile-editor {
+  position: relative;
+}
+
+.profile-avatar-edit {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  cursor: pointer;
+}
+
+.profile-avatar-edit img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #333;
+}
+
+.profile-avatar-edit .edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.profile-avatar-edit:hover .edit-overlay {
+  opacity: 1;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.profile-stat {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+
+.profile-stat .value {
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 3px;
+}
+
+.profile-stat .label {
+  font-size: 11px;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* ===== VERIFICATION CODE ===== */
@@ -831,6 +912,106 @@ h1, h2, h3, h4 {
   padding: 20px;
   border-top: 1px solid #333;
   background: rgba(15, 15, 15, 0.9);
+}
+
+/* ===== INCOMING CALL NOTIFICATION ===== */
+.incoming-call-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  width: 320px;
+  z-index: 10000;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top right;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.incoming-call-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.incoming-call-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #333;
+}
+
+.incoming-call-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.incoming-call-info h4 {
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.incoming-call-info p {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.incoming-call-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.incoming-call-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.incoming-call-btn.accept {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+.incoming-call-btn.accept:hover {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.incoming-call-btn.reject {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+
+.incoming-call-btn.reject:hover {
+  background: rgba(244, 67, 54, 0.3);
 }
 
 /* ===== CHAT STYLES ===== */
@@ -1106,158 +1287,6 @@ h1, h2, h3, h4 {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* ===== GROUP CHAT ===== */
-.group-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.group-item {
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #333;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.group-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: #555;
-}
-
-.group-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.group-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.group-info {
-  flex: 1;
-}
-
-.group-name {
-  font-weight: 400;
-  margin-bottom: 3px;
-}
-
-.group-meta {
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-.group-badge {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 11px;
-}
-
-.create-group-btn {
-  width: 100%;
-  margin-top: 10px;
-}
-
-/* ===== BACKGROUND EDITOR ===== */
-.editor-tools {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.editor-tool {
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #333;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #fff;
-}
-
-.editor-tool:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #555;
-}
-
-.editor-tool.active {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #fff;
-}
-
-.canvas-container {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-#bg-canvas {
-  border: 1px solid #333;
-  background: #000;
-  cursor: crosshair;
-  border-radius: 4px;
-}
-
-.tool-options {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: 15px 0;
-}
-
-.tool-options label {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-.tool-options input[type="range"] {
-  flex: 1;
-}
-
-.tool-options input[type="color"] {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: transparent;
-}
-
-.preview-area {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #333;
-}
-
-.preview-item {
-  display: inline-block;
-  padding: 10px 20px;
-  margin: 5px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #333;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
 /* ===== AUDIO CONTROLS ===== */
 .audio-controls {
   position: fixed;
@@ -1328,6 +1357,178 @@ h1, h2, h3, h4 {
   color: rgba(255, 255, 255, 0.9);
 }
 
+.success-message {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 6px;
+  padding: 15px;
+  margin: 10px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== CALL HISTORY STYLES ===== */
+.call-history-section {
+  margin-top: 20px;
+}
+
+.call-history-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 10px;
+}
+
+.call-history-table th {
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 400;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.7;
+  border-bottom: 1px solid #333;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.call-history-table td {
+  padding: 15px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+.call-history-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.call-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.call-type.video {
+  color: #4CAF50;
+}
+
+.call-type.audio {
+  color: #2196F3;
+}
+
+.call-status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.call-status-badge.connected {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.call-status-badge.missed {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.call-status-badge.ended {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.call-duration {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+/* ===== GLOBAL CHAT SCROLL BUTTON ===== */
+.scroll-to-bottom {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.9);
+  border: 1px solid #333;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+
+.scroll-to-bottom:hover {
+  background: rgba(40, 40, 40, 0.95);
+  transform: translateY(-2px);
+}
+
+/* ===== USER LIST MODAL ===== */
+.user-list-modal .modal-content {
+  max-width: 400px;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.user-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.user-item-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-item-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-item-info {
+  flex: 1;
+}
+
+.user-item-name {
+  font-weight: 400;
+  margin-bottom: 3px;
+}
+
+.user-item-status {
+  font-size: 11px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar {
   width: 6px;
@@ -1385,6 +1586,13 @@ h1, h2, h3, h4 {
   #video-container {
     height: 250px;
   }
+  
+  .incoming-call-notification {
+    width: calc(100% - 40px);
+    left: 20px;
+    right: 20px;
+    top: 20px;
+  }
 }
 
 @media (orientation: portrait) and (max-width: 767px) {
@@ -1430,6 +1638,51 @@ h1, h2, h3, h4 {
   #count {
     font-size: 30px;
   }
+}
+
+/* ===== NOTIFICATION STYLES ===== */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 15px 20px;
+  color: #fff;
+  font-size: 14px;
+  z-index: 10000;
+  transform: translateX(150%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification i {
+  font-size: 18px;
+}
+
+.notification.success i {
+  color: #4CAF50;
+}
+
+.notification.error i {
+  color: #f44336;
+}
+
+.notification.info i {
+  color: #2196F3;
 }
 </style>
 </head>
@@ -1491,6 +1744,70 @@ h1, h2, h3, h4 {
   
   <div class="panel-content" id="panel-content">
     <!-- Content akan diisi oleh JavaScript -->
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div id="profile-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-user-edit"></i> Edit Profil</h3>
+      <button class="modal-close" onclick="closeProfileEditor()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="profile-editor">
+        <div class="profile-avatar-edit" onclick="document.getElementById('profile-photo-input').click()">
+          <img id="profile-avatar-preview" src="foto.webp" alt="Profil">
+          <div class="edit-overlay">
+            <i class="fas fa-camera"></i>
+          </div>
+        </div>
+        <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="previewProfilePhoto(event)">
+        
+        <div class="input-group">
+          <label>Username</label>
+          <input type="text" id="profile-username" value="" readonly>
+          <small style="opacity:0.6; font-size:12px; margin-top:5px;">Username tidak dapat diubah</small>
+        </div>
+        
+        <div class="input-group">
+          <label>Bio/Status</label>
+          <textarea id="profile-bio" placeholder="Tulis bio atau status Anda..." maxlength="200"></textarea>
+          <div style="text-align:right; font-size:12px; opacity:0.6; margin-top:5px;">
+            <span id="bio-counter">0</span>/200
+          </div>
+        </div>
+        
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="value" id="profile-total-clicks">0</div>
+            <div class="label">Total Klik</div>
+          </div>
+          <div class="profile-stat">
+            <div class="value" id="profile-rank">#0</div>
+            <div class="label">Peringkat</div>
+          </div>
+        </div>
+        
+        <div style="margin-top:20px; padding-top:20px; border-top:1px solid #333;">
+          <div class="input-group">
+            <label>Ubah Password (Opsional)</label>
+            <input type="password" id="profile-new-password" placeholder="Password baru">
+          </div>
+          <div class="input-group">
+            <label>Konfirmasi Password</label>
+            <input type="password" id="profile-confirm-password" placeholder="Ulangi password baru">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveProfile()">
+        <i class="fas fa-save"></i> Simpan Perubahan
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1578,107 +1895,8 @@ h1, h2, h3, h4 {
   </div>
 </div>
 
-<!-- Group Chat Modal -->
-<div id="group-chat-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fas fa-users"></i> Grup Chat</h3>
-      <button class="modal-close" onclick="closeGroupChat()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="group-list" id="group-list">
-        <!-- Group list akan diisi oleh JavaScript -->
-      </div>
-      <button class="btn create-group-btn" onclick="showCreateGroup()">
-        <i class="fas fa-plus"></i> Buat Grup Baru
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Create Group Modal -->
-<div id="create-group-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fas fa-plus-circle"></i> Buat Grup Baru</h3>
-      <button class="modal-close" onclick="closeCreateGroup()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="input-group">
-        <label>Nama Grup</label>
-        <input type="text" id="group-name" placeholder="Masukkan nama grup">
-      </div>
-      <div class="input-group">
-        <label>Deskripsi</label>
-        <input type="text" id="group-desc" placeholder="Deskripsi grup (opsional)">
-      </div>
-      <div class="input-group">
-        <label>Foto Grup (Opsional)</label>
-        <input type="file" id="group-photo" accept="image/*" onchange="previewGroupPhoto(event)">
-        <div id="group-photo-preview" style="margin-top:10px; display:none;">
-          <img id="group-photo-img" src="" style="width:100px; height:100px; object-fit:cover; border-radius:6px;">
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="createGroup()">
-        <i class="fas fa-check"></i> Buat Grup
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Background Editor Modal -->
-<div id="bg-editor-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fas fa-palette"></i> Edit Latar Belakang</h3>
-      <button class="modal-close" onclick="closeBgEditor()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="editor-tools">
-        <button class="editor-tool active" onclick="setTool('pencil')" title="Pensil">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-        <button class="editor-tool" onclick="setTool('eraser')" title="Penghapus">
-          <i class="fas fa-eraser"></i>
-        </button>
-        <button class="editor-tool" onclick="setTool('bucket')" title="Ember">
-          <i class="fas fa-fill-drip"></i>
-        </button>
-        <input type="color" id="color-picker" value="#ffffff" onchange="setColor(this.value)">
-      </div>
-      <div class="tool-options">
-        <label>Ukuran:</label>
-        <input type="range" id="brush-size" min="1" max="20" value="3" onchange="setBrushSize(this.value)">
-        <span id="brush-size-label">3px</span>
-      </div>
-      <div class="canvas-container">
-        <canvas id="bg-canvas" width="300" height="40"></canvas>
-      </div>
-      <div class="preview-area">
-        <p>Preview:</p>
-        <div class="preview-item" id="bg-preview">Username</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <div style="display:flex; gap:10px;">
-        <button class="btn" onclick="clearCanvas()">
-          <i class="fas fa-trash"></i> Hapus
-        </button>
-        <button class="btn btn-primary" onclick="saveBackground()">
-          <i class="fas fa-save"></i> Simpan
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Incoming Call Notification -->
+<div id="incoming-call-notification" style="display:none;"></div>
 
 <!-- Global Chat Modal -->
 <div id="global-chat-modal" class="modal">
@@ -1691,6 +1909,9 @@ h1, h2, h3, h4 {
     </div>
     <div class="modal-body">
       <div class="chat-messages" id="global-chat-messages"></div>
+      <button class="scroll-to-bottom" onclick="scrollToBottom('global')">
+        <i class="fas fa-arrow-down"></i>
+      </button>
     </div>
     <div class="modal-footer">
       <div class="chat-input-area">
@@ -1703,6 +1924,40 @@ h1, h2, h3, h4 {
             <i class="fas fa-paper-plane"></i>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User List Modal -->
+<div id="user-list-modal" class="modal user-list-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-users"></i> Pilih Kontak</h3>
+      <button class="modal-close" onclick="closeUserList()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="user-list" id="user-list">
+        <!-- Daftar user akan diisi oleh JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Call History Modal -->
+<div id="call-history-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-history"></i> Riwayat Panggilan</h3>
+      <button class="modal-close" onclick="closeCallHistory()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="call-history-content">
+        <!-- Riwayat panggilan akan diisi oleh JavaScript -->
       </div>
     </div>
   </div>
@@ -1722,25 +1977,23 @@ const sb = supabase.createClient(
 const TABLE_KLIKUSER = 'KLIKUSER';
 const TABLE_KLIKCHAT = 'KLIKCHAT';
 const TABLE_GLOBALCHAT = 'GLOBALCHAT';
-const TABLE_GROUPS = 'KLIKGROUP-bahlil';
-const TABLE_GROUP_MEMBERS = 'GROUPMEMBER-bahlil';
-const TABLE_GROUP_CHAT = 'GROUPCHAT-bahlil';
-const TABLE_CALLS = 'CALLS-bahlil';
+const TABLE_CALLS = 'CALLS';
 
 // ===== GLOBAL VARIABLES =====
 let currentUser = null;
 let currentClick = 0;
 let verificationCode = '';
 let chatTarget = null;
-let currentGroup = null;
 let activeCall = null;
 let callTimer = null;
 let callStartTime = null;
 let callType = null; // 'audio' or 'video'
 let unreadChats = new Set();
 let unreadGlobal = 0;
-let unreadGroups = new Set();
 let musicPlaying = false;
+let userProfile = {};
+let userRank = 0;
+let globalChatSubscription = null;
 
 // WebRTC variables
 let peerConnection = null;
@@ -1750,28 +2003,8 @@ let isMuted = false;
 let isVideoOff = false;
 let isSpeakerOn = true;
 
-// Canvas variables
-let canvasTool = 'pencil';
-let canvasColor = '#ffffff';
-let brushSize = 3;
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-
-// STUN servers for WebRTC
-const iceServers = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' }
-  ]
-};
-
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
-  initCanvas();
   generateVerificationCode();
   loadPanelContent('auth');
   
@@ -1784,8 +2017,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize audio
   initAudio();
   
-  // Check for incoming calls
-  checkIncomingCalls();
+  // Setup bio counter
+  document.getElementById('profile-bio')?.addEventListener('input', function() {
+    document.getElementById('bio-counter').textContent = this.value.length;
+  });
+  
+  // Setup notification permission
+  if('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
 });
 
 // ===== AUDIO FUNCTIONS =====
@@ -1853,6 +2093,10 @@ document.getElementById('photo').onclick = async function() {
     await sb.from(TABLE_KLIKUSER)
       .update({ jumlah_klik: currentClick })
       .eq('username', currentUser);
+    
+    // Update user profile
+    userProfile.jumlah_klik = currentClick;
+    
   } catch (error) {
     console.error('Error updating click count:', error);
   }
@@ -1866,11 +2110,20 @@ function togglePanel() {
   if(panel.classList.contains('show')) {
     generateVerificationCode();
     loadBoard();
+    updatePanelContent();
   }
 }
 
 function closePanel() {
   document.getElementById('panel').classList.remove('show');
+}
+
+function updatePanelContent() {
+  if(currentUser) {
+    loadPanelContent('loggedIn');
+  } else {
+    loadPanelContent('auth');
+  }
 }
 
 function loadPanelContent(section) {
@@ -1941,17 +2194,32 @@ function loadPanelContent(section) {
     case 'loggedIn':
       panelContent.innerHTML = `
         <div class="user-info-card">
+          <div class="profile-avatar-edit" onclick="openProfileEditor()" style="width:80px;height:80px;margin:0 auto 15px;">
+            <img src="${userProfile.profile_image || 'foto.webp'}" alt="${currentUser}" onerror="this.src='foto.webp'">
+            <div class="edit-overlay">
+              <i class="fas fa-edit"></i>
+            </div>
+          </div>
           <h3>Logged in as</h3>
           <div class="username">${currentUser}</div>
+          ${userProfile.bio ? `<p style="opacity:0.7;font-size:13px;margin:10px 0;">${userProfile.bio}</p>` : ''}
           <div class="click-count">${currentClick} Klik</div>
+          <div style="margin-top:15px;">
+            <button class="btn btn-sm" onclick="openProfileEditor()">
+              <i class="fas fa-edit"></i> Edit Profil
+            </button>
+            <button class="btn btn-sm" onclick="openCallHistory()">
+              <i class="fas fa-history"></i> Riwayat Panggilan
+            </button>
+          </div>
         </div>
 
         <div class="form-section">
           <button class="btn" onclick="openGlobalChat()">
             <i class="fas fa-globe"></i> Chat Global
           </button>
-          <button class="btn" onclick="openGroupChat()">
-            <i class="fas fa-users"></i> Grup Chat
+          <button class="btn" onclick="openUserList()">
+            <i class="fas fa-comments"></i> Chat Pribadi
           </button>
           <button class="btn btn-danger" onclick="logout()">
             <i class="fas fa-sign-out-alt"></i> Logout
@@ -2023,6 +2291,7 @@ async function register() {
         jumlah_klik: 0,
         background_data: null,
         profile_image: null,
+        bio: '',
         last_seen: new Date().toISOString()
       });
 
@@ -2031,6 +2300,7 @@ async function register() {
     showNotification('Akun berhasil dibuat', 'success');
     currentUser = username;
     currentClick = 0;
+    await loadUserProfile();
     afterLogin();
   } catch (error) {
     console.error('Registration error:', error);
@@ -2056,6 +2326,7 @@ async function login() {
 
     currentUser = username;
     currentClick = data.jumlah_klik || 0;
+    userProfile = data;
     afterLogin();
   } catch (error) {
     console.error('Login error:', error);
@@ -2066,13 +2337,14 @@ async function login() {
 async function restoreSession(username) {
   try {
     const {data} = await sb.from(TABLE_KLIKUSER)
-      .select('jumlah_klik')
+      .select('*')
       .eq('username', username)
       .single();
     
     if(data) {
       currentUser = username;
       currentClick = data.jumlah_klik || 0;
+      userProfile = data;
       afterLogin();
     }
   } catch (error) {
@@ -2080,12 +2352,27 @@ async function restoreSession(username) {
   }
 }
 
+async function loadUserProfile() {
+  if(!currentUser) return;
+  
+  try {
+    const {data} = await sb.from(TABLE_KLIKUSER)
+      .select('*')
+      .eq('username', currentUser)
+      .single();
+    
+    if(data) {
+      userProfile = data;
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+  }
+}
+
 function afterLogin() {
   document.getElementById('count').textContent = currentClick;
   loadPanelContent('loggedIn');
   loadBoard();
-  loadUserBackground();
-  checkUnreadMessages();
   startRealtime();
   updateOnlineStatus();
   
@@ -2098,10 +2385,140 @@ function afterLogin() {
 function logout() {
   currentUser = null;
   currentClick = 0;
+  userProfile = {};
   document.getElementById('count').textContent = 0;
   localStorage.removeItem('klikUser');
   loadPanelContent('auth');
+  
+  // Stop realtime subscriptions
+  if(globalChatSubscription) {
+    sb.removeChannel(globalChatSubscription);
+  }
+  
   showNotification('Anda telah logout', 'info');
+}
+
+// ===== PROFILE EDITOR =====
+function openProfileEditor() {
+  if(!currentUser) {
+    showNotification('Login terlebih dahulu', 'error');
+    return;
+  }
+  
+  const modal = document.getElementById('profile-modal');
+  const preview = document.getElementById('profile-avatar-preview');
+  const username = document.getElementById('profile-username');
+  const bio = document.getElementById('profile-bio');
+  const totalClicks = document.getElementById('profile-total-clicks');
+  const rank = document.getElementById('profile-rank');
+  
+  // Load current profile data
+  preview.src = userProfile.profile_image || 'foto.webp';
+  username.value = currentUser;
+  bio.value = userProfile.bio || '';
+  document.getElementById('bio-counter').textContent = bio.value.length;
+  totalClicks.textContent = userProfile.jumlah_klik || 0;
+  rank.textContent = userRank ? `#${userRank}` : '#-';
+  
+  modal.classList.add('show');
+}
+
+function closeProfileEditor() {
+  document.getElementById('profile-modal').classList.remove('show');
+  document.getElementById('profile-new-password').value = '';
+  document.getElementById('profile-confirm-password').value = '';
+}
+
+function previewProfilePhoto(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  if(!file.type.startsWith('image/')) {
+    showNotification('Hanya file gambar yang diizinkan', 'error');
+    return;
+  }
+  
+  if(file.size > 5 * 1024 * 1024) {
+    showNotification('Ukuran file maksimal 5MB', 'error');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('profile-avatar-preview').src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  if(!currentUser) return;
+  
+  const bio = document.getElementById('profile-bio').value.trim();
+  const newPassword = document.getElementById('profile-new-password').value;
+  const confirmPassword = document.getElementById('profile-confirm-password').value;
+  const photoFile = document.getElementById('profile-photo-input').files[0];
+  
+  // Password validation
+  if(newPassword && newPassword !== confirmPassword) {
+    showNotification('Password tidak cocok', 'error');
+    return;
+  }
+  
+  if(newPassword && newPassword.length < 6) {
+    showNotification('Password minimal 6 karakter', 'error');
+    return;
+  }
+  
+  try {
+    let profileImageUrl = userProfile.profile_image;
+    
+    // Upload new profile photo if exists
+    if(photoFile) {
+      const fileName = `profile_${currentUser}_${Date.now()}_${photoFile.name}`;
+      
+      const {data, error} = await sb.storage
+        .from('profile-photos')
+        .upload(fileName, photoFile);
+      
+      if(!error) {
+        const {data: urlData} = sb.storage
+          .from('profile-photos')
+          .getPublicUrl(fileName);
+        profileImageUrl = urlData.publicUrl;
+      }
+    }
+    
+    // Update profile data
+    const updateData = {
+      bio: bio,
+      profile_image: profileImageUrl,
+      last_seen: new Date().toISOString()
+    };
+    
+    // Add password if changed
+    if(newPassword) {
+      updateData.password = newPassword;
+    }
+    
+    const {error} = await sb.from(TABLE_KLIKUSER)
+      .update(updateData)
+      .eq('username', currentUser);
+    
+    if(error) throw error;
+    
+    // Update local profile
+    userProfile.bio = bio;
+    userProfile.profile_image = profileImageUrl;
+    
+    showNotification('Profil berhasil diperbarui', 'success');
+    closeProfileEditor();
+    loadPanelContent('loggedIn');
+    loadBoard();
+    
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    showNotification('Gagal menyimpan profil', 'error');
+  }
 }
 
 // ===== IMPROVED LEADERBOARD =====
@@ -2115,7 +2532,7 @@ async function loadBoard() {
     const {data, error} = await sb.from(TABLE_KLIKUSER)
       .select('*')
       .order('jumlah_klik', { ascending:false })
-      .limit(20);
+      .limit(50);
 
     if(error) throw error;
 
@@ -2123,6 +2540,10 @@ async function loadBoard() {
       container.innerHTML = '<p style="text-align:center;padding:40px;opacity:0.5;">Belum ada data</p>';
       return;
     }
+    
+    // Find current user's rank
+    userRank = data.findIndex(user => user.username === currentUser) + 1;
+    if(userRank === 0) userRank = '-';
     
     // Desktop version
     let desktopHTML = `
@@ -2146,6 +2567,8 @@ async function loadBoard() {
       const isMe = user.username === currentUser;
       const hasUnread = unreadChats.has(user.username);
       const isOnline = user.last_seen && (Date.now() - new Date(user.last_seen).getTime()) < 30000;
+      const profileImage = user.profile_image || 'foto.webp';
+      const userBio = user.bio ? `<div style="font-size:11px;opacity:0.6;margin-top:2px;">${user.bio.substring(0, 30)}${user.bio.length > 30 ? '...' : ''}</div>` : '';
       
       // Desktop row
       desktopHTML += `
@@ -2154,11 +2577,12 @@ async function loadBoard() {
             <div class="rank-medal">${rank <= 3 ? '🏆' : rank}</div>
           </td>
           <td class="user-cell" onclick="${user.username !== currentUser ? `openChat('${user.username.replace(/'/g, "\\'")}')` : ''}">
-            <div class="user-avatar">
-              <img src="${user.profile_image || 'foto.webp'}" alt="${user.username}" onerror="this.src='foto.webp'">
+            <div class="user-avatar" onclick="${!isMe ? `openUserProfile('${user.username.replace(/'/g, "\\'")}')` : 'openProfileEditor()'}">
+              <img src="${profileImage}" alt="${user.username}" onerror="this.src='foto.webp'">
             </div>
             <div>
               <div class="username">${user.username} ${isMe ? '(Anda)' : ''}</div>
+              ${userBio}
               <div class="user-status">
                 <span class="status-dot ${isOnline ? 'online' : ''}"></span>
                 <span>${isOnline ? 'Online' : 'Offline'}</span>
@@ -2169,8 +2593,8 @@ async function loadBoard() {
           <td class="click-cell">${user.jumlah_klik || 0}</td>
           <td class="action-cell">
             ${isMe ? `
-              <button class="chat-action-btn" onclick="openBgEditor()" style="border:none;background:transparent;color:#666;">
-                <i class="fas fa-palette"></i>
+              <button class="chat-action-btn" onclick="openProfileEditor()" style="border:none;background:transparent;color:#666;">
+                <i class="fas fa-edit"></i>
               </button>
             ` : `
               <button class="chat-action-btn" onclick="openChat('${user.username.replace(/'/g, "\\'")}')" style="border:none;background:transparent;color:#666;">
@@ -2183,15 +2607,16 @@ async function loadBoard() {
       
       // Mobile card
       mobileHTML += `
-        <div class="leaderboard-card ${isMe ? 'highlight' : ''}" onclick="${user.username !== currentUser ? `openChat('${user.username.replace(/'/g, "\\'")}')` : 'openBgEditor()'}">
+        <div class="leaderboard-card ${isMe ? 'highlight' : ''}" onclick="${user.username !== currentUser ? `openChat('${user.username.replace(/'/g, "\\'")}')` : 'openProfileEditor()'}">
           <div class="rank-badge ${rank <= 3 ? `rank-${rank}` : ''}">
             ${rank <= 3 ? '🏆' : rank}
           </div>
-          <div class="user-avatar-mobile">
-            <img src="${user.profile_image || 'foto.webp'}" alt="${user.username}" onerror="this.src='foto.webp'">
+          <div class="user-avatar-mobile" onclick="${!isMe ? `openUserProfile('${user.username.replace(/'/g, "\\'")}')` : 'openProfileEditor()'}">
+            <img src="${profileImage}" alt="${user.username}" onerror="this.src='foto.webp'">
           </div>
           <div class="user-info-mobile">
             <div class="username-mobile">${user.username} ${isMe ? '(Anda)' : ''}</div>
+            ${userBio ? `<div style="font-size:11px;opacity:0.6;">${user.bio.substring(0, 25)}${user.bio.length > 25 ? '...' : ''}</div>` : ''}
             <div class="user-stats-mobile">
               <span class="click-count-mobile">${user.jumlah_klik || 0} klik</span>
               <span class="status-mobile">
@@ -2216,6 +2641,12 @@ async function loadBoard() {
   }
 }
 
+function openUserProfile(username) {
+  // Show user profile modal (simplified version)
+  showNotification(`Profil ${username}`, 'info');
+  // You can expand this to show full profile modal
+}
+
 // ===== CHAT FUNCTIONS =====
 async function openChat(username) {
   if(!currentUser) {
@@ -2224,7 +2655,7 @@ async function openChat(username) {
   }
   
   if(username === currentUser) {
-    openBgEditor();
+    openProfileEditor();
     return;
   }
   
@@ -2328,7 +2759,7 @@ function handleChatKeyPress(e) {
   }
 }
 
-// ===== CALL/VOICE/VIDEO CALL FUNCTIONS =====
+// ===== CALL SYSTEM =====
 async function startAudioCall() {
   if(!chatTarget || !currentUser) {
     showNotification('Pilih kontak terlebih dahulu', 'error');
@@ -2352,29 +2783,32 @@ async function startVideoCall() {
 async function initiateCall(type) {
   try {
     // Create call record
-    const {data: callData, error} = await sb.from(TABLE_CALLS)
-      .insert({
-        caller: currentUser,
-        receiver: chatTarget,
-        type: type,
-        status: 'calling',
-        started_at: new Date().toISOString()
-      })
+    const callData = {
+      caller: currentUser,
+      receiver: chatTarget,
+      type: type,
+      status: 'calling',
+      started_at: new Date().toISOString()
+    };
+    
+    // Save to database
+    const {data: savedCall, error} = await sb.from(TABLE_CALLS)
+      .insert(callData)
       .select()
       .single();
 
     if(error) throw error;
 
-    activeCall = callData;
+    activeCall = savedCall;
     showCallModal('outgoing');
     
     // Request media permissions
-    const constraints = {
-      audio: true,
-      video: type === 'video'
-    };
-    
     try {
+      const constraints = {
+        audio: true,
+        video: type === 'video'
+      };
+      
       localStream = await navigator.mediaDevices.getUserMedia(constraints);
       
       if(type === 'video') {
@@ -2392,8 +2826,20 @@ async function initiateCall(type) {
       updateCallTimer();
       callTimer = setInterval(updateCallTimer, 1000);
       
-      // Wait for callee to answer
-      checkCallStatus();
+      // Create and send offer
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      
+      // Save offer to database for signaling
+      await sb.from(TABLE_CALLS)
+        .update({ 
+          offer: JSON.stringify(offer),
+          status: 'waiting'
+        })
+        .eq('id', activeCall.id);
+      
+      // Listen for answer
+      listenForAnswer();
       
     } catch (mediaError) {
       console.error('Media error:', mediaError);
@@ -2407,124 +2853,26 @@ async function initiateCall(type) {
   }
 }
 
-async function checkCallStatus() {
-  if(!activeCall) return;
-  
-  const checkInterval = setInterval(async () => {
-    const {data} = await sb.from(TABLE_CALLS)
-      .select('*')
-      .eq('id', activeCall.id)
-      .single();
-    
-    if(data && data.status === 'connected') {
-      clearInterval(checkInterval);
-      document.getElementById('call-status').textContent = 'Terhubung';
-      
-      // Send offer to receiver via WebRTC
-      await createAndSendOffer();
-      
-    } else if(data && data.status === 'ended') {
-      clearInterval(checkInterval);
-      showNotification('Panggilan ditolak', 'info');
-      endCall();
-    }
-  }, 1000);
-  
-  // Timeout after 30 seconds
-  setTimeout(() => {
-    clearInterval(checkInterval);
-    if(document.getElementById('call-modal').classList.contains('show')) {
-      showNotification('Panggilan tidak dijawab', 'info');
-      endCall();
-    }
-  }, 30000);
-}
-
-async function checkIncomingCalls() {
-  if(!currentUser) return;
-  
-  // Listen for incoming calls
-  sb.channel('calls-channel')
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: TABLE_CALLS,
-      filter: `receiver=eq.${currentUser}`
-    }, async (payload) => {
-      if(payload.new.status === 'calling') {
-        const acceptCall = confirm(`${payload.new.caller} sedang ${payload.new.type === 'video' ? 'video call' : 'audio call'}. Terima?`);
-        
-        if(acceptCall) {
-          activeCall = payload.new;
-          callType = payload.new.type;
-          
-          // Update call status to connected
-          await sb.from(TABLE_CALLS)
-            .update({ status: 'connected' })
-            .eq('id', activeCall.id);
-          
-          // Setup call
-          await answerCall();
-        } else {
-          // Reject call
-          await sb.from(TABLE_CALLS)
-            .update({ status: 'ended', ended_at: new Date().toISOString() })
-            .eq('id', payload.new.id);
-        }
-      }
-    })
-    .subscribe();
-}
-
-async function answerCall() {
-  showCallModal('incoming');
-  
-  // Request media permissions
-  const constraints = {
-    audio: true,
-    video: callType === 'video'
-  };
-  
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia(constraints);
-    
-    if(callType === 'video') {
-      const localVideo = document.getElementById('local-video');
-      localVideo.srcObject = localStream;
-      document.getElementById('video-container').style.display = 'block';
-      document.getElementById('call-info').style.display = 'none';
-    }
-    
-    // Setup WebRTC
-    await setupPeerConnection();
-    
-    // Start call timer
-    callStartTime = Date.now();
-    updateCallTimer();
-    callTimer = setInterval(updateCallTimer, 1000);
-    
-    // Wait for offer from caller
-    await waitForOffer();
-    
-  } catch (mediaError) {
-    console.error('Media error:', mediaError);
-    showNotification('Akses kamera/mikrofon ditolak', 'error');
-    endCall();
-  }
-}
-
 async function setupPeerConnection() {
   try {
-    peerConnection = new RTCPeerConnection(iceServers);
+    const configuration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+      ]
+    };
     
-    // Add local stream
+    peerConnection = new RTCPeerConnection(configuration);
+    
+    // Add local stream tracks
     if(localStream) {
       localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);
       });
     }
     
-    // Get remote stream
+    // Handle remote stream
     peerConnection.ontrack = (event) => {
       remoteStream = event.streams[0];
       const remoteVideo = document.getElementById('remote-video');
@@ -2534,7 +2882,6 @@ async function setupPeerConnection() {
     // ICE candidate handling
     peerConnection.onicecandidate = (event) => {
       if(event.candidate) {
-        // Send ICE candidate to other peer (simplified)
         console.log('ICE candidate:', event.candidate);
       }
     };
@@ -2542,44 +2889,62 @@ async function setupPeerConnection() {
     // Connection state changes
     peerConnection.onconnectionstatechange = () => {
       console.log('Connection state:', peerConnection.connectionState);
-      if(peerConnection.connectionState === 'disconnected' ||
-         peerConnection.connectionState === 'failed' ||
-         peerConnection.connectionState === 'closed') {
-        endCall();
+      if(peerConnection.connectionState === 'connected') {
+        document.getElementById('call-status').textContent = 'Terhubung';
       }
     };
     
   } catch (error) {
     console.error('Error setting up peer connection:', error);
+    showNotification('Error setting up call', 'error');
   }
 }
 
-async function createAndSendOffer() {
-  try {
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
+async function listenForAnswer() {
+  if(!activeCall) return;
+  
+  const checkInterval = setInterval(async () => {
+    const {data: callData} = await sb.from(TABLE_CALLS)
+      .select('*')
+      .eq('id', activeCall.id)
+      .single();
     
-    // In a real app, send offer to signaling server
-    // For simplicity, we'll just log it
-    console.log('Offer created:', offer);
-    
-  } catch (error) {
-    console.error('Error creating offer:', error);
-  }
-}
-
-async function waitForOffer() {
-  // In a real app, receive offer from signaling server
-  // For demo, we'll create answer when called
-  setTimeout(async () => {
-    try {
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
-      console.log('Answer created:', answer);
-    } catch (error) {
-      console.error('Error creating answer:', error);
+    if(callData && callData.answer) {
+      clearInterval(checkInterval);
+      
+      try {
+        // Set remote description from answer
+        const answer = JSON.parse(callData.answer);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        
+        document.getElementById('call-status').textContent = 'Terhubung';
+        
+        // Update call status
+        await sb.from(TABLE_CALLS)
+          .update({ status: 'connected' })
+          .eq('id', activeCall.id);
+          
+      } catch (error) {
+        console.error('Error processing answer:', error);
+        showNotification('Error processing call answer', 'error');
+        endCall();
+      }
+      
+    } else if(callData && callData.status === 'ended') {
+      clearInterval(checkInterval);
+      showNotification('Panggilan ditolak', 'info');
+      endCall();
     }
-  }, 1000);
+  }, 2000);
+  
+  // Timeout after 45 seconds
+  setTimeout(() => {
+    clearInterval(checkInterval);
+    if(document.getElementById('call-modal').classList.contains('show')) {
+      showNotification('Panggilan tidak dijawab', 'info');
+      endCall();
+    }
+  }, 45000);
 }
 
 function showCallModal(type) {
@@ -2624,8 +2989,6 @@ function toggleMute() {
     const muteBtn = document.getElementById('mute-btn');
     muteBtn.classList.toggle('active', isMuted);
     muteBtn.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
-    
-    showNotification(isMuted ? 'Mikrofon dimatikan' : 'Mikrofon diaktifkan', 'info');
   }
 }
 
@@ -2640,13 +3003,10 @@ function toggleVideo() {
     const videoBtn = document.getElementById('toggle-video-btn');
     videoBtn.classList.toggle('active', isVideoOff);
     videoBtn.innerHTML = isVideoOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
-    
-    showNotification(isVideoOff ? 'Kamera dimatikan' : 'Kamera diaktifkan', 'info');
   }
 }
 
-function toggleAudio() {
-  // This toggles local audio (different from toggleMute which toggles microphone)
+function toggleSpeaker() {
   if(!remoteStream) return;
   
   const audioElements = document.getElementsByTagName('audio');
@@ -2661,16 +3021,15 @@ function toggleAudio() {
   const speakerBtn = document.getElementById('speaker-btn');
   speakerBtn.classList.toggle('active', !isSpeakerOn);
   speakerBtn.innerHTML = isSpeakerOn ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
-  
-  showNotification(isSpeakerOn ? 'Speaker diaktifkan' : 'Speaker dimatikan', 'info');
 }
 
-function toggleSpeaker() {
-  // Alias for toggleAudio
-  toggleAudio();
+function toggleAudio() {
+  toggleMute();
 }
 
 async function endCall() {
+  clearInterval(callTimer);
+  
   if(activeCall) {
     try {
       const endedAt = new Date().toISOString();
@@ -2684,7 +3043,9 @@ async function endCall() {
         })
         .eq('id', activeCall.id);
       
-      showNotification(`Panggilan berakhir (${Math.floor(duration/60)}:${(duration%60).toString().padStart(2, '0')})`, 'info');
+      if(duration > 0) {
+        showNotification(`Panggilan berakhir (${Math.floor(duration/60)}:${(duration%60).toString().padStart(2, '0')})`, 'info');
+      }
       
     } catch (error) {
       console.error('Error updating call status:', error);
@@ -2708,9 +3069,6 @@ async function endCall() {
     remoteStream = null;
   }
   
-  // Clear timer
-  clearInterval(callTimer);
-  
   // Hide modal
   document.getElementById('call-modal').classList.remove('show');
   document.getElementById('video-container').style.display = 'none';
@@ -2725,332 +3083,199 @@ async function endCall() {
   isSpeakerOn = true;
 }
 
-// ===== GROUP FUNCTIONS =====
-function openGroupChat() {
-  if(!currentUser) {
-    showNotification('Login terlebih dahulu', 'error');
-    return;
-  }
+// ===== INCOMING CALL HANDLING =====
+function startRealtime() {
+  if(!currentUser) return;
   
-  document.getElementById('group-chat-modal').classList.add('show');
-  loadGroups();
-}
-
-function closeGroupChat() {
-  document.getElementById('group-chat-modal').classList.remove('show');
-}
-
-async function loadGroups() {
-  const container = document.getElementById('group-list');
-  container.innerHTML = '<div class="loading">Memuat grup...</div>';
+  // Update online status every 30 seconds
+  setInterval(updateOnlineStatus, 30000);
   
-  try {
-    // Get groups where user is a member
-    const {data: memberships, error: memError} = await sb.from(TABLE_GROUP_MEMBERS)
-      .select('group_id')
-      .eq('user_id', currentUser);
-    
-    if(memError) throw memError;
-    
-    if(!memberships || memberships.length === 0) {
-      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:20px;">Belum ada grup</p>';
-      return;
-    }
-    
-    const groupIds = memberships.map(m => m.group_id);
-    
-    const {data: groups, error: groupError} = await sb.from(TABLE_GROUPS)
-      .select('*')
-      .in('id', groupIds)
-      .order('created_at', {ascending: false});
-    
-    if(groupError) throw groupError;
-    
-    container.innerHTML = '';
-    
-    if(groups && groups.length > 0) {
-      groups.forEach(group => {
-        const item = document.createElement('div');
-        item.className = 'group-item';
-        item.onclick = () => openGroup(group.id);
-        
-        item.innerHTML = `
-          <div class="group-avatar">
-            <img src="${group.photo_url || 'logo.jpg'}" alt="${group.name}" onerror="this.src='logo.jpg'">
-          </div>
-          <div class="group-info">
-            <div class="group-name">${group.name}</div>
-            <div class="group-meta">${group.member_count || 1} anggota</div>
-          </div>
-          ${unreadGroups.has(group.id) ? '<div class="group-badge">Baru</div>' : ''}
-        `;
-        
-        container.appendChild(item);
-      });
-    }
-  } catch (error) {
-    console.error('Error loading groups:', error);
-    container.innerHTML = '<div class="error-message">Gagal memuat grup</div>';
-  }
-}
-
-function showCreateGroup() {
-  document.getElementById('create-group-modal').classList.add('show');
-}
-
-function closeCreateGroup() {
-  document.getElementById('create-group-modal').classList.remove('show');
-}
-
-function previewGroupPhoto(event) {
-  const file = event.target.files[0];
-  if(!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('group-photo-img').src = e.target.result;
-    document.getElementById('group-photo-preview').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
-
-async function createGroup() {
-  const name = document.getElementById('group-name').value.trim();
-  const desc = document.getElementById('group-desc').value.trim();
-  
-  if(!name) {
-    showNotification('Nama grup diperlukan', 'error');
-    return;
-  }
-  
-  try {
-    // Upload photo if exists
-    let photoUrl = null;
-    const photoInput = document.getElementById('group-photo');
-    if(photoInput.files[0]) {
-      const file = photoInput.files[0];
-      const fileName = `group_${Date.now()}_${file.name}`;
-      
-      const {data, error} = await sb.storage
-        .from('group-photos')
-        .upload(fileName, file);
-      
-      if(!error) {
-        const {data: urlData} = sb.storage
-          .from('group-photos')
-          .getPublicUrl(fileName);
-        photoUrl = urlData.publicUrl;
+  // Subscribe to incoming calls
+  sb.channel('calls-realtime')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: TABLE_CALLS,
+      filter: `receiver=eq.${currentUser}`
+    }, async (payload) => {
+      if(payload.new.status === 'calling') {
+        showIncomingCallNotification(payload.new);
       }
+    })
+    .subscribe();
+  
+  // Subscribe to private chats
+  sb.channel('private-chat')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: TABLE_KLIKCHAT,
+      filter: `receiver=eq.${currentUser}`
+    }, (payload) => {
+      const sender = payload.new.sender;
+      if(chatTarget !== sender) {
+        unreadChats.add(sender);
+        loadBoard();
+        
+        // Show notification
+        if(Notification.permission === 'granted') {
+          new Notification(`Pesan baru dari ${sender}`, {
+            body: payload.new.message.length > 100 ? 
+              payload.new.message.substring(0, 100) + '...' : 
+              payload.new.message,
+            icon: 'logo.jpg'
+          });
+        }
+      }
+    })
+    .subscribe();
+}
+
+function showIncomingCallNotification(callData) {
+  const notification = document.getElementById('incoming-call-notification');
+  
+  notification.innerHTML = `
+    <div class="incoming-call-notification">
+      <div class="incoming-call-header">
+        <div class="incoming-call-avatar">
+          <img src="foto.webp" alt="${callData.caller}" onerror="this.src='foto.webp'">
+        </div>
+        <div class="incoming-call-info">
+          <h4>${callData.caller}</h4>
+          <p>${callData.type === 'video' ? 'Video Call' : 'Audio Call'}</p>
+        </div>
+      </div>
+      <div class="incoming-call-controls">
+        <button class="incoming-call-btn accept" onclick="acceptIncomingCall('${callData.id}')">
+          <i class="fas fa-phone"></i> Terima
+        </button>
+        <button class="incoming-call-btn reject" onclick="rejectIncomingCall('${callData.id}')">
+          <i class="fas fa-phone-slash"></i> Tolak
+        </button>
+      </div>
+    </div>
+  `;
+  
+  notification.style.display = 'block';
+  
+  // Auto hide after 45 seconds
+  setTimeout(() => {
+    if(notification.style.display !== 'none') {
+      notification.style.display = 'none';
+      // Auto reject if not answered
+      rejectIncomingCall(callData.id);
+    }
+  }, 45000);
+}
+
+async function acceptIncomingCall(callId) {
+  try {
+    // Hide notification
+    document.getElementById('incoming-call-notification').style.display = 'none';
+    
+    // Get call data
+    const {data: callData} = await sb.from(TABLE_CALLS)
+      .select('*')
+      .eq('id', callId)
+      .single();
+    
+    if(!callData) return;
+    
+    activeCall = callData;
+    chatTarget = callData.caller;
+    callType = callData.type;
+    
+    // Update call status to connected
+    await sb.from(TABLE_CALLS)
+      .update({ status: 'accepted' })
+      .eq('id', callId);
+    
+    // Show call modal
+    showCallModal('incoming');
+    
+    // Request media permissions
+    const constraints = {
+      audio: true,
+      video: callType === 'video'
+    };
+    
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if(callType === 'video') {
+        const localVideo = document.getElementById('local-video');
+        localVideo.srcObject = localStream;
+        document.getElementById('video-container').style.display = 'block';
+        document.getElementById('call-info').style.display = 'none';
+      }
+      
+      // Setup WebRTC
+      await setupPeerConnection();
+      
+      // Set remote description from offer
+      if(callData.offer) {
+        const offer = JSON.parse(callData.offer);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      }
+      
+      // Create and send answer
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      
+      // Save answer to database
+      await sb.from(TABLE_CALLS)
+        .update({ 
+          answer: JSON.stringify(answer),
+          status: 'connected'
+        })
+        .eq('id', callId);
+      
+      // Start call timer
+      callStartTime = Date.now();
+      updateCallTimer();
+      callTimer = setInterval(updateCallTimer, 1000);
+      
+    } catch (mediaError) {
+      console.error('Media error:', mediaError);
+      showNotification('Akses kamera/mikrofon ditolak', 'error');
+      endCall();
     }
     
-    // Create group
-    const {data: group, error: groupError} = await sb.from(TABLE_GROUPS)
-      .insert({
-        name: name,
-        description: desc,
-        photo_url: photoUrl,
-        created_by: currentUser,
-        member_count: 1
+  } catch (error) {
+    console.error('Error accepting call:', error);
+    showNotification('Gagal menerima panggilan', 'error');
+    endCall();
+  }
+}
+
+async function rejectIncomingCall(callId) {
+  try {
+    // Hide notification
+    document.getElementById('incoming-call-notification').style.display = 'none';
+    
+    // Update call status to rejected
+    await sb.from(TABLE_CALLS)
+      .update({ 
+        status: 'ended',
+        ended_at: new Date().toISOString(),
+        duration: 0
       })
-      .select()
-      .single();
-    
-    if(groupError) throw groupError;
-    
-    // Add creator as admin member
-    const {error: memberError} = await sb.from(TABLE_GROUP_MEMBERS)
-      .insert({
-        group_id: group.id,
-        user_id: currentUser,
-        role: 'admin',
-        joined_at: new Date().toISOString()
-      });
-    
-    if(memberError) throw memberError;
-    
-    showNotification('Grup berhasil dibuat', 'success');
-    closeCreateGroup();
-    loadGroups();
+      .eq('id', callId);
     
   } catch (error) {
-    console.error('Error creating group:', error);
-    showNotification('Gagal membuat grup', 'error');
+    console.error('Error rejecting call:', error);
   }
 }
 
-async function openGroup(groupId) {
-  // Implement group chat opening
-  showNotification('Fitur grup chat dalam pengembangan', 'info');
-}
-
-// ===== BACKGROUND EDITOR =====
-function initCanvas() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  
-  // Set initial background
-  ctx.fillStyle = '#000000';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // Add event listeners
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDrawing);
-  canvas.addEventListener('mouseout', stopDrawing);
-}
-
-function openBgEditor() {
-  if(!currentUser) {
-    showNotification('Login terlebih dahulu', 'error');
-    return;
-  }
-  document.getElementById('bg-editor-modal').classList.add('show');
-}
-
-function closeBgEditor() {
-  document.getElementById('bg-editor-modal').classList.remove('show');
-}
-
-function setTool(tool) {
-  canvasTool = tool;
-  
-  document.querySelectorAll('.editor-tool').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  
-  event.target.classList.add('active');
-}
-
-function setColor(color) {
-  canvasColor = color;
-  document.getElementById('bg-preview').style.color = color;
-}
-
-function setBrushSize(size) {
-  brushSize = parseInt(size);
-  document.getElementById('brush-size-label').textContent = size + 'px';
-}
-
-function startDrawing(e) {
-  isDrawing = true;
-  const canvas = document.getElementById('bg-canvas');
-  const rect = canvas.getBoundingClientRect();
-  lastX = e.clientX - rect.left;
-  lastY = e.clientY - rect.top;
-}
-
-function draw(e) {
-  if(!isDrawing) return;
-  
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  
-  if(canvasTool === 'pencil') {
-    ctx.strokeStyle = canvasColor;
-    ctx.lineWidth = brushSize;
-    
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  } else if(canvasTool === 'eraser') {
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = brushSize * 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  }
-  
-  lastX = x;
-  lastY = y;
-  
-  // Update preview
-  updatePreview();
-}
-
-function stopDrawing() {
-  isDrawing = false;
-}
-
-// Bucket tool
-document.querySelector('[onclick="setTool(\'bucket\')"]').addEventListener('click', function(e) {
-  setTool('bucket');
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = canvasColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  updatePreview();
-});
-
-function clearCanvas() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#000000';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  updatePreview();
-}
-
-function updatePreview() {
-  const canvas = document.getElementById('bg-canvas');
-  const preview = document.getElementById('bg-preview');
-  const dataUrl = canvas.toDataURL();
-  preview.style.background = `url('${dataUrl}')`;
-  preview.style.backgroundSize = 'cover';
-}
-
-async function saveBackground() {
+async function updateOnlineStatus() {
   if(!currentUser) return;
   
   try {
-    const canvas = document.getElementById('bg-canvas');
-    const imageData = canvas.toDataURL('image/png');
-    
-    const {error} = await sb.from(TABLE_KLIKUSER)
-      .update({ background_data: imageData })
+    await sb.from(TABLE_KLIKUSER)
+      .update({ last_seen: new Date().toISOString() })
       .eq('username', currentUser);
-    
-    if(error) throw error;
-    
-    showNotification('Background berhasil disimpan', 'success');
-    closeBgEditor();
-    loadBoard();
-    
   } catch (error) {
-    console.error('Error saving background:', error);
-    showNotification('Gagal menyimpan background', 'error');
-  }
-}
-
-async function loadUserBackground() {
-  if(!currentUser) return;
-  
-  try {
-    const {data, error} = await sb.from(TABLE_KLIKUSER)
-      .select('background_data')
-      .eq('username', currentUser)
-      .single();
-    
-    if(error || !data || !data.background_data) return;
-    
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.getElementById('bg-canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      updatePreview();
-    };
-    img.src = data.background_data;
-    
-  } catch (error) {
-    console.error('Error loading background:', error);
+    console.error('Error updating online status:', error);
   }
 }
 
@@ -3064,25 +3289,29 @@ function openGlobalChat() {
   document.getElementById('global-chat-modal').classList.add('show');
   document.getElementById('global-chat-input').focus();
   
-  // Reset notification
-  unreadGlobal = 0;
-  updateGlobalNotification();
-  
-  loadGlobalMessages();
+  loadGlobalChat();
+  startGlobalChatSubscription();
 }
 
 function closeGlobalChat() {
   document.getElementById('global-chat-modal').classList.remove('show');
+  document.getElementById('global-chat-input').value = '';
+  
+  // Stop subscription
+  if(globalChatSubscription) {
+    sb.removeChannel(globalChatSubscription);
+    globalChatSubscription = null;
+  }
 }
 
-async function loadGlobalMessages() {
+async function loadGlobalChat() {
   const container = document.getElementById('global-chat-messages');
   container.innerHTML = '<div class="loading">Memuat chat global...</div>';
   
   try {
     const {data, error} = await sb.from(TABLE_GLOBALCHAT)
       .select('*')
-      .order('created_at', { ascending:false })
+      .order('created_at', { ascending: false })
       .limit(50);
 
     if(error) throw error;
@@ -3090,29 +3319,9 @@ async function loadGlobalMessages() {
     container.innerHTML = '';
     
     if(data && data.length > 0) {
+      // Reverse to show oldest first
       data.reverse().forEach(msg => {
-        const time = new Date(msg.created_at).toLocaleTimeString('id-ID', {
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        
-        const isSent = msg.sender === currentUser;
-        
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isSent ? 'sent' : ''}`;
-        messageDiv.innerHTML = `
-          <div class="message-header">
-            <span class="sender-name">${msg.sender}</span>
-            <span class="message-time">${time}</span>
-          </div>
-          <div class="message-content">
-            ${msg.message.startsWith('data:image') ? 
-              `<img src="${msg.message}" alt="Gambar" style="max-width:200px;">` : 
-              msg.message}
-          </div>
-        `;
-        
-        container.appendChild(messageDiv);
+        addGlobalMessageToDOM(msg);
       });
       
       container.scrollTop = container.scrollHeight;
@@ -3120,9 +3329,53 @@ async function loadGlobalMessages() {
       container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada pesan global</p>';
     }
   } catch (error) {
-    console.error('Error loading global messages:', error);
+    console.error('Error loading global chat:', error);
     container.innerHTML = '<div class="error-message">Gagal memuat chat global</div>';
   }
+}
+
+function startGlobalChatSubscription() {
+  if(globalChatSubscription) {
+    sb.removeChannel(globalChatSubscription);
+  }
+  
+  globalChatSubscription = sb.channel('global-chat-realtime')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: TABLE_GLOBALCHAT
+    }, (payload) => {
+      addGlobalMessageToDOM(payload.new);
+    })
+    .subscribe();
+}
+
+function addGlobalMessageToDOM(msg) {
+  const container = document.getElementById('global-chat-messages');
+  
+  const time = new Date(msg.created_at).toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  const isMe = msg.sender === currentUser;
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${isMe ? 'sent' : ''}`;
+  messageDiv.innerHTML = `
+    <div class="message-header">
+      <span class="sender-name">${msg.sender}</span>
+      <span class="message-time">${time}</span>
+    </div>
+    <div class="message-content">
+      ${msg.message.startsWith('data:image') ? 
+        `<img src="${msg.message}" alt="Gambar" style="max-width:200px;">` : 
+        msg.message}
+    </div>
+  `;
+  
+  container.appendChild(messageDiv);
+  container.scrollTop = container.scrollHeight;
 }
 
 async function sendGlobalMessage() {
@@ -3141,10 +3394,9 @@ async function sendGlobalMessage() {
     if(error) throw error;
 
     input.value = '';
-    loadGlobalMessages();
   } catch (error) {
     console.error('Error sending global message:', error);
-    showNotification('Gagal mengirim pesan', 'error');
+    showNotification('Gagal mengirim pesan global', 'error');
   }
 }
 
@@ -3155,56 +3407,177 @@ function handleGlobalChatKeyPress(e) {
   }
 }
 
-// ===== FILE UPLOAD =====
-function attachFile(type) {
-  const input = document.getElementById('file-input');
-  input.setAttribute('data-type', type);
-  input.click();
+function scrollToBottom(type) {
+  const container = type === 'global' ? 
+    document.getElementById('global-chat-messages') : 
+    document.getElementById('chat-messages');
+  
+  if(container) {
+    container.scrollTop = container.scrollHeight;
+  }
 }
 
-async function handleFileUpload(event) {
-  const file = event.target.files[0];
-  const type = event.target.getAttribute('data-type');
-  
-  if(!file || !file.type.startsWith('image/')) {
-    showNotification('Hanya file gambar yang diizinkan', 'error');
+// ===== USER LIST =====
+function openUserList() {
+  if(!currentUser) {
+    showNotification('Login terlebih dahulu', 'error');
     return;
   }
   
-  if(file.size > 5 * 1024 * 1024) {
-    showNotification('Ukuran file maksimal 5MB', 'error');
-    return;
-  }
+  document.getElementById('user-list-modal').classList.add('show');
+  loadUserList();
+}
+
+function closeUserList() {
+  document.getElementById('user-list-modal').classList.remove('show');
+}
+
+async function loadUserList() {
+  const container = document.getElementById('user-list');
+  container.innerHTML = '<div class="loading">Memuat daftar pengguna...</div>';
   
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    const imageData = e.target.result;
+  try {
+    const {data, error} = await sb.from(TABLE_KLIKUSER)
+      .select('username, profile_image, last_seen, bio')
+      .neq('username', currentUser)
+      .order('username', { ascending: true });
+
+    if(error) throw error;
+
+    container.innerHTML = '';
     
-    try {
-      if(type === 'chat' && chatTarget) {
-        await sb.from(TABLE_KLIKCHAT)
-          .insert({
-            sender: currentUser,
-            receiver: chatTarget,
-            message: imageData
-          });
-        loadChatMessages();
-      } else if(type === 'global') {
-        await sb.from(TABLE_GLOBALCHAT)
-          .insert({
-            sender: currentUser,
-            message: imageData
-          });
-        loadGlobalMessages();
-      }
-    } catch (error) {
-      console.error('Error sending image:', error);
-      showNotification('Gagal mengirim gambar', 'error');
+    if(data && data.length > 0) {
+      data.forEach(user => {
+        const isOnline = user.last_seen && (Date.now() - new Date(user.last_seen).getTime()) < 30000;
+        const profileImage = user.profile_image || 'foto.webp';
+        
+        const userDiv = document.createElement('div');
+        userDiv.className = 'user-item';
+        userDiv.onclick = () => {
+          closeUserList();
+          openChat(user.username);
+        };
+        
+        userDiv.innerHTML = `
+          <div class="user-item-avatar">
+            <img src="${profileImage}" alt="${user.username}" onerror="this.src='foto.webp'">
+          </div>
+          <div class="user-item-info">
+            <div class="user-item-name">${user.username}</div>
+            <div class="user-item-status">
+              <span class="status-dot ${isOnline ? 'online' : ''}"></span>
+              <span>${isOnline ? 'Online' : 'Offline'}</span>
+              ${user.bio ? `<span style="margin-left:10px;">${user.bio.substring(0, 20)}${user.bio.length > 20 ? '...' : ''}</span>` : ''}
+            </div>
+          </div>
+        `;
+        
+        container.appendChild(userDiv);
+      });
+    } else {
+      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada pengguna lain</p>';
     }
-  };
+  } catch (error) {
+    console.error('Error loading user list:', error);
+    container.innerHTML = '<div class="error-message">Gagal memuat daftar pengguna</div>';
+  }
+}
+
+// ===== CALL HISTORY =====
+function openCallHistory() {
+  if(!currentUser) {
+    showNotification('Login terlebih dahulu', 'error');
+    return;
+  }
   
-  reader.readAsDataURL(file);
-  event.target.value = '';
+  document.getElementById('call-history-modal').classList.add('show');
+  loadCallHistory();
+}
+
+function closeCallHistory() {
+  document.getElementById('call-history-modal').classList.remove('show');
+}
+
+async function loadCallHistory() {
+  const container = document.getElementById('call-history-content');
+  container.innerHTML = '<div class="loading">Memuat riwayat panggilan...</div>';
+  
+  try {
+    const {data, error} = await sb.from(TABLE_CALLS)
+      .select('*')
+      .or(`caller.eq.${currentUser},receiver.eq.${currentUser}`)
+      .order('started_at', { ascending: false })
+      .limit(50);
+
+    if(error) throw error;
+
+    container.innerHTML = '';
+    
+    if(data && data.length > 0) {
+      let html = `
+        <table class="call-history-table">
+          <thead>
+            <tr>
+              <th>Tipe</th>
+              <th>Kontak</th>
+              <th>Status</th>
+              <th>Waktu</th>
+              <th>Durasi</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.forEach(call => {
+        const isOutgoing = call.caller === currentUser;
+        const contact = isOutgoing ? call.receiver : call.caller;
+        const direction = isOutgoing ? 'Keluar' : 'Masuk';
+        
+        let statusClass = 'ended';
+        let statusText = 'Berakhir';
+        
+        if(call.status === 'connected') {
+          statusClass = 'connected';
+          statusText = 'Terhubung';
+        } else if(call.status === 'calling' || call.status === 'waiting') {
+          statusClass = 'missed';
+          statusText = 'Tidak terjawab';
+        }
+        
+        const startTime = new Date(call.started_at).toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        const duration = call.duration ? 
+          `${Math.floor(call.duration/60)}:${(call.duration%60).toString().padStart(2, '0')}` : 
+          '--:--';
+        
+        html += `
+          <tr>
+            <td>
+              <div class="call-type ${call.type}">
+                <i class="fas fa-${call.type === 'video' ? 'video' : 'phone'}"></i>
+                <span>${direction}</span>
+              </div>
+            </td>
+            <td>${contact}</td>
+            <td><span class="call-status-badge ${statusClass}">${statusText}</span></td>
+            <td>${startTime}</td>
+            <td class="call-duration">${duration}</td>
+          </tr>
+        `;
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada riwayat panggilan</p>';
+    }
+  } catch (error) {
+    console.error('Error loading call history:', error);
+    container.innerHTML = '<div class="error-message">Gagal memuat riwayat panggilan</div>';
+  }
 }
 
 // ===== NOTIFICATION SYSTEM =====
@@ -3238,182 +3611,56 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// Add notification styles
-const notificationStyles = document.createElement('style');
-notificationStyles.textContent = `
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(20, 20, 20, 0.95);
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: 15px 20px;
-  color: #fff;
-  font-size: 14px;
-  z-index: 10000;
-  transform: translateX(150%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  min-width: 300px;
-  max-width: 400px;
-}
-
-.notification.show {
-  transform: translateX(0);
-}
-
-.notification-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.notification i {
-  font-size: 18px;
-}
-
-.notification.success i {
-  color: #4CAF50;
-}
-
-.notification.error i {
-  color: #f44336;
-}
-
-.notification.info i {
-  color: #2196F3;
-}
-`;
-document.head.appendChild(notificationStyles);
-
-// ===== REALTIME UPDATES =====
-async function checkUnreadMessages() {
-  if(!currentUser) return;
-  
-  try {
-    // Check private chats
-    const {data: chatData} = await sb.from(TABLE_KLIKCHAT)
-      .select('sender')
-      .eq('receiver', currentUser)
-      .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
-    
-    if(chatData) {
-      chatData.forEach(msg => {
-        if(msg.sender !== chatTarget) {
-          unreadChats.add(msg.sender);
-        }
-      });
-      loadBoard();
-    }
-    
-    // Check global chat
-    const {data: globalData} = await sb.from(TABLE_GLOBALCHAT)
-      .select('id')
-      .order('created_at', {ascending: false})
-      .limit(1)
-      .single();
-    
-    if(globalData) {
-      const lastSeen = localStorage.getItem('lastSeenGlobal');
-      if(!lastSeen || globalData.id > parseInt(lastSeen)) {
-        unreadGlobal++;
-        updateGlobalNotification();
-      }
-    }
-    
-  } catch (error) {
-    console.error('Error checking unread messages:', error);
-  }
-}
-
-function updateGlobalNotification() {
-  const badge = document.getElementById('global-notification');
-  if(unreadGlobal > 0) {
-    badge.style.display = 'flex';
-    badge.textContent = unreadGlobal > 9 ? '9+' : unreadGlobal;
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-async function updateOnlineStatus() {
-  if(!currentUser) return;
-  
-  try {
-    await sb.from(TABLE_KLIKUSER)
-      .update({ last_seen: new Date().toISOString() })
-      .eq('username', currentUser);
-  } catch (error) {
-    console.error('Error updating online status:', error);
-  }
-}
-
-function startRealtime() {
-  if(!currentUser) return;
-  
-  // Update online status every 30 seconds
-  setInterval(updateOnlineStatus, 30000);
-  
-  // Subscribe to private chats
-  const chatChannel = sb.channel('private-chat')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: TABLE_KLIKCHAT,
-        filter: `receiver=eq.${currentUser}`
-      },
-      (payload) => {
-        const sender = payload.new.sender;
-        if(chatTarget !== sender) {
-          unreadChats.add(sender);
-          loadBoard();
-          
-          // Show notification
-          if(Notification.permission === 'granted') {
-            new Notification(`Pesan baru dari ${sender}`, {
-              body: payload.new.message.length > 100 ? 
-                payload.new.message.substring(0, 100) + '...' : 
-                payload.new.message,
-              icon: 'logo.jpg'
-            });
-          }
-        }
-      }
-    )
-    .subscribe();
-  
-  // Subscribe to global chat
-  const globalChannel = sb.channel('global-chat')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: TABLE_GLOBALCHAT
-      },
-      (payload) => {
-        if(!document.getElementById('global-chat-modal').classList.contains('show')) {
-          unreadGlobal++;
-          updateGlobalNotification();
-        } else {
-          loadGlobalMessages();
-        }
-      }
-    )
-    .subscribe();
-  
-  // Request notification permission
-  if('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-}
-
 // ===== UTILITY FUNCTIONS =====
-function formatNumber(num) {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+function attachFile(type) {
+  document.getElementById('file-input').click();
+}
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  if(!file.type.startsWith('image/')) {
+    showNotification('Hanya file gambar yang diizinkan', 'error');
+    return;
+  }
+  
+  if(file.size > 5 * 1024 * 1024) {
+    showNotification('Ukuran file maksimal 5MB', 'error');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const imageData = e.target.result;
+    
+    try {
+      if(chatTarget) {
+        // Send to private chat
+        await sb.from(TABLE_KLIKCHAT)
+          .insert({
+            sender: currentUser,
+            receiver: chatTarget,
+            message: imageData
+          });
+      } else {
+        // Send to global chat
+        await sb.from(TABLE_GLOBALCHAT)
+          .insert({
+            sender: currentUser,
+            message: imageData
+          });
+      }
+      
+      showNotification('Gambar berhasil dikirim', 'success');
+    } catch (error) {
+      console.error('Error sending image:', error);
+      showNotification('Gagal mengirim gambar', 'error');
+    }
+  };
+  
+  reader.readAsDataURL(file);
+  event.target.value = ''; // Reset input
 }
 
 // Initialize online status on page visibility change
@@ -3421,11 +3668,6 @@ document.addEventListener('visibilitychange', function() {
   if(!document.hidden && currentUser) {
     updateOnlineStatus();
   }
-});
-
-// Handle window resize for responsive leaderboard
-window.addEventListener('resize', function() {
-  // Leaderboard will auto-adjust with CSS media queries
 });
 </script>
 
