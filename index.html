@@ -41,6 +41,7 @@ h1, h2, h3, h4 {
   gap: 25px;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   position: relative;
+  padding: 20px;
 }
 
 #count {
@@ -66,8 +67,8 @@ h1, h2, h3, h4 {
 /* ===== CIRCLE CLICK AREA ===== */
 .circle-container {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: min(280px, 70vw);
+  height: min(280px, 70vw);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,8 +137,8 @@ h1, h2, h3, h4 {
 /* RING EFFECT */
 .ring-container {
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: calc(min(280px, 70vw) + 40px);
+  height: calc(min(280px, 70vw) + 40px);
   pointer-events: none;
 }
 
@@ -237,7 +238,7 @@ h1, h2, h3, h4 {
   position: fixed;
   top: 0;
   right: 0;
-  width: 85%;
+  width: 100%;
   max-width: 400px;
   height: 100%;
   background: rgba(20, 20, 20, 0.98);
@@ -292,6 +293,312 @@ h1, h2, h3, h4 {
   padding: 20px;
 }
 
+/* ===== LEADERBOARD IMPROVED ===== */
+.leaderboard-section {
+  margin-top: 20px;
+}
+
+.leaderboard-section h3 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Desktop Leaderboard */
+.leaderboard-desktop {
+  display: none;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 15px;
+}
+
+.leaderboard-desktop thead {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.leaderboard-desktop th {
+  padding: 15px 10px;
+  text-align: left;
+  font-weight: 400;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.7;
+  border-bottom: 1px solid #333;
+}
+
+.leaderboard-desktop tbody tr {
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.leaderboard-desktop tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.leaderboard-desktop tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-desktop td {
+  padding: 18px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+  position: relative;
+}
+
+.leaderboard-desktop .rank-cell {
+  width: 60px;
+  text-align: center;
+  font-weight: 300;
+  font-size: 16px;
+  opacity: 0.8;
+  position: relative;
+}
+
+.leaderboard-desktop .rank-medal {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+
+.leaderboard-desktop .rank-1 .rank-medal { color: #FFD700; }
+.leaderboard-desktop .rank-2 .rank-medal { color: #C0C0C0; }
+.leaderboard-desktop .rank-3 .rank-medal { color: #CD7F32; }
+
+.leaderboard-desktop .user-cell {
+  cursor: pointer;
+  position: relative;
+  padding-left: 60px !important;
+  padding-right: 40px !important;
+}
+
+.leaderboard-desktop .user-avatar {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.leaderboard-desktop .user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.leaderboard-desktop .username {
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.leaderboard-desktop .user-status {
+  font-size: 11px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.leaderboard-desktop .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+}
+
+.leaderboard-desktop .status-dot.online {
+  background: #4CAF50;
+}
+
+.leaderboard-desktop .click-cell {
+  text-align: right;
+  font-weight: 300;
+  font-size: 16px;
+  letter-spacing: 1px;
+  width: 100px;
+}
+
+.leaderboard-desktop .action-cell {
+  width: 80px;
+  text-align: center;
+}
+
+.leaderboard-desktop .highlight-row {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-left: 3px solid #fff;
+}
+
+.leaderboard-desktop .chat-indicator {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* Mobile Leaderboard */
+.leaderboard-mobile {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.leaderboard-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.leaderboard-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #555;
+}
+
+.leaderboard-card.highlight {
+  background: rgba(255, 255, 255, 0.07);
+  border-left: 3px solid #fff;
+}
+
+.rank-badge {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.rank-badge.rank-1 { color: #FFD700; }
+.rank-badge.rank-2 { color: #C0C0C0; }
+.rank-badge.rank-3 { color: #CD7F32; }
+
+.user-avatar-mobile {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid #333;
+}
+
+.user-avatar-mobile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info-mobile {
+  flex: 1;
+  min-width: 0;
+}
+
+.username-mobile {
+  font-weight: 400;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-stats-mobile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.click-count-mobile {
+  font-weight: 300;
+  font-size: 14px;
+}
+
+.status-mobile {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-dot-mobile {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+}
+
+.status-dot-mobile.online {
+  background: #4CAF50;
+}
+
+.chat-indicator-mobile {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* Responsive Leaderboard */
+@media (min-width: 768px) {
+  .leaderboard-desktop {
+    display: table;
+  }
+  .leaderboard-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .leaderboard-desktop {
+    display: none;
+  }
+  .leaderboard-mobile {
+    display: flex;
+  }
+  #panel {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
 /* ===== FORM ELEMENTS ===== */
 .form-section {
   margin-bottom: 25px;
@@ -301,9 +608,9 @@ h1, h2, h3, h4 {
 
 .form-section h3 {
   font-size: 16px;
-  margin-bottom: 15px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  margin-bottom: 15px;
   opacity: 0.8;
 }
 
@@ -443,145 +750,6 @@ h1, h2, h3, h4 {
   font-size: 28px;
   font-weight: 200;
   opacity: 0.9;
-}
-
-/* ===== LEADERBOARD ===== */
-.leaderboard-section {
-  margin-top: 20px;
-}
-
-.leaderboard-section h3 {
-  font-size: 16px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 15px;
-  opacity: 0.8;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.leaderboard-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.leaderboard-table thead {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.leaderboard-table th {
-  padding: 12px 10px;
-  text-align: left;
-  font-weight: 400;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.7;
-  border-bottom: 1px solid #333;
-}
-
-.leaderboard-table tbody tr {
-  background: rgba(255, 255, 255, 0.02);
-  transition: all 0.2s;
-  position: relative;
-}
-
-.leaderboard-table tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.01);
-}
-
-.leaderboard-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.leaderboard-table td {
-  padding: 15px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 14px;
-  position: relative;
-}
-
-.rank-cell {
-  width: 50px;
-  text-align: center;
-  font-weight: 300;
-  opacity: 0.8;
-}
-
-.user-cell {
-  cursor: pointer;
-  position: relative;
-  padding-right: 40px !important;
-}
-
-.user-cell .username {
-  font-weight: 400;
-  letter-spacing: 0.5px;
-}
-
-.user-cell .user-status {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #333;
-}
-
-.user-cell .user-status.online {
-  background: #4CAF50;
-}
-
-.click-cell {
-  text-align: right;
-  font-weight: 300;
-  font-size: 16px;
-  letter-spacing: 1px;
-}
-
-.action-cell {
-  width: 40px;
-  text-align: center;
-}
-
-.medal-1 { color: #FFD700; }
-.medal-2 { color: #C0C0C0; }
-.medal-3 { color: #CD7F32; }
-
-.highlight-row {
-  background: rgba(255, 255, 255, 0.07) !important;
-}
-
-.highlight-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 2px;
-  background: #fff;
-}
-
-.chat-indicator {
-  position: absolute;
-  top: 50%;
-  right: 25px;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  background: #fff;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
 }
 
 /* ===== MODAL STYLES ===== */
@@ -880,6 +1048,64 @@ h1, h2, h3, h4 {
   background: rgba(244, 67, 54, 0.3);
 }
 
+.call-control-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+}
+
+#video-container {
+  width: 100%;
+  height: 300px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 15px 0;
+  position: relative;
+}
+
+#local-video, #remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#remote-video {
+  background: #111;
+}
+
+.video-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.video-control-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #333;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.video-control-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.video-control-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* ===== GROUP CHAT ===== */
 .group-list {
   display: flex;
@@ -1120,7 +1346,7 @@ h1, h2, h3, h4 {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== MEDIA QUERIES ===== */
 @media (max-width: 768px) {
   .circle-container {
     width: 240px;
@@ -1145,6 +1371,64 @@ h1, h2, h3, h4 {
     width: 44px;
     height: 44px;
     font-size: 16px;
+  }
+  
+  .call-controls {
+    gap: 15px;
+  }
+  
+  .call-control-btn {
+    width: 50px;
+    height: 50px;
+  }
+  
+  #video-container {
+    height: 250px;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 767px) {
+  .leaderboard-card {
+    padding: 12px;
+  }
+  
+  .rank-badge {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  .user-avatar-mobile {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .user-stats-mobile {
+    font-size: 11px;
+  }
+  
+  .click-count-mobile {
+    font-size: 13px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  #app {
+    padding: 10px;
+  }
+  
+  .circle-container {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .ring-container {
+    width: 220px;
+    height: 220px;
+  }
+  
+  #count {
+    font-size: 30px;
   }
 }
 </style>
@@ -1258,16 +1542,31 @@ h1, h2, h3, h4 {
       </button>
     </div>
     <div class="modal-body">
-      <div class="call-info">
+      <div id="video-container" style="display:none;">
+        <video id="remote-video" autoplay playsinline></video>
+        <video id="local-video" autoplay playsinline muted style="position:absolute; top:10px; right:10px; width:120px; height:160px; border-radius:8px; border:1px solid #333;"></video>
+        <div class="video-controls">
+          <button class="video-control-btn" onclick="toggleVideo()" id="toggle-video-btn">
+            <i class="fas fa-video"></i>
+          </button>
+          <button class="video-control-btn" onclick="toggleAudio()" id="toggle-audio-btn">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <button class="video-control-btn end-call" onclick="endCall()">
+            <i class="fas fa-phone-slash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="call-info" id="call-info">
         <div class="call-avatar" id="call-avatar"></div>
         <h3 id="call-name">...</h3>
         <div class="call-status" id="call-status">Menghubungkan...</div>
         <div class="call-timer" id="call-timer">00:00</div>
         <div class="call-controls">
-          <button class="call-control-btn" onclick="toggleMute()">
+          <button class="call-control-btn" onclick="toggleMute()" id="mute-btn">
             <i class="fas fa-microphone"></i>
           </button>
-          <button class="call-control-btn" onclick="toggleSpeaker()">
+          <button class="call-control-btn" onclick="toggleSpeaker()" id="speaker-btn">
             <i class="fas fa-volume-up"></i>
           </button>
           <button class="call-control-btn end-call" onclick="endCall()">
@@ -1437,12 +1736,19 @@ let currentGroup = null;
 let activeCall = null;
 let callTimer = null;
 let callStartTime = null;
+let callType = null; // 'audio' or 'video'
 let unreadChats = new Set();
 let unreadGlobal = 0;
 let unreadGroups = new Set();
 let musicPlaying = false;
-let audioContext = null;
-let audioSource = null;
+
+// WebRTC variables
+let peerConnection = null;
+let localStream = null;
+let remoteStream = null;
+let isMuted = false;
+let isVideoOff = false;
+let isSpeakerOn = true;
 
 // Canvas variables
 let canvasTool = 'pencil';
@@ -1451,6 +1757,17 @@ let brushSize = 3;
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+
+// STUN servers for WebRTC
+const iceServers = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' }
+  ]
+};
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -1466,6 +1783,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize audio
   initAudio();
+  
+  // Check for incoming calls
+  checkIncomingCalls();
 });
 
 // ===== AUDIO FUNCTIONS =====
@@ -1784,7 +2104,7 @@ function logout() {
   showNotification('Anda telah logout', 'info');
 }
 
-// ===== LEADERBOARD =====
+// ===== IMPROVED LEADERBOARD =====
 async function loadBoard() {
   const container = document.getElementById('board-container');
   if (!container) return;
@@ -1799,47 +2119,96 @@ async function loadBoard() {
 
     if(error) throw error;
 
-    let html = `
-      <table class="leaderboard-table">
+    if(!data || data.length === 0) {
+      container.innerHTML = '<p style="text-align:center;padding:40px;opacity:0.5;">Belum ada data</p>';
+      return;
+    }
+    
+    // Desktop version
+    let desktopHTML = `
+      <table class="leaderboard-desktop">
         <thead>
           <tr>
-            <th class="rank-cell">#</th>
+            <th class="rank-cell">RANK</th>
             <th>USERNAME</th>
             <th class="click-cell">KLIK</th>
-            <th class="action-cell"></th>
+            <th class="action-cell">AKSI</th>
           </tr>
         </thead>
         <tbody>
     `;
     
-    if(data && data.length > 0) {
-      data.forEach((user, index) => {
-        const rank = index + 1;
-        const isMe = user.username === currentUser;
-        const hasUnread = unreadChats.has(user.username);
-        const medalClass = rank <= 3 ? `medal-${rank}` : '';
-        
-        html += `
-          <tr class="${isMe ? 'highlight-row' : ''}">
-            <td class="rank-cell ${medalClass}">${rank}</td>
-            <td class="user-cell" onclick="${user.username !== currentUser ? `openChat('${user.username.replace(/'/g, "\\'")}')` : ''}">
-              <div class="username">${user.username}</div>
-              <div class="user-status ${user.last_seen && (Date.now() - new Date(user.last_seen).getTime()) < 30000 ? 'online' : ''}"></div>
-              ${hasUnread ? '<div class="chat-indicator"></div>' : ''}
-            </td>
-            <td class="click-cell">${user.jumlah_klik || 0}</td>
-            <td class="action-cell">
-              ${isMe ? `<button class="chat-action-btn" onclick="openBgEditor()" style="border:none;background:transparent;color:#666;"><i class="fas fa-palette"></i></button>` : ''}
-            </td>
-          </tr>
-        `;
-      });
-    } else {
-      html += '<tr><td colspan="4" style="text-align:center;padding:40px;opacity:0.5;">Belum ada data</td></tr>';
-    }
+    // Mobile version
+    let mobileHTML = '<div class="leaderboard-mobile">';
     
-    html += '</tbody></table>';
-    container.innerHTML = html;
+    data.forEach((user, index) => {
+      const rank = index + 1;
+      const isMe = user.username === currentUser;
+      const hasUnread = unreadChats.has(user.username);
+      const isOnline = user.last_seen && (Date.now() - new Date(user.last_seen).getTime()) < 30000;
+      
+      // Desktop row
+      desktopHTML += `
+        <tr class="${isMe ? 'highlight-row' : ''} ${rank <= 3 ? `rank-${rank}` : ''}">
+          <td class="rank-cell">
+            <div class="rank-medal">${rank <= 3 ? '🏆' : rank}</div>
+          </td>
+          <td class="user-cell" onclick="${user.username !== currentUser ? `openChat('${user.username.replace(/'/g, "\\'")}')` : ''}">
+            <div class="user-avatar">
+              <img src="${user.profile_image || 'foto.webp'}" alt="${user.username}" onerror="this.src='foto.webp'">
+            </div>
+            <div>
+              <div class="username">${user.username} ${isMe ? '(Anda)' : ''}</div>
+              <div class="user-status">
+                <span class="status-dot ${isOnline ? 'online' : ''}"></span>
+                <span>${isOnline ? 'Online' : 'Offline'}</span>
+              </div>
+            </div>
+            ${hasUnread ? '<div class="chat-indicator"></div>' : ''}
+          </td>
+          <td class="click-cell">${user.jumlah_klik || 0}</td>
+          <td class="action-cell">
+            ${isMe ? `
+              <button class="chat-action-btn" onclick="openBgEditor()" style="border:none;background:transparent;color:#666;">
+                <i class="fas fa-palette"></i>
+              </button>
+            ` : `
+              <button class="chat-action-btn" onclick="openChat('${user.username.replace(/'/g, "\\'")}')" style="border:none;background:transparent;color:#666;">
+                <i class="fas fa-comment"></i>
+              </button>
+            `}
+          </td>
+        </tr>
+      `;
+      
+      // Mobile card
+      mobileHTML += `
+        <div class="leaderboard-card ${isMe ? 'highlight' : ''}" onclick="${user.username !== currentUser ? `openChat('${user.username.replace(/'/g, "\\'")}')` : 'openBgEditor()'}">
+          <div class="rank-badge ${rank <= 3 ? `rank-${rank}` : ''}">
+            ${rank <= 3 ? '🏆' : rank}
+          </div>
+          <div class="user-avatar-mobile">
+            <img src="${user.profile_image || 'foto.webp'}" alt="${user.username}" onerror="this.src='foto.webp'">
+          </div>
+          <div class="user-info-mobile">
+            <div class="username-mobile">${user.username} ${isMe ? '(Anda)' : ''}</div>
+            <div class="user-stats-mobile">
+              <span class="click-count-mobile">${user.jumlah_klik || 0} klik</span>
+              <span class="status-mobile">
+                <span class="status-dot-mobile ${isOnline ? 'online' : ''}"></span>
+                <span>${isOnline ? 'Online' : 'Offline'}</span>
+              </span>
+            </div>
+          </div>
+          ${hasUnread ? '<div class="chat-indicator-mobile"></div>' : ''}
+        </div>
+      `;
+    });
+    
+    desktopHTML += '</tbody></table>';
+    mobileHTML += '</div>';
+    
+    container.innerHTML = desktopHTML + mobileHTML;
     
   } catch (error) {
     console.error('Error loading leaderboard:', error);
@@ -1959,31 +2328,78 @@ function handleChatKeyPress(e) {
   }
 }
 
-// ===== CALL FUNCTIONS =====
+// ===== CALL/VOICE/VIDEO CALL FUNCTIONS =====
 async function startAudioCall() {
-  if(!chatTarget || !currentUser) return;
+  if(!chatTarget || !currentUser) {
+    showNotification('Pilih kontak terlebih dahulu', 'error');
+    return;
+  }
   
+  callType = 'audio';
+  await initiateCall('audio');
+}
+
+async function startVideoCall() {
+  if(!chatTarget || !currentUser) {
+    showNotification('Pilih kontak terlebih dahulu', 'error');
+    return;
+  }
+  
+  callType = 'video';
+  await initiateCall('video');
+}
+
+async function initiateCall(type) {
   try {
     // Create call record
-    const {data, error} = await sb.from(TABLE_CALLS)
+    const {data: callData, error} = await sb.from(TABLE_CALLS)
       .insert({
         caller: currentUser,
         receiver: chatTarget,
-        type: 'audio',
-        status: 'calling'
+        type: type,
+        status: 'calling',
+        started_at: new Date().toISOString()
       })
       .select()
       .single();
 
     if(error) throw error;
 
-    activeCall = data;
+    activeCall = callData;
     showCallModal('outgoing');
     
-    // Start call timer
-    callStartTime = Date.now();
-    updateCallTimer();
-    callTimer = setInterval(updateCallTimer, 1000);
+    // Request media permissions
+    const constraints = {
+      audio: true,
+      video: type === 'video'
+    };
+    
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if(type === 'video') {
+        const localVideo = document.getElementById('local-video');
+        localVideo.srcObject = localStream;
+        document.getElementById('video-container').style.display = 'block';
+        document.getElementById('call-info').style.display = 'none';
+      }
+      
+      // Setup WebRTC
+      await setupPeerConnection();
+      
+      // Start call timer
+      callStartTime = Date.now();
+      updateCallTimer();
+      callTimer = setInterval(updateCallTimer, 1000);
+      
+      // Wait for callee to answer
+      checkCallStatus();
+      
+    } catch (mediaError) {
+      console.error('Media error:', mediaError);
+      showNotification('Akses kamera/mikrofon ditolak', 'error');
+      endCall();
+    }
     
   } catch (error) {
     console.error('Error starting call:', error);
@@ -1991,11 +2407,179 @@ async function startAudioCall() {
   }
 }
 
-async function startVideoCall() {
-  if(!chatTarget || !currentUser) return;
+async function checkCallStatus() {
+  if(!activeCall) return;
   
-  showNotification('Fitur video call dalam pengembangan', 'info');
-  // Implement video call logic here
+  const checkInterval = setInterval(async () => {
+    const {data} = await sb.from(TABLE_CALLS)
+      .select('*')
+      .eq('id', activeCall.id)
+      .single();
+    
+    if(data && data.status === 'connected') {
+      clearInterval(checkInterval);
+      document.getElementById('call-status').textContent = 'Terhubung';
+      
+      // Send offer to receiver via WebRTC
+      await createAndSendOffer();
+      
+    } else if(data && data.status === 'ended') {
+      clearInterval(checkInterval);
+      showNotification('Panggilan ditolak', 'info');
+      endCall();
+    }
+  }, 1000);
+  
+  // Timeout after 30 seconds
+  setTimeout(() => {
+    clearInterval(checkInterval);
+    if(document.getElementById('call-modal').classList.contains('show')) {
+      showNotification('Panggilan tidak dijawab', 'info');
+      endCall();
+    }
+  }, 30000);
+}
+
+async function checkIncomingCalls() {
+  if(!currentUser) return;
+  
+  // Listen for incoming calls
+  sb.channel('calls-channel')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: TABLE_CALLS,
+      filter: `receiver=eq.${currentUser}`
+    }, async (payload) => {
+      if(payload.new.status === 'calling') {
+        const acceptCall = confirm(`${payload.new.caller} sedang ${payload.new.type === 'video' ? 'video call' : 'audio call'}. Terima?`);
+        
+        if(acceptCall) {
+          activeCall = payload.new;
+          callType = payload.new.type;
+          
+          // Update call status to connected
+          await sb.from(TABLE_CALLS)
+            .update({ status: 'connected' })
+            .eq('id', activeCall.id);
+          
+          // Setup call
+          await answerCall();
+        } else {
+          // Reject call
+          await sb.from(TABLE_CALLS)
+            .update({ status: 'ended', ended_at: new Date().toISOString() })
+            .eq('id', payload.new.id);
+        }
+      }
+    })
+    .subscribe();
+}
+
+async function answerCall() {
+  showCallModal('incoming');
+  
+  // Request media permissions
+  const constraints = {
+    audio: true,
+    video: callType === 'video'
+  };
+  
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia(constraints);
+    
+    if(callType === 'video') {
+      const localVideo = document.getElementById('local-video');
+      localVideo.srcObject = localStream;
+      document.getElementById('video-container').style.display = 'block';
+      document.getElementById('call-info').style.display = 'none';
+    }
+    
+    // Setup WebRTC
+    await setupPeerConnection();
+    
+    // Start call timer
+    callStartTime = Date.now();
+    updateCallTimer();
+    callTimer = setInterval(updateCallTimer, 1000);
+    
+    // Wait for offer from caller
+    await waitForOffer();
+    
+  } catch (mediaError) {
+    console.error('Media error:', mediaError);
+    showNotification('Akses kamera/mikrofon ditolak', 'error');
+    endCall();
+  }
+}
+
+async function setupPeerConnection() {
+  try {
+    peerConnection = new RTCPeerConnection(iceServers);
+    
+    // Add local stream
+    if(localStream) {
+      localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+      });
+    }
+    
+    // Get remote stream
+    peerConnection.ontrack = (event) => {
+      remoteStream = event.streams[0];
+      const remoteVideo = document.getElementById('remote-video');
+      remoteVideo.srcObject = remoteStream;
+    };
+    
+    // ICE candidate handling
+    peerConnection.onicecandidate = (event) => {
+      if(event.candidate) {
+        // Send ICE candidate to other peer (simplified)
+        console.log('ICE candidate:', event.candidate);
+      }
+    };
+    
+    // Connection state changes
+    peerConnection.onconnectionstatechange = () => {
+      console.log('Connection state:', peerConnection.connectionState);
+      if(peerConnection.connectionState === 'disconnected' ||
+         peerConnection.connectionState === 'failed' ||
+         peerConnection.connectionState === 'closed') {
+        endCall();
+      }
+    };
+    
+  } catch (error) {
+    console.error('Error setting up peer connection:', error);
+  }
+}
+
+async function createAndSendOffer() {
+  try {
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    
+    // In a real app, send offer to signaling server
+    // For simplicity, we'll just log it
+    console.log('Offer created:', offer);
+    
+  } catch (error) {
+    console.error('Error creating offer:', error);
+  }
+}
+
+async function waitForOffer() {
+  // In a real app, receive offer from signaling server
+  // For demo, we'll create answer when called
+  setTimeout(async () => {
+    try {
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      console.log('Answer created:', answer);
+    } catch (error) {
+      console.error('Error creating answer:', error);
+    }
+  }, 1000);
 }
 
 function showCallModal(type) {
@@ -2007,10 +2591,13 @@ function showCallModal(type) {
   if(type === 'outgoing') {
     name.textContent = chatTarget;
     status.textContent = 'Menghubungkan...';
+  } else {
+    name.textContent = activeCall.caller;
+    status.textContent = 'Panggilan masuk...';
   }
   
-  // Set avatar (you can implement actual avatar loading)
-  avatar.innerHTML = `<img src="foto.webp" alt="${chatTarget}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\"><rect width=\"100%\" height=\"100%\" fill=\"%23111\"/><text x=\"50%\" y=\"50%\" font-family=\"Arial\" font-size=\"20\" fill=\"white\" text-anchor=\"middle\" dy=\".3em\">${chatTarget.charAt(0)}</text></svg>'">`;
+  // Set avatar
+  avatar.innerHTML = `<img src="foto.webp" alt="${type === 'outgoing' ? chatTarget : activeCall.caller}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\"><rect width=\"100%\" height=\"100%\" fill=\"%23111\"/><text x=\"50%\" y=\"50%\" font-family=\"Arial\" font-size=\"20\" fill=\"white\" text-anchor=\"middle\" dy=\".3em\">${type === 'outgoing' ? chatTarget.charAt(0) : activeCall.caller.charAt(0)}</text></svg>'">`;
   
   modal.classList.add('show');
 }
@@ -2027,30 +2614,115 @@ function updateCallTimer() {
 }
 
 function toggleMute() {
-  // Implement mute functionality
-  showNotification('Mute diaktifkan', 'info');
+  if(!localStream) return;
+  
+  const audioTracks = localStream.getAudioTracks();
+  if(audioTracks.length > 0) {
+    isMuted = !isMuted;
+    audioTracks[0].enabled = !isMuted;
+    
+    const muteBtn = document.getElementById('mute-btn');
+    muteBtn.classList.toggle('active', isMuted);
+    muteBtn.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>';
+    
+    showNotification(isMuted ? 'Mikrofon dimatikan' : 'Mikrofon diaktifkan', 'info');
+  }
+}
+
+function toggleVideo() {
+  if(!localStream || callType !== 'video') return;
+  
+  const videoTracks = localStream.getVideoTracks();
+  if(videoTracks.length > 0) {
+    isVideoOff = !isVideoOff;
+    videoTracks[0].enabled = !isVideoOff;
+    
+    const videoBtn = document.getElementById('toggle-video-btn');
+    videoBtn.classList.toggle('active', isVideoOff);
+    videoBtn.innerHTML = isVideoOff ? '<i class="fas fa-video-slash"></i>' : '<i class="fas fa-video"></i>';
+    
+    showNotification(isVideoOff ? 'Kamera dimatikan' : 'Kamera diaktifkan', 'info');
+  }
+}
+
+function toggleAudio() {
+  // This toggles local audio (different from toggleMute which toggles microphone)
+  if(!remoteStream) return;
+  
+  const audioElements = document.getElementsByTagName('audio');
+  for(let audio of audioElements) {
+    audio.muted = !audio.muted;
+  }
+  
+  const remoteVideo = document.getElementById('remote-video');
+  remoteVideo.muted = !remoteVideo.muted;
+  
+  isSpeakerOn = !isSpeakerOn;
+  const speakerBtn = document.getElementById('speaker-btn');
+  speakerBtn.classList.toggle('active', !isSpeakerOn);
+  speakerBtn.innerHTML = isSpeakerOn ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+  
+  showNotification(isSpeakerOn ? 'Speaker diaktifkan' : 'Speaker dimatikan', 'info');
 }
 
 function toggleSpeaker() {
-  // Implement speaker functionality
-  showNotification('Speaker diaktifkan', 'info');
+  // Alias for toggleAudio
+  toggleAudio();
 }
 
 async function endCall() {
   if(activeCall) {
     try {
+      const endedAt = new Date().toISOString();
+      const duration = callStartTime ? Math.floor((Date.now() - callStartTime) / 1000) : 0;
+      
       await sb.from(TABLE_CALLS)
-        .update({ status: 'ended', ended_at: new Date().toISOString() })
+        .update({ 
+          status: 'ended', 
+          ended_at: endedAt,
+          duration: duration
+        })
         .eq('id', activeCall.id);
+      
+      showNotification(`Panggilan berakhir (${Math.floor(duration/60)}:${(duration%60).toString().padStart(2, '0')})`, 'info');
+      
     } catch (error) {
       console.error('Error updating call status:', error);
     }
   }
   
+  // Close peer connection
+  if(peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+  }
+  
+  // Stop media streams
+  if(localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+  }
+  
+  if(remoteStream) {
+    remoteStream.getTracks().forEach(track => track.stop());
+    remoteStream = null;
+  }
+  
+  // Clear timer
   clearInterval(callTimer);
+  
+  // Hide modal
   document.getElementById('call-modal').classList.remove('show');
+  document.getElementById('video-container').style.display = 'none';
+  document.getElementById('call-info').style.display = 'block';
+  
+  // Reset variables
   activeCall = null;
   callStartTime = null;
+  callType = null;
+  isMuted = false;
+  isVideoOff = false;
+  isSpeakerOn = true;
 }
 
 // ===== GROUP FUNCTIONS =====
@@ -2733,32 +3405,6 @@ function startRealtime() {
     )
     .subscribe();
   
-  // Subscribe to calls
-  const callChannel = sb.channel('calls')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: TABLE_CALLS,
-        filter: `receiver=eq.${currentUser}`
-      },
-      (payload) => {
-        if(payload.new.status === 'calling') {
-          // Show incoming call notification
-          if(confirm(`${payload.new.caller} sedang menelpon Anda. Terima panggilan?`)) {
-            activeCall = payload.new;
-            showCallModal('incoming');
-            // Update call status to connected
-            sb.from(TABLE_CALLS)
-              .update({ status: 'connected' })
-              .eq('id', payload.new.id);
-          }
-        }
-      }
-    )
-    .subscribe();
-  
   // Request notification permission
   if('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
@@ -2777,39 +3423,10 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
-// Add some missing CSS for new elements
-const additionalStyles = document.createElement('style');
-additionalStyles.textContent = `
-.call-modal .modal-content {
-  max-width: 400px;
-}
-
-#group-photo-preview img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #333;
-}
-
-.editor-tool input[type="color"] {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: transparent;
-}
-
-#bg-preview {
-  min-width: 200px;
-  padding: 15px 30px;
-  font-size: 16px;
-  text-align: center;
-  border: 1px solid #333;
-}
-`;
-document.head.appendChild(additionalStyles);
+// Handle window resize for responsive leaderboard
+window.addEventListener('resize', function() {
+  // Leaderboard will auto-adjust with CSS media queries
+});
 </script>
 
 </body>
