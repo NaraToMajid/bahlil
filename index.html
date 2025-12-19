@@ -628,7 +628,7 @@ h1, h2, h3, h4 {
   letter-spacing: 0.5px;
 }
 
-.input-group input, .input-group textarea {
+.input-group input, .input-group textarea, .input-group select {
   width: 100%;
   padding: 12px 15px;
   background: rgba(255, 255, 255, 0.05);
@@ -640,7 +640,7 @@ h1, h2, h3, h4 {
   font-family: inherit;
 }
 
-.input-group input:focus, .input-group textarea:focus {
+.input-group input:focus, .input-group textarea:focus, .input-group select:focus {
   outline: none;
   border-color: #555;
   background: rgba(255, 255, 255, 0.08);
@@ -710,14 +710,15 @@ h1, h2, h3, h4 {
   height: 120px;
   margin: 0 auto 20px;
   cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #333;
 }
 
 .profile-avatar-edit img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #333;
 }
 
 .profile-avatar-edit .edit-overlay {
@@ -733,6 +734,8 @@ h1, h2, h3, h4 {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s;
+  color: white;
+  font-size: 24px;
 }
 
 .profile-avatar-edit:hover .edit-overlay {
@@ -1367,6 +1370,109 @@ h1, h2, h3, h4 {
   color: rgba(255, 255, 255, 0.9);
 }
 
+/* ===== GROUP STYLES ===== */
+.group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.group-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.group-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.group-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.group-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.group-info {
+  flex: 1;
+}
+
+.group-name {
+  font-weight: 400;
+  margin-bottom: 3px;
+}
+
+.group-desc {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.group-members {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+/* ===== NOTIFICATION STYLES ===== */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 15px 20px;
+  color: #fff;
+  font-size: 14px;
+  z-index: 10000;
+  transform: translateX(150%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification i {
+  font-size: 18px;
+}
+
+.notification.success i {
+  color: #4CAF50;
+}
+
+.notification.error i {
+  color: #f44336;
+}
+
+.notification.info i {
+  color: #2196F3;
+}
+
 /* ===== CALL HISTORY STYLES ===== */
 .call-history-section {
   margin-top: 20px;
@@ -1442,91 +1548,6 @@ h1, h2, h3, h4 {
   text-align: right;
   font-family: 'Courier New', monospace;
   font-size: 13px;
-}
-
-/* ===== GLOBAL CHAT SCROLL BUTTON ===== */
-.scroll-to-bottom {
-  position: absolute;
-  bottom: 80px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(30, 30, 30, 0.9);
-  border: 1px solid #333;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s;
-  backdrop-filter: blur(10px);
-}
-
-.scroll-to-bottom:hover {
-  background: rgba(40, 40, 40, 0.95);
-  transform: translateY(-2px);
-}
-
-/* ===== USER LIST MODAL ===== */
-.user-list-modal .modal-content {
-  max-width: 400px;
-}
-
-.user-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid #333;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.user-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.user-item-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.user-item-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.user-item-info {
-  flex: 1;
-}
-
-.user-item-name {
-  font-weight: 400;
-  margin-bottom: 3px;
-}
-
-.user-item-status {
-  font-size: 11px;
-  opacity: 0.6;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 /* ===== SCROLLBAR ===== */
@@ -1638,51 +1659,6 @@ h1, h2, h3, h4 {
   #count {
     font-size: 30px;
   }
-}
-
-/* ===== NOTIFICATION STYLES ===== */
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(20, 20, 20, 0.95);
-  border: 1px solid #333;
-  border-radius: 6px;
-  padding: 15px 20px;
-  color: #fff;
-  font-size: 14px;
-  z-index: 10000;
-  transform: translateX(150%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  min-width: 300px;
-  max-width: 400px;
-}
-
-.notification.show {
-  transform: translateX(0);
-}
-
-.notification-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.notification i {
-  font-size: 18px;
-}
-
-.notification.success i {
-  color: #4CAF50;
-}
-
-.notification.error i {
-  color: #f44336;
-}
-
-.notification.info i {
-  color: #2196F3;
 }
 </style>
 </head>
@@ -1898,6 +1874,97 @@ h1, h2, h3, h4 {
 <!-- Incoming Call Notification -->
 <div id="incoming-call-notification" style="display:none;"></div>
 
+<!-- Group Chat Modal -->
+<div id="group-chat-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-users"></i> Grup Chat</h3>
+      <button class="modal-close" onclick="closeGroupChat()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="group-list" id="group-list">
+        <!-- Group list akan diisi oleh JavaScript -->
+      </div>
+      <button class="btn" onclick="showCreateGroupModal()" style="margin-top: 15px;">
+        <i class="fas fa-plus"></i> Buat Grup Baru
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Group Modal -->
+<div id="create-group-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-plus-circle"></i> Buat Grup Baru</h3>
+      <button class="modal-close" onclick="closeCreateGroupModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Nama Grup</label>
+        <input type="text" id="group-name" placeholder="Masukkan nama grup">
+      </div>
+      <div class="input-group">
+        <label>Deskripsi Grup (Opsional)</label>
+        <textarea id="group-desc" placeholder="Deskripsi grup" maxlength="200"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Foto Grup (Opsional)</label>
+        <input type="file" id="group-photo-input" accept="image/*" onchange="previewGroupPhoto(event)">
+        <div id="group-photo-preview" style="margin-top: 10px; display: none;">
+          <img id="group-photo-img" src="" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Pilih Anggota (Minimal 1)</label>
+        <select id="group-members" multiple style="height: 150px;">
+          <!-- Options akan diisi oleh JavaScript -->
+        </select>
+        <small style="opacity:0.6; font-size:12px; margin-top:5px;">Tahan Ctrl/Cmd untuk memilih multiple</small>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="createGroup()">
+        <i class="fas fa-check"></i> Buat Grup
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Group Chat Room Modal -->
+<div id="group-room-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-users"></i> <span id="group-room-title">Grup</span></h3>
+      <button class="modal-close" onclick="closeGroupRoom()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="chat-container">
+        <div class="chat-messages" id="group-room-messages"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="chat-input-area">
+        <input type="text" id="group-room-input" placeholder="Ketik pesan grup..." onkeypress="handleGroupRoomKeyPress(event)">
+        <div class="chat-actions">
+          <button class="chat-action-btn" onclick="attachFile('group')">
+            <i class="fas fa-paperclip"></i>
+          </button>
+          <button class="chat-action-btn" onclick="sendGroupRoomMessage()">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Global Chat Modal -->
 <div id="global-chat-modal" class="modal">
   <div class="modal-content">
@@ -1909,9 +1976,6 @@ h1, h2, h3, h4 {
     </div>
     <div class="modal-body">
       <div class="chat-messages" id="global-chat-messages"></div>
-      <button class="scroll-to-bottom" onclick="scrollToBottom('global')">
-        <i class="fas fa-arrow-down"></i>
-      </button>
     </div>
     <div class="modal-footer">
       <div class="chat-input-area">
@@ -1924,23 +1988,6 @@ h1, h2, h3, h4 {
             <i class="fas fa-paper-plane"></i>
           </button>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- User List Modal -->
-<div id="user-list-modal" class="modal user-list-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fas fa-users"></i> Pilih Kontak</h3>
-      <button class="modal-close" onclick="closeUserList()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="user-list" id="user-list">
-        <!-- Daftar user akan diisi oleh JavaScript -->
       </div>
     </div>
   </div>
@@ -1978,22 +2025,29 @@ const TABLE_KLIKUSER = 'KLIKUSER';
 const TABLE_KLIKCHAT = 'KLIKCHAT';
 const TABLE_GLOBALCHAT = 'GLOBALCHAT';
 const TABLE_CALLS = 'CALLS';
+const TABLE_GROUPS = 'KLIKGROUP';
+const TABLE_GROUP_MEMBERS = 'GROUPMEMBER';
+const TABLE_GROUP_CHAT = 'GROUPCHAT';
 
 // ===== GLOBAL VARIABLES =====
 let currentUser = null;
 let currentClick = 0;
 let verificationCode = '';
 let chatTarget = null;
+let currentGroup = null;
 let activeCall = null;
 let callTimer = null;
 let callStartTime = null;
 let callType = null; // 'audio' or 'video'
 let unreadChats = new Set();
 let unreadGlobal = 0;
+let unreadGroups = new Set();
 let musicPlaying = false;
 let userProfile = {};
 let userRank = 0;
 let globalChatSubscription = null;
+let groupChatSubscription = null;
+let callSubscription = null;
 
 // WebRTC variables
 let peerConnection = null;
@@ -2002,6 +2056,7 @@ let remoteStream = null;
 let isMuted = false;
 let isVideoOff = false;
 let isSpeakerOn = true;
+let answerInterval = null;
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -2026,6 +2081,14 @@ document.addEventListener('DOMContentLoaded', function() {
   if('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
   }
+  
+  // Setup group desc counter
+  document.getElementById('group-desc')?.addEventListener('input', function() {
+    const counter = this.nextElementSibling?.querySelector('.bio-counter');
+    if(counter) {
+      counter.textContent = this.value.length;
+    }
+  });
 });
 
 // ===== AUDIO FUNCTIONS =====
@@ -2218,8 +2281,8 @@ function loadPanelContent(section) {
           <button class="btn" onclick="openGlobalChat()">
             <i class="fas fa-globe"></i> Chat Global
           </button>
-          <button class="btn" onclick="openUserList()">
-            <i class="fas fa-comments"></i> Chat Pribadi
+          <button class="btn" onclick="openGroupChat()">
+            <i class="fas fa-users"></i> Grup Chat
           </button>
           <button class="btn btn-danger" onclick="logout()">
             <i class="fas fa-sign-out-alt"></i> Logout
@@ -2394,6 +2457,12 @@ function logout() {
   if(globalChatSubscription) {
     sb.removeChannel(globalChatSubscription);
   }
+  if(groupChatSubscription) {
+    sb.removeChannel(groupChatSubscription);
+  }
+  if(callSubscription) {
+    sb.removeChannel(callSubscription);
+  }
   
   showNotification('Anda telah logout', 'info');
 }
@@ -2474,17 +2543,28 @@ async function saveProfile() {
     
     // Upload new profile photo if exists
     if(photoFile) {
-      const fileName = `profile_${currentUser}_${Date.now()}_${photoFile.name}`;
+      const fileName = `profile_${currentUser}_${Date.now()}.${photoFile.name.split('.').pop()}`;
       
-      const {data, error} = await sb.storage
+      const {data, error: uploadError} = await sb.storage
         .from('profile-photos')
-        .upload(fileName, photoFile);
+        .upload(fileName, photoFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
       
-      if(!error) {
+      if(!uploadError) {
         const {data: urlData} = sb.storage
           .from('profile-photos')
           .getPublicUrl(fileName);
         profileImageUrl = urlData.publicUrl;
+      } else {
+        console.error('Upload error:', uploadError);
+        // Fallback to data URL if upload fails
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          profileImageUrl = e.target.result;
+        };
+        reader.readAsDataURL(photoFile);
       }
     }
     
@@ -2517,7 +2597,7 @@ async function saveProfile() {
     
   } catch (error) {
     console.error('Error saving profile:', error);
-    showNotification('Gagal menyimpan profil', 'error');
+    showNotification('Gagal menyimpan profil: ' + error.message, 'error');
   }
 }
 
@@ -2644,7 +2724,6 @@ async function loadBoard() {
 function openUserProfile(username) {
   // Show user profile modal (simplified version)
   showNotification(`Profil ${username}`, 'info');
-  // You can expand this to show full profile modal
 }
 
 // ===== CHAT FUNCTIONS =====
@@ -2759,7 +2838,7 @@ function handleChatKeyPress(e) {
   }
 }
 
-// ===== CALL SYSTEM =====
+// ===== IMPROVED CALL SYSTEM =====
 async function startAudioCall() {
   if(!chatTarget || !currentUser) {
     showNotification('Pilih kontak terlebih dahulu', 'error');
@@ -2782,6 +2861,25 @@ async function startVideoCall() {
 
 async function initiateCall(type) {
   try {
+    // Request media permissions first
+    try {
+      const constraints = {
+        audio: true,
+        video: type === 'video'
+      };
+      
+      localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if(type === 'video') {
+        const localVideo = document.getElementById('local-video');
+        localVideo.srcObject = localStream;
+      }
+    } catch (mediaError) {
+      console.error('Media error:', mediaError);
+      showNotification('Akses kamera/mikrofon ditolak', 'error');
+      return;
+    }
+    
     // Create call record
     const callData = {
       caller: currentUser,
@@ -2802,54 +2900,37 @@ async function initiateCall(type) {
     activeCall = savedCall;
     showCallModal('outgoing');
     
-    // Request media permissions
-    try {
-      const constraints = {
-        audio: true,
-        video: type === 'video'
-      };
-      
-      localStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if(type === 'video') {
-        const localVideo = document.getElementById('local-video');
-        localVideo.srcObject = localStream;
-        document.getElementById('video-container').style.display = 'block';
-        document.getElementById('call-info').style.display = 'none';
-      }
-      
-      // Setup WebRTC
-      await setupPeerConnection();
-      
-      // Start call timer
-      callStartTime = Date.now();
-      updateCallTimer();
-      callTimer = setInterval(updateCallTimer, 1000);
-      
-      // Create and send offer
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      
-      // Save offer to database for signaling
-      await sb.from(TABLE_CALLS)
-        .update({ 
-          offer: JSON.stringify(offer),
-          status: 'waiting'
-        })
-        .eq('id', activeCall.id);
-      
-      // Listen for answer
-      listenForAnswer();
-      
-    } catch (mediaError) {
-      console.error('Media error:', mediaError);
-      showNotification('Akses kamera/mikrofon ditolak', 'error');
-      endCall();
-    }
+    // Setup WebRTC
+    await setupPeerConnection();
+    
+    // Start call timer
+    callStartTime = Date.now();
+    updateCallTimer();
+    callTimer = setInterval(updateCallTimer, 1000);
+    
+    // Create and send offer
+    const offer = await peerConnection.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: type === 'video'
+    });
+    
+    await peerConnection.setLocalDescription(offer);
+    
+    // Save offer to database for signaling
+    await sb.from(TABLE_CALLS)
+      .update({ 
+        offer: JSON.stringify(peerConnection.localDescription),
+        status: 'waiting'
+      })
+      .eq('id', activeCall.id);
+    
+    // Listen for answer
+    listenForAnswer();
     
   } catch (error) {
     console.error('Error starting call:', error);
-    showNotification('Gagal memulai panggilan', 'error');
+    showNotification('Gagal memulai panggilan: ' + error.message, 'error');
+    endCall();
   }
 }
 
@@ -2859,7 +2940,9 @@ async function setupPeerConnection() {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' }
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' }
       ]
     };
     
@@ -2877,12 +2960,13 @@ async function setupPeerConnection() {
       remoteStream = event.streams[0];
       const remoteVideo = document.getElementById('remote-video');
       remoteVideo.srcObject = remoteStream;
+      document.getElementById('call-status').textContent = 'Terhubung';
     };
     
     // ICE candidate handling
     peerConnection.onicecandidate = (event) => {
       if(event.candidate) {
-        console.log('ICE candidate:', event.candidate);
+        console.log('New ICE candidate:', event.candidate);
       }
     };
     
@@ -2891,60 +2975,61 @@ async function setupPeerConnection() {
       console.log('Connection state:', peerConnection.connectionState);
       if(peerConnection.connectionState === 'connected') {
         document.getElementById('call-status').textContent = 'Terhubung';
+        if(callType === 'video') {
+          document.getElementById('video-container').style.display = 'block';
+          document.getElementById('call-info').style.display = 'none';
+        }
       }
     };
     
   } catch (error) {
     console.error('Error setting up peer connection:', error);
-    showNotification('Error setting up call', 'error');
+    throw error;
   }
 }
 
 async function listenForAnswer() {
   if(!activeCall) return;
   
-  const checkInterval = setInterval(async () => {
-    const {data: callData} = await sb.from(TABLE_CALLS)
-      .select('*')
-      .eq('id', activeCall.id)
-      .single();
-    
-    if(callData && callData.answer) {
-      clearInterval(checkInterval);
+  answerInterval = setInterval(async () => {
+    try {
+      const {data: callData} = await sb.from(TABLE_CALLS)
+        .select('*')
+        .eq('id', activeCall.id)
+        .single();
       
-      try {
+      if(callData && callData.answer) {
+        clearInterval(answerInterval);
+        
         // Set remote description from answer
         const answer = JSON.parse(callData.answer);
         await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-        
-        document.getElementById('call-status').textContent = 'Terhubung';
         
         // Update call status
         await sb.from(TABLE_CALLS)
           .update({ status: 'connected' })
           .eq('id', activeCall.id);
           
-      } catch (error) {
-        console.error('Error processing answer:', error);
-        showNotification('Error processing call answer', 'error');
+      } else if(callData && (callData.status === 'ended' || callData.status === 'rejected')) {
+        clearInterval(answerInterval);
+        showNotification('Panggilan ditolak', 'info');
         endCall();
       }
-      
-    } else if(callData && callData.status === 'ended') {
-      clearInterval(checkInterval);
-      showNotification('Panggilan ditolak', 'info');
-      endCall();
+    } catch (error) {
+      console.error('Error checking answer:', error);
     }
   }, 2000);
   
-  // Timeout after 45 seconds
+  // Timeout after 60 seconds
   setTimeout(() => {
-    clearInterval(checkInterval);
-    if(document.getElementById('call-modal').classList.contains('show')) {
-      showNotification('Panggilan tidak dijawab', 'info');
-      endCall();
+    if(answerInterval) {
+      clearInterval(answerInterval);
+      if(document.getElementById('call-modal').classList.contains('show')) {
+        showNotification('Panggilan tidak dijawab', 'info');
+        endCall();
+      }
     }
-  }, 45000);
+  }, 60000);
 }
 
 function showCallModal(type) {
@@ -2962,7 +3047,8 @@ function showCallModal(type) {
   }
   
   // Set avatar
-  avatar.innerHTML = `<img src="foto.webp" alt="${type === 'outgoing' ? chatTarget : activeCall.caller}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\"><rect width=\"100%\" height=\"100%\" fill=\"%23111\"/><text x=\"50%\" y=\"50%\" font-family=\"Arial\" font-size=\"20\" fill=\"white\" text-anchor=\"middle\" dy=\".3em\">${type === 'outgoing' ? chatTarget.charAt(0) : activeCall.caller.charAt(0)}</text></svg>'">`;
+  const contactName = type === 'outgoing' ? chatTarget : activeCall.caller;
+  avatar.innerHTML = `<img src="foto.webp" alt="${contactName}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\"><rect width=\"100%\" height=\"100%\" fill=\"%23111\"/><text x=\"50%\" y=\"50%\" font-family=\"Arial\" font-size=\"20\" fill=\"white\" text-anchor=\"middle\" dy=\".3em\">${contactName.charAt(0)}</text></svg>'">`;
   
   modal.classList.add('show');
 }
@@ -3029,6 +3115,9 @@ function toggleAudio() {
 
 async function endCall() {
   clearInterval(callTimer);
+  if(answerInterval) {
+    clearInterval(answerInterval);
+  }
   
   if(activeCall) {
     try {
@@ -3081,6 +3170,7 @@ async function endCall() {
   isMuted = false;
   isVideoOff = false;
   isSpeakerOn = true;
+  answerInterval = null;
 }
 
 // ===== INCOMING CALL HANDLING =====
@@ -3091,7 +3181,7 @@ function startRealtime() {
   setInterval(updateOnlineStatus, 30000);
   
   // Subscribe to incoming calls
-  sb.channel('calls-realtime')
+  callSubscription = sb.channel('calls-realtime')
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
@@ -3100,6 +3190,23 @@ function startRealtime() {
     }, async (payload) => {
       if(payload.new.status === 'calling') {
         showIncomingCallNotification(payload.new);
+      }
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: TABLE_CALLS,
+      filter: `id=eq.${activeCall?.id}`
+    }, async (payload) => {
+      if(payload.new.answer && peerConnection && !peerConnection.remoteDescription) {
+        try {
+          // Handle incoming answer
+          const answer = JSON.parse(payload.new.answer);
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+          document.getElementById('call-status').textContent = 'Terhubung';
+        } catch (error) {
+          console.error('Error processing answer:', error);
+        }
       }
     })
     .subscribe();
@@ -3123,7 +3230,7 @@ function startRealtime() {
             body: payload.new.message.length > 100 ? 
               payload.new.message.substring(0, 100) + '...' : 
               payload.new.message,
-            icon: 'logo.jpg'
+            icon: 'foto.webp'
           });
         }
       }
@@ -3158,14 +3265,14 @@ function showIncomingCallNotification(callData) {
   
   notification.style.display = 'block';
   
-  // Auto hide after 45 seconds
+  // Auto hide after 60 seconds
   setTimeout(() => {
     if(notification.style.display !== 'none') {
       notification.style.display = 'none';
       // Auto reject if not answered
       rejectIncomingCall(callData.id);
     }
-  }, 45000);
+  }, 60000);
 }
 
 async function acceptIncomingCall(callId) {
@@ -3185,11 +3292,6 @@ async function acceptIncomingCall(callId) {
     chatTarget = callData.caller;
     callType = callData.type;
     
-    // Update call status to connected
-    await sb.from(TABLE_CALLS)
-      .update({ status: 'accepted' })
-      .eq('id', callId);
-    
     // Show call modal
     showCallModal('incoming');
     
@@ -3201,13 +3303,6 @@ async function acceptIncomingCall(callId) {
     
     try {
       localStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if(callType === 'video') {
-        const localVideo = document.getElementById('local-video');
-        localVideo.srcObject = localStream;
-        document.getElementById('video-container').style.display = 'block';
-        document.getElementById('call-info').style.display = 'none';
-      }
       
       // Setup WebRTC
       await setupPeerConnection();
@@ -3225,7 +3320,7 @@ async function acceptIncomingCall(callId) {
       // Save answer to database
       await sb.from(TABLE_CALLS)
         .update({ 
-          answer: JSON.stringify(answer),
+          answer: JSON.stringify(peerConnection.localDescription),
           status: 'connected'
         })
         .eq('id', callId);
@@ -3243,7 +3338,7 @@ async function acceptIncomingCall(callId) {
     
   } catch (error) {
     console.error('Error accepting call:', error);
-    showNotification('Gagal menerima panggilan', 'error');
+    showNotification('Gagal menerima panggilan: ' + error.message, 'error');
     endCall();
   }
 }
@@ -3256,7 +3351,7 @@ async function rejectIncomingCall(callId) {
     // Update call status to rejected
     await sb.from(TABLE_CALLS)
       .update({ 
-        status: 'ended',
+        status: 'rejected',
         ended_at: new Date().toISOString(),
         duration: 0
       })
@@ -3276,6 +3371,411 @@ async function updateOnlineStatus() {
       .eq('username', currentUser);
   } catch (error) {
     console.error('Error updating online status:', error);
+  }
+}
+
+// ===== GROUP CHAT FUNCTIONS =====
+function openGroupChat() {
+  if(!currentUser) {
+    showNotification('Login terlebih dahulu', 'error');
+    return;
+  }
+  
+  document.getElementById('group-chat-modal').classList.add('show');
+  loadGroupList();
+}
+
+function closeGroupChat() {
+  document.getElementById('group-chat-modal').classList.remove('show');
+}
+
+async function loadGroupList() {
+  const container = document.getElementById('group-list');
+  container.innerHTML = '<div class="loading">Memuat daftar grup...</div>';
+  
+  try {
+    // Get groups where user is a member
+    const {data: memberships, error: membersError} = await sb.from(TABLE_GROUP_MEMBERS)
+      .select('group_id')
+      .eq('username', currentUser);
+    
+    if(membersError) throw membersError;
+    
+    if(!memberships || memberships.length === 0) {
+      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada grup. Buat grup baru!</p>';
+      return;
+    }
+    
+    const groupIds = memberships.map(m => m.group_id);
+    
+    // Get group details
+    const {data: groups, error: groupsError} = await sb.from(TABLE_GROUPS)
+      .select('*')
+      .in('id', groupIds)
+      .order('created_at', { ascending: false });
+    
+    if(groupsError) throw groupsError;
+    
+    container.innerHTML = '';
+    
+    if(groups && groups.length > 0) {
+      // Get member counts for each group
+      for(let group of groups) {
+        const {data: memberCount} = await sb.from(TABLE_GROUP_MEMBERS)
+          .select('username', { count: 'exact' })
+          .eq('group_id', group.id);
+        
+        group.memberCount = memberCount ? memberCount.length : 0;
+        
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'group-item';
+        groupDiv.onclick = () => openGroupRoom(group.id);
+        
+        groupDiv.innerHTML = `
+          <div class="group-avatar">
+            <img src="${group.group_image || 'foto.webp'}" alt="${group.name}" onerror="this.src='foto.webp'">
+          </div>
+          <div class="group-info">
+            <div class="group-name">${group.name}</div>
+            ${group.description ? `<div class="group-desc">${group.description}</div>` : ''}
+            <div class="group-members">${group.memberCount} anggota</div>
+          </div>
+        `;
+        
+        container.appendChild(groupDiv);
+      }
+    } else {
+      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada grup. Buat grup baru!</p>';
+    }
+  } catch (error) {
+    console.error('Error loading group list:', error);
+    container.innerHTML = '<div class="error-message">Gagal memuat daftar grup</div>';
+  }
+}
+
+function showCreateGroupModal() {
+  closeGroupChat();
+  document.getElementById('create-group-modal').classList.add('show');
+  loadUsersForGroup();
+}
+
+function closeCreateGroupModal() {
+  document.getElementById('create-group-modal').classList.remove('show');
+  document.getElementById('group-name').value = '';
+  document.getElementById('group-desc').value = '';
+  document.getElementById('group-photo-input').value = '';
+  document.getElementById('group-photo-preview').style.display = 'none';
+}
+
+async function loadUsersForGroup() {
+  const select = document.getElementById('group-members');
+  select.innerHTML = '<option value="" disabled>Memuat pengguna...</option>';
+  
+  try {
+    const {data, error} = await sb.from(TABLE_KLIKUSER)
+      .select('username')
+      .neq('username', currentUser)
+      .order('username', { ascending: true });
+
+    if(error) throw error;
+
+    select.innerHTML = '';
+    
+    if(data && data.length > 0) {
+      data.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.username;
+        option.textContent = user.username;
+        select.appendChild(option);
+      });
+    } else {
+      select.innerHTML = '<option value="" disabled>Tidak ada pengguna lain</option>';
+    }
+  } catch (error) {
+    console.error('Error loading users:', error);
+    select.innerHTML = '<option value="" disabled>Gagal memuat pengguna</option>';
+  }
+}
+
+function previewGroupPhoto(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  if(!file.type.startsWith('image/')) {
+    showNotification('Hanya file gambar yang diizinkan', 'error');
+    return;
+  }
+  
+  if(file.size > 5 * 1024 * 1024) {
+    showNotification('Ukuran file maksimal 5MB', 'error');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('group-photo-img').src = e.target.result;
+    document.getElementById('group-photo-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function createGroup() {
+  const name = document.getElementById('group-name').value.trim();
+  const description = document.getElementById('group-desc').value.trim();
+  const membersSelect = document.getElementById('group-members');
+  const photoFile = document.getElementById('group-photo-input').files[0];
+  
+  // Validation
+  if(!name) {
+    showNotification('Nama grup harus diisi', 'error');
+    return;
+  }
+  
+  const selectedMembers = Array.from(membersSelect.selectedOptions).map(option => option.value);
+  if(selectedMembers.length === 0) {
+    showNotification('Pilih minimal 1 anggota', 'error');
+    return;
+  }
+  
+  try {
+    let groupImageUrl = null;
+    
+    // Upload group photo if exists
+    if(photoFile) {
+      const fileName = `group_${Date.now()}_${photoFile.name}`;
+      
+      const {data, error: uploadError} = await sb.storage
+        .from('group-photos')
+        .upload(fileName, photoFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if(!uploadError) {
+        const {data: urlData} = sb.storage
+          .from('group-photos')
+          .getPublicUrl(fileName);
+        groupImageUrl = urlData.publicUrl;
+      } else {
+        // Fallback to data URL
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          groupImageUrl = e.target.result;
+        };
+        reader.readAsDataURL(photoFile);
+      }
+    }
+    
+    // Create group
+    const {data: group, error: groupError} = await sb.from(TABLE_GROUPS)
+      .insert({
+        name: name,
+        description: description,
+        group_image: groupImageUrl,
+        created_by: currentUser,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if(groupError) throw groupError;
+    
+    // Add creator as member
+    const membersToAdd = [
+      { group_id: group.id, username: currentUser, joined_at: new Date().toISOString() }
+    ];
+    
+    // Add selected members
+    selectedMembers.forEach(member => {
+      membersToAdd.push({
+        group_id: group.id,
+        username: member,
+        joined_at: new Date().toISOString()
+      });
+    });
+    
+    const {error: membersError} = await sb.from(TABLE_GROUP_MEMBERS)
+      .insert(membersToAdd);
+    
+    if(membersError) throw membersError;
+    
+    showNotification(`Grup "${name}" berhasil dibuat`, 'success');
+    closeCreateGroupModal();
+    openGroupChat(); // Refresh group list
+    
+  } catch (error) {
+    console.error('Error creating group:', error);
+    showNotification('Gagal membuat grup: ' + error.message, 'error');
+  }
+}
+
+function openGroupRoom(groupId) {
+  currentGroup = groupId;
+  loadGroupRoom();
+}
+
+async function loadGroupRoom() {
+  if(!currentGroup) return;
+  
+  try {
+    // Get group info
+    const {data: group, error: groupError} = await sb.from(TABLE_GROUPS)
+      .select('*')
+      .eq('id', currentGroup)
+      .single();
+    
+    if(groupError) throw groupError;
+    
+    document.getElementById('group-room-title').textContent = group.name;
+    document.getElementById('group-room-modal').classList.add('show');
+    document.getElementById('group-room-input').focus();
+    
+    // Load group messages
+    await loadGroupMessages();
+    
+    // Start group chat subscription
+    startGroupChatSubscription();
+    
+  } catch (error) {
+    console.error('Error loading group room:', error);
+    showNotification('Gagal membuka grup', 'error');
+  }
+}
+
+async function loadGroupMessages() {
+  const container = document.getElementById('group-room-messages');
+  container.innerHTML = '<div class="loading">Memuat pesan grup...</div>';
+  
+  try {
+    const {data, error} = await sb.from(TABLE_GROUP_CHAT)
+      .select('*')
+      .eq('group_id', currentGroup)
+      .order('created_at', { ascending: true })
+      .limit(100);
+
+    if(error) throw error;
+
+    container.innerHTML = '';
+    
+    if(data && data.length > 0) {
+      data.forEach(msg => {
+        const time = new Date(msg.created_at).toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        const isSent = msg.sender === currentUser;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isSent ? 'sent' : ''}`;
+        messageDiv.innerHTML = `
+          <div class="message-header">
+            <span class="sender-name">${msg.sender}</span>
+            <span class="message-time">${time}</span>
+          </div>
+          <div class="message-content">
+            ${msg.message.startsWith('data:image') ? 
+              `<img src="${msg.message}" alt="Gambar" style="max-width:200px;">` : 
+              msg.message}
+          </div>
+        `;
+        
+        container.appendChild(messageDiv);
+      });
+      
+      container.scrollTop = container.scrollHeight;
+    } else {
+      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada pesan di grup ini</p>';
+    }
+  } catch (error) {
+    console.error('Error loading group messages:', error);
+    container.innerHTML = '<div class="error-message">Gagal memuat pesan grup</div>';
+  }
+}
+
+function startGroupChatSubscription() {
+  if(groupChatSubscription) {
+    sb.removeChannel(groupChatSubscription);
+  }
+  
+  groupChatSubscription = sb.channel('group-chat-realtime')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: TABLE_GROUP_CHAT,
+      filter: `group_id=eq.${currentGroup}`
+    }, (payload) => {
+      addGroupMessageToDOM(payload.new);
+    })
+    .subscribe();
+}
+
+function addGroupMessageToDOM(msg) {
+  const container = document.getElementById('group-room-messages');
+  
+  const time = new Date(msg.created_at).toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  const isSent = msg.sender === currentUser;
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${isSent ? 'sent' : ''}`;
+  messageDiv.innerHTML = `
+    <div class="message-header">
+      <span class="sender-name">${msg.sender}</span>
+      <span class="message-time">${time}</span>
+    </div>
+    <div class="message-content">
+      ${msg.message.startsWith('data:image') ? 
+        `<img src="${msg.message}" alt="Gambar" style="max-width:200px;">` : 
+        msg.message}
+    </div>
+  `;
+  
+  container.appendChild(messageDiv);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendGroupRoomMessage() {
+  const input = document.getElementById('group-room-input');
+  const message = input.value.trim();
+  
+  if(!message || !currentGroup || !currentUser) return;
+  
+  try {
+    const {error} = await sb.from(TABLE_GROUP_CHAT)
+      .insert({
+        group_id: currentGroup,
+        sender: currentUser,
+        message: message
+      });
+
+    if(error) throw error;
+
+    input.value = '';
+  } catch (error) {
+    console.error('Error sending group message:', error);
+    showNotification('Gagal mengirim pesan grup', 'error');
+  }
+}
+
+function handleGroupRoomKeyPress(e) {
+  if(e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendGroupRoomMessage();
+  }
+}
+
+function closeGroupRoom() {
+  document.getElementById('group-room-modal').classList.remove('show');
+  document.getElementById('group-room-input').value = '';
+  currentGroup = null;
+  
+  if(groupChatSubscription) {
+    sb.removeChannel(groupChatSubscription);
+    groupChatSubscription = null;
   }
 }
 
@@ -3407,82 +3907,6 @@ function handleGlobalChatKeyPress(e) {
   }
 }
 
-function scrollToBottom(type) {
-  const container = type === 'global' ? 
-    document.getElementById('global-chat-messages') : 
-    document.getElementById('chat-messages');
-  
-  if(container) {
-    container.scrollTop = container.scrollHeight;
-  }
-}
-
-// ===== USER LIST =====
-function openUserList() {
-  if(!currentUser) {
-    showNotification('Login terlebih dahulu', 'error');
-    return;
-  }
-  
-  document.getElementById('user-list-modal').classList.add('show');
-  loadUserList();
-}
-
-function closeUserList() {
-  document.getElementById('user-list-modal').classList.remove('show');
-}
-
-async function loadUserList() {
-  const container = document.getElementById('user-list');
-  container.innerHTML = '<div class="loading">Memuat daftar pengguna...</div>';
-  
-  try {
-    const {data, error} = await sb.from(TABLE_KLIKUSER)
-      .select('username, profile_image, last_seen, bio')
-      .neq('username', currentUser)
-      .order('username', { ascending: true });
-
-    if(error) throw error;
-
-    container.innerHTML = '';
-    
-    if(data && data.length > 0) {
-      data.forEach(user => {
-        const isOnline = user.last_seen && (Date.now() - new Date(user.last_seen).getTime()) < 30000;
-        const profileImage = user.profile_image || 'foto.webp';
-        
-        const userDiv = document.createElement('div');
-        userDiv.className = 'user-item';
-        userDiv.onclick = () => {
-          closeUserList();
-          openChat(user.username);
-        };
-        
-        userDiv.innerHTML = `
-          <div class="user-item-avatar">
-            <img src="${profileImage}" alt="${user.username}" onerror="this.src='foto.webp'">
-          </div>
-          <div class="user-item-info">
-            <div class="user-item-name">${user.username}</div>
-            <div class="user-item-status">
-              <span class="status-dot ${isOnline ? 'online' : ''}"></span>
-              <span>${isOnline ? 'Online' : 'Offline'}</span>
-              ${user.bio ? `<span style="margin-left:10px;">${user.bio.substring(0, 20)}${user.bio.length > 20 ? '...' : ''}</span>` : ''}
-            </div>
-          </div>
-        `;
-        
-        container.appendChild(userDiv);
-      });
-    } else {
-      container.innerHTML = '<p style="text-align:center;opacity:0.5;padding:40px;">Belum ada pengguna lain</p>';
-    }
-  } catch (error) {
-    console.error('Error loading user list:', error);
-    container.innerHTML = '<div class="error-message">Gagal memuat daftar pengguna</div>';
-  }
-}
-
 // ===== CALL HISTORY =====
 function openCallHistory() {
   if(!currentUser) {
@@ -3542,6 +3966,9 @@ async function loadCallHistory() {
         } else if(call.status === 'calling' || call.status === 'waiting') {
           statusClass = 'missed';
           statusText = 'Tidak terjawab';
+        } else if(call.status === 'rejected') {
+          statusClass = 'missed';
+          statusText = 'Ditolak';
         }
         
         const startTime = new Date(call.started_at).toLocaleTimeString('id-ID', {
@@ -3641,6 +4068,14 @@ function handleFileUpload(event) {
           .insert({
             sender: currentUser,
             receiver: chatTarget,
+            message: imageData
+          });
+      } else if(currentGroup) {
+        // Send to group chat
+        await sb.from(TABLE_GROUP_CHAT)
+          .insert({
+            group_id: currentGroup,
+            sender: currentUser,
             message: imageData
           });
       } else {
